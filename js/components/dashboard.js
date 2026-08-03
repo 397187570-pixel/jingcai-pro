@@ -5,13 +5,15 @@
  */
 
 /* 依赖解析：浏览器用全局，Node 用 require */
-let esc, deVigOdds, eloPredict;
+let esc, deVigOdds, eloPredict, calibrateProbability;
 if (typeof window !== 'undefined' && window.esc) {
   esc = window.esc; deVigOdds = window.deVigOdds; eloPredict = window.eloPredict;
+  calibrateProbability = window.Calibration ? window.Calibration.calibrateProbability : null;
 } else {
   const utils = require('../core/utils.js');
   const predictor = require('../engine/predictor.js');
   esc = utils.esc; deVigOdds = utils.deVigOdds; eloPredict = predictor.eloPredict;
+  try { calibrateProbability = require('../engine/calibration.js').calibrateProbability; } catch (e) { calibrateProbability = null; }
 }
 
 /* ============================================
@@ -53,6 +55,16 @@ function renderDashboard(matches) {
     }
     const conf = Math.max(probs.homeWin, probs.draw, probs.awayWin);
 
+    // 真实置信度（校准后）
+    let realConf = conf, calNote = '';
+    if (calibrateProbability) {
+      const cal = calibrateProbability(conf / 100);
+      if (cal.calibrated !== conf / 100) {
+        realConf = cal.calibrated * 100;
+        calNote = `<div style="font-size:9px;color:var(--text-muted);margin-top:1px;">真实 ${realConf.toFixed(0)}%</div>`;
+      }
+    }
+
     const oddsHtml = odds.h ? `
       <span class="odds-t" style="color:var(--c-red);">${odds.h.toFixed(2)}</span>
       <span class="odds-t" style="color:var(--c-amber);">${(odds.d||0).toFixed(2)}</span>
@@ -72,8 +84,9 @@ function renderDashboard(matches) {
         ${oddsHtml}
       </div>
       <div class="match-conf" style="text-align:center;">
-        <span class="badge ${conf >= 65 ? 'badge-green' : conf >= 50 ? 'badge-amber' : 'badge-blue'}" style="font-size:12px;">${conf.toFixed(0)}%</span>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">置信度</div>
+        <span class="badge ${realConf >= 65 ? 'badge-green' : realConf >= 50 ? 'badge-amber' : 'badge-blue'}" style="font-size:12px;">${realConf.toFixed(0)}%</span>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">真实置信度</div>
+        ${calNote}
       </div>
     </div>`;
   }).join('');

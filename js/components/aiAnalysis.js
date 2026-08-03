@@ -5,16 +5,18 @@
  */
 
 /* 依赖解析：浏览器用全局，Node 用 require */
-let esc, deVigOdds, eloPredict, findValueBets, CONFIG;
+let esc, deVigOdds, eloPredict, findValueBets, CONFIG, calibrateProbability;
 if (typeof window !== 'undefined' && window.esc) {
   esc = window.esc; deVigOdds = window.deVigOdds; eloPredict = window.eloPredict;
   findValueBets = window.findValueBets; CONFIG = window.CONFIG;
+  calibrateProbability = window.Calibration ? window.Calibration.calibrateProbability : null;
 } else {
   const utils = require('../core/utils.js');
   const predictor = require('../engine/predictor.js');
   esc = utils.esc; deVigOdds = utils.deVigOdds;
   eloPredict = predictor.eloPredict; findValueBets = predictor.findValueBets;
   CONFIG = require('../../config/config.js');
+  try { calibrateProbability = require('../engine/calibration.js').calibrateProbability; } catch (e) { calibrateProbability = null; }
 }
 
 /* ============================================
@@ -45,6 +47,13 @@ function renderAIRecommendations(matches) {
     }
     const conf = Math.max(probs.homeWin, probs.draw, probs.awayWin);
 
+    // 真实置信度（校准后）
+    let realConf = conf;
+    if (calibrateProbability) {
+      const cal = calibrateProbability(conf);
+      if (cal.calibrated !== conf) realConf = cal.calibrated;
+    }
+
     let pred, predClass, betOdd;
     if (probs.homeWin >= probs.draw && probs.homeWin >= probs.awayWin) {
       pred = '主胜'; predClass = 'win'; betOdd = odds.h || 0;
@@ -60,7 +69,7 @@ function renderAIRecommendations(matches) {
       league: m.league || '竞彩',
       pred, predClass,
       odds: betOdd ? betOdd.toFixed(2) : '--',
-      conf: (conf * 100).toFixed(0) + '%'
+      conf: (realConf * 100).toFixed(0) + '%'
     };
   });
 

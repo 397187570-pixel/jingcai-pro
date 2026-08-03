@@ -33,7 +33,10 @@
     "renderAnalysisList": "readonly",
     "renderAnalysisDetail": "readonly",
     "renderToolbox": "readonly",
-    "addBetRecord": "readonly"
+    "addBetRecord": "readonly",
+    "MLModel": "readonly",
+    "Calibration": "readonly",
+    "Fundamentals": "readonly"
   },
   "rules": {
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
