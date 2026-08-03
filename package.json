@@ -4,17 +4,24 @@
   "description": "竞彩智选 Pro - 模块化重构版",
   "main": "index.html",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "node tests/run-tests.js",
     "test:utils": "node tests/utils.test.js",
     "test:predictor": "node tests/predictor.test.js",
+    "test:api": "node tests/api.test.js",
+    "test:components": "node tests/components.test.js",
     "lint": "eslint js/ config/ --ext .js",
     "lint:fix": "eslint js/ config/ --ext .js --fix",
     "format": "prettier --write 'js/**/*.js' 'config/**/*.js'",
-    "check": "npm run lint && npm run test"
+    "check": "npm run lint && npm run test",
+    "build:check": "npm run test && npm run build"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "vite": "^5.4.0"
   },
   "engines": {
     "node": ">=16.0.0"
