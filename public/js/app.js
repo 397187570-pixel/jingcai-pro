@@ -124,14 +124,75 @@ async function scanValueBets() {
   const key = AppState.settings.oddsKey || '';
   if (!key) {
     toast('warn', '⚠️', '请先配置 The Odds API Key');
-    document.getElementById('valueBetListModular').innerHTML =
-      '<div style="padding:10px;background:var(--c-amber-dim);color:var(--c-amber);font-size:12px;">⚠️ 未配置 The Odds API Key — 请在控制台 AppState.settings.oddsKey 设置</div>';
+    showKeySetup();
     return;
   }
   await scanValueBetsModular(AppState.matches, async () => {
     const r = await OddsApi.getOdds('soccer_epl', key);
     return r.ok ? r.data : [];
   });
+}
+
+/* ============================================
+   API Key 可视化设置
+   ============================================ */
+function showKeySetup() {
+  const el = document.getElementById('valueBetListModular');
+  if (!el) return;
+  const current = AppState.settings.oddsKey || '';
+  el.innerHTML = `
+    <div style="padding:14px;background:var(--c-amber-dim);border-radius:8px;border:1px solid var(--c-amber);">
+      <div style="font-size:13px;font-weight:600;color:var(--c-amber);margin-bottom:8px;">⚠️ 未配置 The Odds API Key</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.6;">
+        免费版 500 次/月，<a href="https://the-odds-api.com/" target="_blank" style="color:var(--c-blue);">the-odds-api.com</a> 注册即可
+      </div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="oddsKeyInput" placeholder="粘贴 API Key（形如 ghp_xxx 或纯随机串）"
+          value="${esc(current)}"
+          style="flex:1;padding:8px 10px;border:1px solid var(--border-strong);border-radius:6px;font-size:12px;font-family:var(--font-mono);background:var(--bg-card);color:var(--text-primary);" />
+        <button class="btn btn-primary" id="saveKeyBtn" style="font-size:12px;">💾 保存</button>
+        <button class="btn" id="clearKeyBtn" style="font-size:12px;">清除</button>
+      </div>
+      <div id="keyTestStatus" style="margin-top:8px;font-size:11px;"></div>
+    </div>`;
+  // 绑定
+  const saveBtn = document.getElementById('saveKeyBtn');
+  const clearBtn = document.getElementById('clearKeyBtn');
+  if (saveBtn) saveBtn.addEventListener('click', saveOddsKey);
+  if (clearBtn) clearBtn.addEventListener('click', clearOddsKey);
+}
+
+/**
+ * 保存 API Key 到 localStorage
+ */
+async function saveOddsKey() {
+  const input = document.getElementById('oddsKeyInput');
+  const status = document.getElementById('keyTestStatus');
+  if (!input || !status) return;
+  const key = input.value.trim();
+  if (!key) {
+    status.innerHTML = '<span style="color:var(--c-red);">❌ Key 不能为空</span>';
+    return;
+  }
+  status.innerHTML = '<span style="color:var(--text-muted);">⏳ 验证 Key...</span>';
+  // 真实验证（实时调用一次 API）
+  const r = await OddsApi.getOdds('soccer_epl', key);
+  if (r.ok) {
+    AppState.settings.oddsKey = key;
+    localStorage.setItem('jc_settings', JSON.stringify(AppState.settings));
+    status.innerHTML = `<span style="color:var(--c-green);">✅ Key 有效（找到 ${r.data.length} 场比赛）</span>`;
+    toast('success', '✅', 'API Key 已保存，可扫描价值注');
+    setTimeout(() => scanValueBets(), 1000);
+  } else {
+    status.innerHTML = `<span style="color:var(--c-red);">❌ Key 无效：${esc(r.error)}</span>`;
+  }
+}
+
+function clearOddsKey() {
+  AppState.settings.oddsKey = '';
+  localStorage.removeItem('jc_settings');
+  showKeySetup();
+  toast('info', '🗑', 'API Key 已清除');
 }
 
 /* ============================================
