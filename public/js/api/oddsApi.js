@@ -8,7 +8,11 @@ let CONFIG;
 if (typeof window !== 'undefined' && window.CONFIG) {
   CONFIG = window.CONFIG;
 } else {
-  CONFIG = require('../../config/config.js');
+  try {
+    CONFIG = require('../../config/config.js');
+  } catch (e) {
+    CONFIG = { dataSources: { oddsApi: {} } };
+  }
 }
 
 /**

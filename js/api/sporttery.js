@@ -8,7 +8,12 @@ let CONFIG;
 if (typeof window !== 'undefined' && window.CONFIG) {
   CONFIG = window.CONFIG;
 } else {
-  CONFIG = require('../../config/config.js');
+  try {
+    CONFIG = require('../../config/config.js');
+  } catch (e) {
+    /* 浏览器无 require，全局 CONFIG 不存在时降级为空对象 */
+    CONFIG = { dataSources: { sporttery: {} } };
+  }
 }
 
 /**
