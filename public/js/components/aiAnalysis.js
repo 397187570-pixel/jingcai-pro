@@ -4,6 +4,19 @@
  * 依赖：utils.js (esc/deVigOdds)、predictor.js (eloPredict/findValueBets)
  */
 
+/* 依赖解析：浏览器用全局，Node 用 require */
+let esc, deVigOdds, eloPredict, findValueBets, CONFIG;
+if (typeof window !== 'undefined' && window.esc) {
+  esc = window.esc; deVigOdds = window.deVigOdds; eloPredict = window.eloPredict;
+  findValueBets = window.findValueBets; CONFIG = window.CONFIG;
+} else {
+  const utils = require('../core/utils.js');
+  const predictor = require('../engine/predictor.js');
+  esc = utils.esc; deVigOdds = utils.deVigOdds;
+  eloPredict = predictor.eloPredict; findValueBets = predictor.findValueBets;
+  CONFIG = require('../../config/config.js');
+}
+
 /* ============================================
    渲染 AI 推荐列表
    ============================================ */

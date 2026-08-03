@@ -4,6 +4,16 @@
  * 依赖：utils.js (esc/deVigOdds)、predictor.js (eloPredict)、CONFIG
  */
 
+/* 依赖解析：浏览器用全局，Node 用 require */
+let esc, deVigOdds, eloPredict;
+if (typeof window !== 'undefined' && window.esc) {
+  esc = window.esc; deVigOdds = window.deVigOdds; eloPredict = window.eloPredict;
+} else {
+  const utils = require('../core/utils.js');
+  const predictor = require('../engine/predictor.js');
+  esc = utils.esc; deVigOdds = utils.deVigOdds; eloPredict = predictor.eloPredict;
+}
+
 /* ============================================
    渲染数据看板
    ============================================ */

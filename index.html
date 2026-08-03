@@ -26,11 +26,12 @@
 
     <!-- 主内容 -->
     <main class="main-content">
+      <!-- 📊 数据看板 -->
       <div id="page-dashboard" class="page active">
         <div class="page-header">
           <div>
             <div class="page-title">数据看板</div>
-            <div class="page-subtitle">模块化架构示范版 · 2026-08-03</div>
+            <div class="page-subtitle">竞彩官方实时数据 · 模块化版 v2.0</div>
           </div>
           <div class="header-actions">
             <select class="refresh-interval-select" id="refreshIntervalSelect">
@@ -42,57 +43,125 @@
           </div>
         </div>
         <div class="grid grid-4">
-          <div class="card"><div class="page-subtitle">今日比赛</div><div class="page-title" id="statMatches">--</div></div>
-          <div class="card"><div class="page-subtitle">高置信推荐</div><div class="page-title" id="statConf">--</div></div>
+          <div class="card"><div class="page-subtitle">今日比赛</div><div class="page-title" id="kpiTotal">--</div></div>
+          <div class="card"><div class="page-subtitle">高置信推荐</div><div class="page-title" id="kpiHigh">--</div></div>
+          <div class="card"><div class="page-subtitle">德比/焦点</div><div class="page-title" id="kpiFeatured">--</div></div>
           <div class="card"><div class="page-subtitle">数据源</div><div class="page-title" id="statSource">--</div></div>
-          <div class="card"><div class="page-subtitle">状态</div><div class="page-title" id="statStatus">--</div></div>
         </div>
         <div class="grid" style="margin-top:16px;">
           <div class="card">
-            <div class="page-subtitle" style="margin-bottom:12px;">⚽ 比赛列表（来自 sporttery API 模块）</div>
+            <div class="page-subtitle" style="margin-bottom:12px;">⚽ 比赛列表（点击进入深度分析）</div>
             <div id="matchList"></div>
           </div>
         </div>
       </div>
 
+      <!-- 📈 深度分析 -->
       <div id="page-analysis" class="page">
         <div class="page-header">
           <div>
             <div class="page-title">深度分析</div>
-            <div class="page-subtitle">Elo + 泊松融合预测 · predictor.js 模块</div>
+            <div class="page-subtitle">Elo + 泊松融合预测 · 点击比赛下钻</div>
           </div>
         </div>
-        <div class="card"><div id="analysisList"></div></div>
+        <div id="analysisList" class="card"></div>
+        <div id="analysisDetail" style="margin-top:16px;"></div>
       </div>
 
+      <!-- 🎲 赔率监测 -->
       <div id="page-odds" class="page">
         <div class="page-header">
           <div>
             <div class="page-title">赔率监测</div>
-            <div class="page-subtitle">oddsApi.js 模块 · 国际赔率对比</div>
+            <div class="page-subtitle">6 大博彩公司赔率对比 · 凯利指数分析</div>
           </div>
         </div>
-        <div class="card"><div id="oddsPanel">配置 The Odds API Key 后点击扫描</div></div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="font-size:14px;font-weight:600;">📊 胜平负赔率对比</div>
+            <span class="badge badge-blue">竞彩官方</span>
+          </div>
+          <table class="table">
+            <thead><tr><th>公司</th><th>主胜</th><th>平局</th><th>客胜</th><th>返还率</th><th>凯利</th><th>状态</th></tr></thead>
+            <tbody id="oddsTableBody"></tbody>
+          </table>
+        </div>
+        <div class="grid grid-2" style="margin-top:16px;">
+          <div class="card">
+            <div style="font-size:14px;font-weight:600;margin-bottom:12px;">⚖️ 亚盘</div>
+            <table class="table"><tbody id="asianTableBody"></tbody></table>
+          </div>
+          <div class="card">
+            <div style="font-size:14px;font-weight:600;margin-bottom:12px;">⚽ 大小球</div>
+            <table class="table"><tbody id="ouTableBody"></tbody></table>
+          </div>
+        </div>
+        <div class="grid grid-2" style="margin-top:16px;">
+          <div class="card">
+            <div style="font-size:14px;font-weight:600;margin-bottom:12px;">🎯 比分玩法</div>
+            <div class="score-grid" id="scoreGrid"></div>
+          </div>
+          <div class="card">
+            <div style="font-size:14px;font-weight:600;margin-bottom:12px;">🔢 总进球</div>
+            <div class="goals-grid" id="goalsGrid"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">🔄 半全场</div>
+          <div class="htft-grid" id="htftGrid"></div>
+        </div>
+        <div class="card" style="margin-top:16px;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">⚠️ 诱盘/风险信号</div>
+          <div class="trap-list" id="trapList"></div>
+        </div>
       </div>
 
+      <!-- 🧠 AI 研判 -->
       <div id="page-ai" class="page">
         <div class="page-header">
           <div>
             <div class="page-title">AI 研判</div>
-            <div class="page-subtitle">valueBet 引擎 · 置信度校准</div>
+            <div class="page-subtitle">高置信推荐 · 价值注检测</div>
           </div>
         </div>
-        <div class="card"><div id="aiPanel">基于 predictor.js 的置信度推荐</div></div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="font-size:14px;font-weight:600;">🎯 高置信投注建议</div>
+            <button class="btn" id="scanValueBtn">💎 扫描价值注</button>
+          </div>
+          <div id="aiRecList"></div>
+        </div>
+        <div class="card" style="margin-top:16px;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">💎 价值注检测</div>
+          <div id="valueBetListModular" style="min-height:40px;color:var(--text-muted);font-size:12px;">配置 The Odds API Key 后点击"扫描价值注"</div>
+        </div>
       </div>
 
+      <!-- 🛠️ 个人工具箱 -->
       <div id="page-toolbox" class="page">
         <div class="page-header">
           <div>
             <div class="page-title">个人工具箱</div>
-            <div class="page-subtitle">localStorage 持久化</div>
+            <div class="page-subtitle">投注记录 · localStorage 持久化</div>
           </div>
         </div>
-        <div class="card">工具箱模块（开发中）</div>
+        <div class="grid grid-4" style="margin-bottom:16px;">
+          <div class="card"><div class="page-subtitle">总投注</div><div class="page-title" id="toolboxTotal">0</div></div>
+          <div class="card"><div class="page-subtitle">命中</div><div class="page-title" id="toolboxWin" style="color:var(--c-green);">0</div></div>
+          <div class="card"><div class="page-subtitle">未中</div><div class="page-title" id="toolboxLoss" style="color:var(--c-red);">0</div></div>
+          <div class="card"><div class="page-subtitle">净盈亏</div><div class="page-title" id="toolboxProfit" style="color:var(--c-amber);">¥0</div></div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">📋 投注记录</div>
+          <table class="table">
+            <thead><tr><th>日期</th><th>比赛</th><th>玩法</th><th>赔率</th><th>金额</th><th>结果</th><th>盈亏</th></tr></thead>
+            <tbody id="betTableBody"></tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-top:16px;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">⭐ 关注球队</div>
+          <div id="followList"></div>
+        </div>
       </div>
     </main>
   </div>
