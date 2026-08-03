@@ -1,0 +1,40 @@
+name: Weekly Calibration
+
+on:
+  schedule:
+    # 每周日凌晨 3:00 运行（UTC）→ 北京时间上午 11:00
+    - cron: '0 3 * * 0'
+  workflow_dispatch:  # 支持手动触发
+
+permissions:
+  contents: write   # 允许提交校准结果
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Collect data & calibrate
+        run: |
+          cd ml
+          python3 collect_and_calibrate.py --months 3
+          python3 backtest.py | tee backtest_latest.txt
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git diff --quiet js/engine/calibration.json || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit updated calibration
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "Calibration Bot"
+          git config user.email "bot@jingcai-pro.local"
+          git add js/engine/calibration.json ml/data/ ml/backtest_latest.txt
+          git commit -m "chore: 自动校准更新（每周）$(date +%Y-%m-%d)"
+          git push
