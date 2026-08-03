@@ -1,0 +1,22 @@
+{
+  "name": "jingcai-pro",
+  "version": "2.0.0",
+  "description": "竞彩智选 Pro - 模块化重构版",
+  "main": "index.html",
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "test:utils": "node tests/utils.test.js",
+    "test:predictor": "node tests/predictor.test.js",
+    "lint": "eslint js/ config/ --ext .js",
+    "lint:fix": "eslint js/ config/ --ext .js --fix",
+    "format": "prettier --write 'js/**/*.js' 'config/**/*.js'",
+    "check": "npm run lint && npm run test"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

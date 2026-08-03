@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>竞彩智选 Pro · 模块化版</title>
+
+  <!-- 样式模块化引入 -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- 侧边导航 -->
+    <aside class="sidebar">
+      <div class="brand">⚽ 竞彩智选</div>
+      <nav>
+        <button class="nav-tab active" data-page="dashboard">📊 <span>数据看板</span></button>
+        <button class="nav-tab" data-page="analysis">📈 <span>深度分析</span></button>
+        <button class="nav-tab" data-page="odds">🎲 <span>赔率监测</span></button>
+        <button class="nav-tab" data-page="ai">🧠 <span>AI 研判</span></button>
+        <button class="nav-tab" data-page="toolbox">🛠️ <span>个人工具箱</span></button>
+      </nav>
+    </aside>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+      <div id="page-dashboard" class="page active">
+        <div class="page-header">
+          <div>
+            <div class="page-title">数据看板</div>
+            <div class="page-subtitle">模块化架构示范版 · 2026-08-03</div>
+          </div>
+          <div class="header-actions">
+            <select class="refresh-interval-select" id="refreshIntervalSelect">
+              <option value="30" selected>30 秒</option>
+              <option value="60">60 秒</option>
+              <option value="300">5 分钟</option>
+            </select>
+            <button class="btn" id="refreshBtn">🔄 刷新</button>
+          </div>
+        </div>
+        <div class="grid grid-4">
+          <div class="card"><div class="page-subtitle">今日比赛</div><div class="page-title" id="statMatches">--</div></div>
+          <div class="card"><div class="page-subtitle">高置信推荐</div><div class="page-title" id="statConf">--</div></div>
+          <div class="card"><div class="page-subtitle">数据源</div><div class="page-title" id="statSource">--</div></div>
+          <div class="card"><div class="page-subtitle">状态</div><div class="page-title" id="statStatus">--</div></div>
+        </div>
+        <div class="grid" style="margin-top:16px;">
+          <div class="card">
+            <div class="page-subtitle" style="margin-bottom:12px;">⚽ 比赛列表（来自 sporttery API 模块）</div>
+            <div id="matchList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="page-analysis" class="page">
+        <div class="page-header">
+          <div>
+            <div class="page-title">深度分析</div>
+            <div class="page-subtitle">Elo + 泊松融合预测 · predictor.js 模块</div>
+          </div>
+        </div>
+        <div class="card"><div id="analysisList"></div></div>
+      </div>
+
+      <div id="page-odds" class="page">
+        <div class="page-header">
+          <div>
+            <div class="page-title">赔率监测</div>
+            <div class="page-subtitle">oddsApi.js 模块 · 国际赔率对比</div>
+          </div>
+        </div>
+        <div class="card"><div id="oddsPanel">配置 The Odds API Key 后点击扫描</div></div>
+      </div>
+
+      <div id="page-ai" class="page">
+        <div class="page-header">
+          <div>
+            <div class="page-title">AI 研判</div>
+            <div class="page-subtitle">valueBet 引擎 · 置信度校准</div>
+          </div>
+        </div>
+        <div class="card"><div id="aiPanel">基于 predictor.js 的置信度推荐</div></div>
+      </div>
+
+      <div id="page-toolbox" class="page">
+        <div class="page-header">
+          <div>
+            <div class="page-title">个人工具箱</div>
+            <div class="page-subtitle">localStorage 持久化</div>
+          </div>
+        </div>
+        <div class="card">工具箱模块（开发中）</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="toastContainer"></div>
+
+  <!-- 模块化引入（顺序：core → config → engine → api → components → app） -->
+  <script src="js/core/utils.js"></script>
+  <script src="config/config.js"></script>
+  <script src="js/engine/predictor.js"></script>
+  <script src="js/api/sporttery.js"></script>
+  <script src="js/api/oddsApi.js"></script>
+  <script src="js/api/corsProxy.js"></script>
+  <script src="js/components/dashboard.js"></script>
+  <script src="js/components/aiAnalysis.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

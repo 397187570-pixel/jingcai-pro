@@ -1,0 +1,209 @@
+/* ============================================
+   components.css — 组件样式
+   竞彩智选 Pro · 通用组件
+   ============================================ */
+
+/* 按钮 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: var(--fs-md);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn:hover { border-color: var(--c-blue); color: var(--c-blue); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--c-blue), var(--c-cyan));
+  border: none;
+  color: #fff;
+}
+
+.btn-primary:hover { opacity: .9; color: #fff; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+/* 卡片 */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+}
+
+.card:hover { box-shadow: var(--shadow-md); }
+
+/* 徽章 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.badge-blue { background: var(--c-blue-dim); color: var(--c-blue); }
+.badge-green { background: var(--c-green-dim); color: var(--c-green); }
+.badge-amber { background: var(--c-amber-dim); color: var(--c-amber); }
+.badge-red { background: var(--c-red-dim); color: var(--c-red); }
+
+/* 状态标签 */
+.status-tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.st-normal { background: var(--c-green-dim); color: var(--c-green); }
+.st-value { background: var(--c-amber-dim); color: var(--c-amber); }
+.st-risk { background: var(--c-red-dim); color: var(--c-red); }
+
+/* 表格 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+
+.table th {
+  text-align: left;
+  padding: var(--space-3);
+  color: var(--text-muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table tr:last-child td { border-bottom: none; }
+.table tbody tr { transition: background var(--transition); }
+.table tbody tr:hover { background: var(--bg-card-hover); }
+
+/* 赔率数字 */
+.odds-t { font-family: var(--font-mono); font-weight: 600; }
+.odds-t.low { color: var(--c-red); }
+
+/* 表单 */
+.form-group { margin-bottom: var(--space-5); }
+.form-label { display: block; font-size: var(--fs-sm); font-weight: 600; margin-bottom: var(--space-2); }
+.form-input {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-md);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color var(--transition);
+}
+.form-input:focus { outline: none; border-color: var(--c-blue); }
+
+/* 开关 */
+.switch {
+  width: 44px; height: 24px;
+  border-radius: 999px;
+  background: var(--border-strong);
+  position: relative;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform var(--transition);
+}
+.switch.on { background: var(--c-green); }
+.switch.on::after { transform: translateX(20px); }
+
+/* 下拉 */
+.refresh-interval-select {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+/* Toast */
+#toastContainer {
+  position: fixed;
+  top: var(--space-5);
+  right: var(--space-5);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--c-blue);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--fs-sm);
+  animation: slideIn .3s var(--ease-premium);
+  transition: all .3s;
+  max-width: 360px;
+}
+.toast.success { border-left-color: var(--c-green); }
+.toast.warn { border-left-color: var(--c-amber); }
+.toast.error { border-left-color: var(--c-red); }
+.toast-text { flex: 1; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* 深度分析列表项 */
+.analysis-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all var(--transition);
+  background: var(--bg-card);
+}
+.analysis-item:hover {
+  border-color: var(--c-blue);
+  box-shadow: 0 2px 12px rgba(59, 130, 246, .12);
+  transform: translateX(4px);
+}
+.analysis-item .ai-num { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--c-blue); min-width: 72px; }
+.analysis-item .ai-teams { flex: 1; font-size: var(--fs-md); font-weight: 600; }
+.analysis-item .ai-league { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 3px; }
+.analysis-item .ai-odds { display: flex; gap: 8px; font-size: var(--fs-xs); font-family: var(--font-mono); }
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

@@ -1,0 +1,129 @@
+/* ============================================
+   layout.css — 布局样式
+   竞彩智选 Pro
+   ============================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  transition: background var(--transition), color var(--transition);
+}
+
+/* 主容器 */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* 侧边栏 */
+.sidebar {
+  width: 200px;
+  background: var(--bg-sidebar);
+  color: var(--text-inverse);
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  padding: var(--space-5) var(--space-3);
+}
+
+.sidebar .brand {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-6);
+  letter-spacing: .5px;
+}
+
+/* 导航 */
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: transparent;
+  color: rgba(248, 250, 252, .7);
+  font-size: var(--fs-md);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all var(--transition);
+  text-align: left;
+}
+
+.nav-tab:hover {
+  background: rgba(255, 255, 255, .08);
+  color: var(--text-inverse);
+}
+
+.nav-tab.active {
+  background: rgba(59, 130, 246, .2);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 主内容 */
+.main-content {
+  flex: 1;
+  margin-left: 200px;
+  padding: var(--space-6);
+}
+
+/* 页面切换 */
+.page { display: none; }
+.page.active { display: block; animation: fadeIn .3s var(--ease-premium); }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 页头 */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.page-title {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+.page-subtitle {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* 卡片网格 */
+.grid { display: grid; gap: var(--space-4); }
+
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .sidebar { width: 60px; }
+  .sidebar .brand span, .nav-tab span:last-child { display: none; }
+  .main-content { margin-left: 60px; padding: var(--space-4); }
+  .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+}
