@@ -173,6 +173,15 @@ function init() {
   }
   setInterval(() => loadMatches(), interval);
 
+  // 加载 ML 模型 + 校准表（异步，不影响首屏）
+  if (typeof MLModel !== 'undefined' && typeof Calibration !== 'undefined') {
+    Promise.all([MLModel.loadModel('js/engine/mlModel.json'), Calibration.loadCalibration('js/engine/calibration.json')])
+      .then(() => {
+        toast('success', '🧠', 'AI 模型 + 真实置信度已加载（' + (Calibration.isCalibrated() ? Calibration.__nMatches() + ' 场历史校准' : '') + '）');
+      })
+      .catch(() => { /* 降级：继续用 Elo */ });
+  }
+
   // 首屏加载
   loadMatches();
 }
