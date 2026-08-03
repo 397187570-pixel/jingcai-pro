@@ -40,6 +40,7 @@
               <option value="300">5 分钟</option>
             </select>
             <button class="btn" id="refreshBtn">🔄 刷新</button>
+            <button class="btn" id="settingsBtn" title="数据源设置">⚙️ 设置</button>
           </div>
         </div>
         <div class="grid grid-4">
@@ -164,6 +165,29 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- ⚙️ 设置弹窗 -->
+  <div class="modal-overlay" id="settingsModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:2000;align-items:center;justify-content:center;">
+    <div class="modal" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:16px;padding:24px;width:90%;max-width:460px;box-shadow:var(--shadow-lg);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="font-size:16px;font-weight:600;">⚙️ 数据源设置</div>
+        <button class="btn" onclick="closeSettings()" style="padding:4px 10px;font-size:13px;">✕</button>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label class="form-label" style="font-size:12px;color:var(--text-secondary);">🔗 SCF 代理地址（可选，解决跨域）</label>
+        <input type="text" class="form-input" id="settingsProxyUrl" placeholder="https://xxx.ap-guangzhou.tencentscf.com" style="font-size:12px;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label class="form-label" style="font-size:12px;color:var(--text-secondary);">🌐 The Odds API Key（价值注检测）</label>
+        <input type="text" class="form-input" id="settingsOddsKey" placeholder="免费注册：the-odds-api.com" style="font-size:12px;font-family:var(--font-mono);">
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">免费版 500 次/月 · <a href="https://the-odds-api.com/" target="_blank" style="color:var(--c-blue);">立即注册</a></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px;">
+        <button class="btn" onclick="closeSettings()" style="font-size:12px;">取消</button>
+        <button class="btn btn-primary" onclick="saveSettings()" style="font-size:12px;">💾 保存设置</button>
+      </div>
+    </div>
   </div>
 
   <!-- Toast -->

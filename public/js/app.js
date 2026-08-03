@@ -220,6 +220,10 @@ function init() {
   const refreshBtn = document.getElementById('refreshBtn');
   if (refreshBtn) refreshBtn.addEventListener('click', loadMatches);
 
+  // 设置按钮
+  const settingsBtn = document.getElementById('settingsBtn');
+  if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
+
   // 价值注扫描
   const scanBtn = document.getElementById('scanValueBtn');
   if (scanBtn) scanBtn.addEventListener('click', scanValueBets);
@@ -248,3 +252,45 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+/* ============================================
+   设置弹窗（⚙️ 右上角）
+   ============================================ */
+function openSettings() {
+  const modal = document.getElementById('settingsModal');
+  if (!modal) return;
+  // 填充当前值
+  const proxyInput = document.getElementById('settingsProxyUrl');
+  if (proxyInput) proxyInput.value = AppState.settings.proxyUrl || '';
+  const keyInput = document.getElementById('settingsOddsKey');
+  if (keyInput) keyInput.value = AppState.settings.oddsKey || '';
+  modal.style.display = 'flex';
+}
+
+function closeSettings() {
+  const modal = document.getElementById('settingsModal');
+  if (modal) modal.style.display = 'none';
+}
+
+/* eslint-disable-next-line no-unused-vars -- 由 HTML onclick 调用 */
+function saveSettings() {
+  const proxyInput = document.getElementById('settingsProxyUrl');
+  const keyInput = document.getElementById('settingsOddsKey');
+  if (proxyInput) AppState.settings.proxyUrl = proxyInput.value.trim();
+  if (keyInput) AppState.settings.oddsKey = keyInput.value.trim();
+  try {
+    localStorage.setItem('jc_settings', JSON.stringify(AppState.settings));
+  } catch (e) { /* 存储失败忽略 */ }
+  closeSettings();
+  toast('success', '✅', '设置已保存');
+  // 若保存了 Key 且当前页是 AI 研判，自动扫描
+  if (AppState.settings.oddsKey) {
+    setTimeout(() => scanValueBets(), 500);
+  }
+}
+
+/* 点击弹窗遮罩关闭 */
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('settingsModal');
+  if (modal && e.target === modal) closeSettings();
+});
