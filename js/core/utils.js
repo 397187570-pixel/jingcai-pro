@@ -12,7 +12,7 @@
  * @returns {string} 转义后的安全字符串
  */
 function esc(v) {
-  return String(v == null ? '' : v)
+  return String(v === null || v === undefined ? '' : v)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')

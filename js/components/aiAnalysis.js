@@ -35,7 +35,7 @@ function renderAIRecommendations(matches) {
     const a = m.awayTeam || m.awayName || '客队';
     const odds = m.odds || {};
 
-    let probs, conf;
+    let probs;
     if (odds.h && odds.h > 1) {
       const p = deVigOdds(odds.h, odds.d || 3.3, odds.a || 3.4);
       probs = { homeWin: p.pH, draw: p.pD, awayWin: p.pA };
@@ -43,7 +43,7 @@ function renderAIRecommendations(matches) {
       const e = eloPredict(1600, 1500);
       probs = { homeWin: e.homeWin / 100, draw: e.draw / 100, awayWin: e.awayWin / 100 };
     }
-    conf = Math.max(probs.homeWin, probs.draw, probs.awayWin);
+    const conf = Math.max(probs.homeWin, probs.draw, probs.awayWin);
 
     let pred, predClass, betOdd;
     if (probs.homeWin >= probs.draw && probs.homeWin >= probs.awayWin) {

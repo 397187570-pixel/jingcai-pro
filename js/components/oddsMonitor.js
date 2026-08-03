@@ -5,12 +5,11 @@
  */
 
 /* 依赖解析：浏览器用全局，Node 用 require */
-let esc, deVigOdds;
+let esc;
 if (typeof window !== 'undefined' && window.esc) {
-  esc = window.esc; deVigOdds = window.deVigOdds;
+  esc = window.esc;
 } else {
-  const utils = require('../core/utils.js');
-  esc = utils.esc; deVigOdds = utils.deVigOdds;
+  esc = require('../core/utils.js').esc;
 }
 
 /* 赔率静态数据（示例值，运行时用真实赔率覆盖） */
@@ -143,8 +142,8 @@ function renderOddsMonitor(matches, selectedIndex) {
   // 半全场
   const htftEl = document.getElementById('htftGrid');
   if (htftEl) {
-    htftEl.innerHTML = `<div class="htft-header">半场\\全场</div>` +
-      ['胜', '平', '负'].map(h => `<div class="htft-header">${h}</div>`).join('') +
+    htftEl.innerHTML = '<div class="htft-header">半场\\全场</div>' +
+      ['胜', '平', '负'].map(h => '<div class="htft-header">' + h + '</div>').join('') +
       ODDS_STATIC.htft.map(o => `
         <div class="htft-cell">
           <div class="combo ${o.cls}">${esc(o.label)}</div>

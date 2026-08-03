@@ -107,7 +107,9 @@ function toast(type, icon, msg) {
 
 /* ============================================
    深度分析：列表点击下钻
+   注：此函数由 dashboard 渲染的 onclick 调用（全局），非 JS 内部引用
    ============================================ */
+/* eslint-disable-next-line no-unused-vars */
 function openAnalysisDetail(idx) {
   AppState.selectedIndex = idx;
   switchPage('analysis');

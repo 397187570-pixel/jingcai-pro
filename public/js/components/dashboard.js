@@ -38,20 +38,20 @@ function renderDashboard(matches) {
     return;
   }
 
-  ml.innerHTML = list.map(m => {
+  ml.innerHTML = list.map((m, idx) => {
     const h = m.homeTeam || m.homeName || '主队';
     const a = m.awayTeam || m.awayName || '客队';
     const odds = m.odds || {};
 
     // AI 概率：优先用赔率反推，无赔率用 Elo
-    let probs, conf;
+    let probs;
     if (odds.h && odds.h > 1) {
       const p = deVigOdds(odds.h, odds.d || 3.3, odds.a || 3.4);
       probs = { homeWin: p.pH * 100, draw: p.pD * 100, awayWin: p.pA * 100 };
     } else {
       probs = eloPredict(1600, 1500);
     }
-    conf = Math.max(probs.homeWin, probs.draw, probs.awayWin);
+    const conf = Math.max(probs.homeWin, probs.draw, probs.awayWin);
 
     const oddsHtml = odds.h ? `
       <span class="odds-t" style="color:var(--c-red);">${odds.h.toFixed(2)}</span>
@@ -59,7 +59,7 @@ function renderDashboard(matches) {
       <span class="odds-t" style="color:var(--c-green);">${(odds.a||0).toFixed(2)}</span>` : '暂无赔率';
 
     return `
-    <div class="match-item" onclick="openAnalysisDetail('${esc(h)}','${esc(a)}')">
+    <div class="match-item" onclick="openAnalysisDetail(${idx})" data-match-idx="${idx}">
       <div class="match-league-info">
         <div class="league-tag"><span class="dot" style="background:var(--c-blue);"></span>${esc(m.league || '')}</div>
         <div class="match-code" style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">${esc(m.code || '')}</div>
