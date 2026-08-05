@@ -51,7 +51,7 @@ function renderAIRecommendations(matches) {
     const h = m.homeTeam || m.homeName || '主队';
     const a = m.awayTeam || m.awayName || '客队';
     const odds = m.odds || {};
-    const goalLine = m.handicap != null && m.handicap !== '' ? Number(m.handicap) : null;
+    const goalLine = m.handicap !== null && m.handicap !== '' ? Number(m.handicap) : null;
 
     // 优先用真实推荐模型
     if (haveModel && odds.h && odds.h > 1) {
@@ -74,8 +74,8 @@ function renderAIRecommendations(matches) {
         const vs = r.valueSignal;
         const side = vs.bestValueSide;
         const sideZh = side === 'home' ? '主胜' : side === 'draw' ? '平' : '客胜';
-        const pct = vs.percentile && vs.percentile[side] != null ? ('历史分位 ' + vs.percentile[side] + '%') : '';
-        const z = vs.zscore && vs.zscore[side] != null ? ('z=' + vs.zscore[side]) : '';
+        const pct = vs.percentile && vs.percentile[side] !== null ? ('历史分位 ' + vs.percentile[side] + '%') : '';
+        const z = vs.zscore && vs.zscore[side] !== null ? ('z=' + vs.zscore[side]) : '';
         if (vs.flagged[side]) {
           if (vs.euFree) {
             const strong = (vs.strong && vs.strong[side]) ? '💎💎 超欧盘历史 p90' : '💎 模型价值';
@@ -99,6 +99,16 @@ function renderAIRecommendations(matches) {
         const d = r.asian.dist;
         asianHtml = '<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">⚖️ 亚盘（' + Number(r.asian.line).toFixed(2)
           + '）：让球主胜 ' + (d.home * 100).toFixed(0) + '% · 平 ' + (d.draw * 100).toFixed(0) + '% · 客胜 ' + (d.away * 100).toFixed(0) + '%（' + d.n + ' 场回测）</div>';
+      }
+
+      // 多维预测（胜平负 / 让胜平负 / 进球数 / 比分 + Top5 选择）
+      let multiDimHtml = '';
+      if (window.MultiDim && r.directionProbs && r.directionProbs.length === 3) {
+        const md = window.MultiDim.buildMultiDim(
+          { homeWin: r.directionProbs[0], draw: r.directionProbs[1], awayWin: r.directionProbs[2] },
+          { line: goalLine }
+        );
+        multiDimHtml = renderMultiDimBoard(md, idx);
       }
 
       return `
@@ -125,6 +135,7 @@ function renderAIRecommendations(matches) {
         </div>
         ${asianHtml}
         ${valueHtml}
+        ${multiDimHtml}
       </div>`;
     }
 
@@ -164,6 +175,107 @@ function renderAIRecommendations(matches) {
   });
 
   listEl.innerHTML = banner + cards.join('');
+
+  // 多维预测 Top5 选择交互（单场单选高亮）
+  listEl.onclick = function (e) {
+    const opt = e.target.closest && e.target.closest('.top5-opt');
+    if (!opt) return;
+    const mid = opt.getAttribute('data-mid');
+    listEl.querySelectorAll('.top5-opt[data-mid="' + mid + '"]').forEach(function (o) {
+      o.style.borderColor = 'var(--border-color)';
+      o.style.boxShadow = 'none';
+      const tag = o.querySelector('.top5-check');
+      if (tag) tag.style.display = 'none';
+    });
+    opt.style.borderColor = 'var(--c-blue)';
+    opt.style.boxShadow = '0 0 0 2px var(--c-blue-dim)';
+    let tag = opt.querySelector('.top5-check');
+    if (!tag) {
+      tag = document.createElement('span');
+      tag.className = 'top5-check';
+      tag.textContent = ' ✓ 已选';
+      tag.style.cssText = 'font-size:10px;color:var(--c-blue);font-weight:700;';
+      opt.appendChild(tag);
+    } else {
+      tag.style.display = 'inline';
+    }
+  };
+}
+
+/* ============================================
+   多维预测渲染（胜平负 / 让胜平负 / 进球数 / 比分 + Top5 选择）
+   ============================================ */
+function renderMultiDimBoard(md, idx) {
+  const dimColor = { '胜平负': 'var(--c-blue)', '让胜平负': 'var(--c-cyan)', '进球数': 'var(--c-green)', '比分': 'var(--c-amber)' };
+  const dimBg = { '胜平负': 'var(--c-blue-dim)', '让胜平负': 'rgba(6,182,212,.12)', '进球数': 'var(--c-green-dim)', '比分': 'var(--c-amber-dim)' };
+  const pct = function (v) { return (v * 100).toFixed(1) + '%'; };
+  const bar = function (v, color) {
+    return '<div style="height:6px;background:var(--border-color);border-radius:3px;overflow:hidden;margin-top:3px;">' +
+      '<div style="width:' + (v * 100).toFixed(1) + '%;height:100%;background:' + color + ';"></div></div>';
+  };
+  const findCell = function (k) { return md.cells.find(function (c) { return c.key === k; }); };
+
+  const bars = function (rows) {
+    return rows.map(function (x) {
+      return '<div style="font-size:11px;color:var(--text-secondary);">' +
+        '<div style="display:flex;justify-content:space-between;"><span>' + esc(x.l) + '</span>' +
+        '<span style="font-family:var(--font-mono);">' + pct(x.p) + '</span></div>' + bar(x.p, x.c) + '</div>';
+    }).join('');
+  };
+
+  const wdlBars = bars([
+    { l: '主胜', p: findCell('1x2-home').p, c: 'var(--c-green)' },
+    { l: '平', p: findCell('1x2-draw').p, c: 'var(--c-amber)' },
+    { l: '客胜', p: findCell('1x2-away').p, c: 'var(--c-red)' }
+  ]);
+
+  const ahLabel = md.lineLabel + (md.lineSuggested ? '（模型建议）' : '');
+  const ahBars = bars([
+    { l: '让胜', p: md.asian.home, c: 'var(--c-green)' },
+    { l: '让平', p: md.asian.draw, c: 'var(--c-amber)' },
+    { l: '让负', p: md.asian.away, c: 'var(--c-red)' }
+  ]);
+
+  const goalsHtml = md.totalGoals.slice(0, 5).map(function (t) {
+    return '<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:3px;">' +
+      '<span style="width:40px;color:var(--text-secondary);">' + esc(t.label) + '</span>' +
+      '<div style="flex:1;height:6px;background:var(--border-color);border-radius:3px;overflow:hidden;">' +
+      '<div style="width:' + (t.p * 100).toFixed(1) + '%;height:100%;background:var(--c-green);"></div></div>' +
+      '<span style="width:42px;text-align:right;font-family:var(--font-mono);color:var(--text-muted);">' + pct(t.p) + '</span></div>';
+  }).join('');
+
+  const scoreHtml = md.scoreMatrix.slice(0, 6).map(function (s) {
+    return '<span style="display:inline-block;padding:2px 7px;margin:2px;border:1px solid var(--border-color);border-radius:10px;font-size:11px;color:var(--text-secondary);">' +
+      esc(s.score.replace(':', '-')) + ' <b style="font-family:var(--font-mono);color:var(--c-amber);">' + pct(s.p) + '</b></span>';
+  }).join('');
+
+  const top5Html = md.top5.map(function (c, i) {
+    const col = dimColor[c.dim];
+    const bg = dimBg[c.dim];
+    return '<div class="top5-opt" data-mid="' + idx + '" data-opt="' + esc(c.key) + '" ' +
+      'style="display:flex;align-items:center;gap:8px;padding:7px 9px;margin-bottom:5px;border:1px solid var(--border-color);border-radius:8px;cursor:pointer;transition:var(--transition);background:var(--bg-card);">' +
+      '<span style="width:22px;height:22px;border-radius:50%;background:' + col + ';color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;">' + (i + 1) + '</span>' +
+      '<span style="font-size:10px;padding:2px 6px;border-radius:6px;color:' + col + ';background:' + bg + ';white-space:nowrap;">' + esc(c.dim) + '</span>' +
+      '<span style="flex:1;font-size:13px;font-weight:600;color:var(--text-primary);">' + esc(c.label) + '</span>' +
+      '<span style="font-family:var(--font-mono);font-size:13px;color:' + col + ';font-weight:700;">' + pct(c.p) + '</span>' +
+      '</div>';
+  }).join('');
+
+  return '<div style="margin-top:12px;padding:12px;border:1px dashed var(--border-strong);border-radius:10px;background:var(--bg-card-hover);">' +
+    '<div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">📊 多维预测 ' +
+    '<span style="font-size:10px;font-weight:400;color:var(--text-muted);">（xG 主 ' + md.xg.homeXg + ' / 客 ' + md.xg.awayXg + ' · 锚定可信 1X2 概率派生）</span></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--c-blue);margin-bottom:4px;">胜平负</div>' + wdlBars + '</div>' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--c-cyan);margin-bottom:4px;">让胜平负 · ' + esc(ahLabel) + '</div>' + ahBars + '</div>' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--c-green);margin-bottom:4px;">进球数（前 5）</div>' + goalsHtml + '</div>' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--c-amber);margin-bottom:4px;">比分（前 6）</div>' + scoreHtml + '</div>' +
+    '</div>' +
+    '<div style="margin-top:12px;">' +
+      '<div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">🎯 概率最高 Top 5 结果（点击选择）</div>' +
+      top5Html +
+      '<div style="font-size:10px;color:var(--text-muted);margin-top:4px;">⚠️ 选择仅为辅助参考，竞彩长期负 EV，请理性仓位。</div>' +
+    '</div>' +
+  '</div>';
 }
 
 /* ============================================

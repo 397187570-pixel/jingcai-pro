@@ -205,6 +205,7 @@
       league: m.league, homeTeam: m.homeTeam, awayTeam: m.awayTeam,
       oddsImplied: pi.map(function (x) { return Math.round(x * 10000) / 10000; }),
       calibratedConfidence: conf.map(function (x) { return Math.round(x * 10000) / 10000; }),
+      directionProbs: pDir.map(function (x) { return Math.round(x * 10000) / 10000; }),
       direction: labels[dir], directionZh: zh[dir],
       directionConfidence: Math.round(pDir[dir] * 10000) / 10000,
       leagueEdge: lgEdge, asian: asianInfo, valueSignal: vs,

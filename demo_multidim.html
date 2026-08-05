@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>多维预测 · 演示（竞彩智选 Pro）</title>
+<style>
+  :root{
+    --c-blue:#3b82f6; --c-cyan:#06b6d4; --c-green:#10b981; --c-amber:#f59e0b; --c-red:#ef4444;
+    --c-blue-dim:rgba(59,130,246,.1); --c-green-dim:rgba(16,185,129,.1); --c-amber-dim:rgba(245,158,11,.1); --c-red-dim:rgba(239,68,68,.1);
+    --bg-primary:#f8fafc; --bg-card:#fff; --bg-card-hover:#f1f5f9;
+    --text-primary:#0f172a; --text-secondary:#475569; --text-muted:#94a3b8;
+    --border-color:#e2e8f0; --border-strong:#cbd5e1;
+    --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+    --font-mono:'SF Mono','JetBrains Mono',Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);padding:24px;}
+  .wrap{max-width:760px;margin:0 auto;}
+  h1{font-size:20px;margin:0 0 4px;}
+  .sub{color:var(--text-muted);font-size:12px;margin-bottom:20px;}
+  .rec-card{border:1px solid var(--border-color);border-radius:10px;padding:14px;margin-bottom:16px;background:var(--bg-card);box-shadow:0 1px 2px rgba(15,23,42,.05);}
+  .team{font-size:14px;font-weight:600;}
+  .league{font-size:11px;color:var(--text-muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📊 多维预测演示</h1>
+  <div class="sub">胜平负 / 让胜平负 / 进球数 / 比分 · 概率最高的前 5 个结果可点击选择 · 锚定可信 1X2 概率派生</div>
+  <div id="board"></div>
+</div>
+
+<script src="js/engine/predictor.js"></script>
+<script src="js/engine/recommend.js"></script>
+<script src="js/engine/multiDim.js"></script>
+<script>
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function renderBoard(md, idx){
+  const dimColor={'胜平负':'var(--c-blue)','让胜平负':'var(--c-cyan)','进球数':'var(--c-green)','比分':'var(--c-amber)'};
+  const dimBg={'胜平负':'var(--c-blue-dim)','让胜平负':'rgba(6,182,212,.12)','进球数':'var(--c-green-dim)','比分':'var(--c-amber-dim)'};
+  const pct=v=>(v*100).toFixed(1)+'%';
+  const bar=(v,c)=>'<div style="height:6px;background:var(--border-color);border-radius:3px;overflow:hidden;margin-top:3px;"><div style="width:'+(v*100).toFixed(1)+'%;height:100%;background:'+c+';"></div></div>';
+  const fc=k=>md.cells.find(c=>c.key===k);
+  const bars=rows=>rows.map(x=>'<div style="font-size:11px;color:var(--text-secondary);"><div style="display:flex;justify-content:space-between;"><span>'+esc(x.l)+'</span><span style="font-family:var(--font-mono);">'+pct(x.p)+'</span></div>'+bar(x.p,x.c)+'</div>').join('');
+  const wdl=bars([{l:'主胜',p:fc('1x2-home').p,c:'var(--c-green)'},{l:'平',p:fc('1x2-draw').p,c:'var(--c-amber)'},{l:'客胜',p:fc('1x2-away').p,c:'var(--c-red)'}]);
+  const ahLabel=md.lineLabel+(md.lineSuggested?'（模型建议）':'');
+  const ah=bars([{l:'让胜',p:md.asian.home,c:'var(--c-green)'},{l:'让平',p:md.asian.draw,c:'var(--c-amber)'},{l:'让负',p:md.asian.away,c:'var(--c-red)'}]);
+  const goals=md.totalGoals.slice(0,5).map(t=>'<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:3px;"><span style="width:40px;color:var(--text-secondary);">'+esc(t.label)+'</span><div style="flex:1;height:6px;background:var(--border-color);border-radius:3px;overflow:hidden;"><div style="width:'+(t.p*100).toFixed(1)+'%;height:100%;background:var(--c-green);"></div></div><span style="width:42px;text-align:right;font-family:var(--font-mono);color:var(--text-muted);">'+pct(t.p)+'</span></div>').join('');
+  const scores=md.scoreMatrix.slice(0,6).map(s=>'<span style="display:inline-block;padding:2px 7px;margin:2px;border:1px solid var(--border-color);border-radius:10px;font-size:11px;color:var(--text-secondary);">'+esc(s.score.replace(':','-'))+' <b style="font-family:var(--font-mono);color:var(--c-amber);">'+pct(s.p)+'</b></span>').join('');
+  const top5=md.top5.map((c,i)=>{const col=dimColor[c.dim],bg=dimBg[c.dim];return '<div class="top5-opt" data-mid="'+idx+'" data-opt="'+esc(c.key)+'" style="display:flex;align-items:center;gap:8px;padding:7px 9px;margin-bottom:5px;border:1px solid var(--border-color);border-radius:8px;cursor:pointer;background:var(--bg-card);"><span style="width:22px;height:22px;border-radius:50%;background:'+col+';color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;">'+(i+1)+'</span><span style="font-size:10px;padding:2px 6px;border-radius:6px;color:'+col+';background:'+bg+';white-space:nowrap;">'+esc(c.dim)+'</span><span style="flex:1;font-size:13px;font-weight:600;color:var(--text-primary);">'+esc(c.label)+'</span><span style="font-family:var(--font-mono);font-size:13px;color:'+col+';font-weight:700;">'+pct(c.p)+'</span></div>';}).join('');
+  return '<div style="margin-top:12px;padding:12px;border:1px dashed var(--border-strong);border-radius:10px;background:var(--bg-card-hover);"><div style="font-size:12px;font-weight:700;margin-bottom:8px;">📊 多维预测 <span style="font-size:10px;font-weight:400;color:var(--text-muted);">（xG 主 '+md.xg.homeXg+' / 客 '+md.xg.awayXg+'）</span></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'+
+      '<div><div style="font-size:11px;font-weight:600;color:var(--c-blue);margin-bottom:4px;">胜平负</div>'+wdl+'</div>'+
+      '<div><div style="font-size:11px;font-weight:600;color:var(--c-cyan);margin-bottom:4px;">让胜平负 · '+esc(ahLabel)+'</div>'+ah+'</div>'+
+      '<div><div style="font-size:11px;font-weight:600;color:var(--c-green);margin-bottom:4px;">进球数（前5）</div>'+goals+'</div>'+
+      '<div><div style="font-size:11px;font-weight:600;color:var(--c-amber);margin-bottom:4px;">比分（前6）</div>'+scores+'</div>'+
+    '</div>'+
+    '<div style="margin-top:12px;"><div style="font-size:12px;font-weight:700;margin-bottom:6px;">🎯 概率最高 Top 5 结果（点击选择）</div>'+top5+'<div style="font-size:10px;color:var(--text-muted);margin-top:4px;">⚠️ 选择仅为辅助参考，竞彩长期负 EV，请理性仓位。</div></div>'+
+  '</div>';
+}
+
+// 演示样例
+const samples=[
+  {league:'巴西杯',home:'弗鲁米嫩塞',away:'达伽马',jc:[1.85,3.10,3.85],goalLine:-1},
+  {league:'欧冠资格赛',home:'费内巴切',away:'格风暴',jc:[1.55,3.80,5.20],goalLine:null}
+];
+const board=document.getElementById('board');
+board.innerHTML=samples.map((s,idx)=>{
+  const m2={league:s.league,homeTeam:s.home,awayTeam:s.away,jc:s.jc,eu:null,goalLine:s.goalLine};
+  const r=Recommend.recommend(m2,null,null,null,null,{});
+  const md=MultiDim.buildMultiDim({homeWin:r.directionProbs[0],draw:r.directionProbs[1],awayWin:r.directionProbs[2]},{line:s.goalLine});
+  return '<div class="rec-card"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div><div class="team">'+esc(s.home)+' <span style="color:var(--text-muted);font-weight:400;">vs</span> '+esc(s.away)+'</div><div class="league">'+esc(s.league)+'</div></div><div style="text-align:right;"><span style="font-size:13px;font-weight:600;padding:6px 10px;border-radius:8px;background:var(--c-green-dim);color:var(--c-green);">'+esc(r.directionZh)+' '+(r.directionConfidence*100).toFixed(1)+'%</span></div></div>'+renderBoard(md,idx)+'</div>';
+}).join('');
+
+// 选择高亮交互
+board.onclick=function(e){
+  const opt=e.target.closest&&e.target.closest('.top5-opt');if(!opt)return;
+  const mid=opt.getAttribute('data-mid');
+  board.querySelectorAll('.top5-opt[data-mid="'+mid+'"]').forEach(o=>{o.style.borderColor='var(--border-color)';o.style.boxShadow='none';const t=o.querySelector('.top5-check');if(t)t.style.display='none';});
+  opt.style.borderColor='var(--c-blue)';opt.style.boxShadow='0 0 0 2px var(--c-blue-dim)';
+  let t=opt.querySelector('.top5-check');
+  if(!t){t=document.createElement('span');t.className='top5-check';t.textContent=' ✓ 已选';t.style.cssText='font-size:10px;color:var(--c-blue);font-weight:700;';opt.appendChild(t);}else{t.style.display='inline';}
+};
+</script>
+</body>
+</html>
