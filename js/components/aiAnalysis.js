@@ -269,9 +269,51 @@ async function scanValueBetsModular(jcMatches, getIntOdds) {
     }
 
     if (!matched.length) {
+      // 未匹配诊断：展示国际赔率返回的联赛分布、时间范围、样本队名
+      var sportCounts = {};
+      var earliest = null, latest = null;
+      var samples = [];
+      intOdds.forEach(function(io, idx) {
+        var sk = io.sportKey || '未知';
+        sportCounts[sk] = (sportCounts[sk] || 0) + 1;
+        if (io.commence) {
+          var t = new Date(io.commence).getTime();
+          if (!earliest || t < earliest) earliest = t;
+          if (!latest || t > latest) latest = t;
+        }
+        if (idx < 5) samples.push((io.homeTeam || '?') + ' vs ' + (io.awayTeam || '?'));
+      });
+      var jcTimes = [];
+      jcMatches.forEach(function(m) {
+        if (m.date && m.time) jcTimes.push(m.date + ' ' + m.time + ' (' + (m.league || '未知') + ' ' + (m.homeTeam || '?') + ' vs ' + (m.awayTeam || '?') + ')');
+      });
+      var diag = result.diagnosis || {};
+      var detail = '<div style="margin-top:6px;font-size:11px;color:var(--text-muted);">';
+      detail += '国际赔率联赛分布：<br>';
+      Object.keys(sportCounts).forEach(function(sk) {
+        detail += '&nbsp;&nbsp;· ' + esc(sk) + '：' + sportCounts[sk] + ' 场<br>';
+      });
+      if (earliest && latest) {
+        detail += '国际比赛时间范围：' + new Date(earliest).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' ~ ' + new Date(latest).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + '（北京时间）<br>';
+      }
+      if (samples.length) {
+        detail += '样本队名（国际）：' + esc(samples.join('、')) + '<br>';
+      }
+      if (jcTimes.length) {
+        detail += '竞彩在售时间/队名：<br>';
+        jcTimes.forEach(function(t) { detail += '&nbsp;&nbsp;· ' + esc(t) + '<br>'; });
+      }
+      if (diag.unmappedLeagues && diag.unmappedLeagues.length) {
+        detail += '⚠️ 未映射联赛：' + esc(diag.unmappedLeagues.join('、')) + '<br>';
+      }
+      if (diag.broadTried) {
+        detail += '已尝试 broad-search 兜底：' + (diag.broadFound ? '找到数据' : '未找到') + '<br>';
+      }
+      detail += '</div>';
       listEl.innerHTML = '<div style="padding:10px;color:var(--text-muted);font-size:12px;">' +
         '📋 国际赔率已获取 ' + intOdds.length + ' 场，但未匹配到当前竞彩比赛。<br>' +
-        '<span style="font-size:11px;">可能是联赛/开赛时间差异过大。</span></div>';
+        '<span style="font-size:11px;">已放宽时间窗口到24小时并启用联赛匹配，若仍无匹配，通常是 The Odds API 不覆盖该杯赛/资格赛。</span>' +
+        detail + '</div>';
       return;
     }
 

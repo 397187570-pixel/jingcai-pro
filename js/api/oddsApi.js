@@ -353,7 +353,7 @@ async function fetchOneSportOnPlatform(platform, sport, apiKey, attempt) {
     var data = await res.json();
     /* 新版平台返回 { events: [...] } 或 { data: [...] }，旧版直接是数组 */
     var events = Array.isArray(data) ? data : (data.events || data.data || []);
-    return { ok: true, data: normalizeOdds(events), platform: platform, rawCount: events.length };
+    return { ok: true, data: normalizeOdds(events, sport), platform: platform, rawCount: events.length };
   } catch (e) {
     var msg = e.message || 'network error';
     if (msg === 'Failed to fetch' || msg === 'Load failed') {
@@ -385,7 +385,7 @@ async function fetchOneSport(sport, apiKey) {
  * 标准化：提取每家公司的平均赔率
  * The Odds API 足球 h2h 的 outcomes 使用真实队名 + "Draw"，需要按队名匹配
  */
-function normalizeOdds(raw) {
+function normalizeOdds(raw, sportKey) {
   return raw.map(function(m) {
     var homeTeam = (m.home_team || '').trim();
     var awayTeam = (m.away_team || '').trim();
@@ -409,6 +409,7 @@ function normalizeOdds(raw) {
     return {
       homeTeam: homeTeam,
       awayTeam: awayTeam,
+      sportKey: sportKey || '',
       commence: m.commence_time || m.start_time || m.commenceTime,
       odds: { h: avg(homeOdds), d: avg(drawOdds), a: avg(awayOdds) },
       bookmakers: (m.bookmakers || []).length
@@ -429,6 +430,10 @@ function matchByTime(jcMatches, intOdds) {
     if (jc.date && jc.time) {
       var d = String(jc.date).replace(/\//g, '-');
       var t = jc.time;
+      // 竞彩日期可能是 MM-DD 或 YYYY-MM-DD；补全年份
+      if (/^\d{2}-\d{2}$/.test(d)) {
+        d = new Date().getFullYear() + '-' + d;
+      }
       jcTs = new Date(d + 'T' + t + ':00+08:00').getTime();
     }
 
@@ -439,26 +444,49 @@ function matchByTime(jcMatches, intOdds) {
       if (!jcTs || !ioTs) return;
 
       var diffH = Math.abs(jcTs - ioTs) / 3600000;
-      if (diffH > 3) return;
+      if (diffH > 24) return; // 放宽到24小时（杯赛/资格赛经常跨时区或挂牌时间差异大）
 
-      var timeScore = 1 - (diffH / 3);
+      // 时间分：<=1h 0.8, <=3h 0.5, <=6h 0.35, <=12h 0.2, <=24h 0.1
+      var timeScore = diffH <= 1 ? 0.8 : diffH <= 3 ? 0.5 : diffH <= 6 ? 0.35 : diffH <= 12 ? 0.2 : 0.1;
+
+      // 队名匹配：中英文/简称/全名互相子串包含，给 bonus
+      function nameSimilar(a, b) {
+        if (!a || !b) return 0;
+        a = a.toLowerCase().replace(/\s+/g, '');
+        b = b.toLowerCase().replace(/\s+/g, '');
+        if (a === b) return 1;
+        // 互相包含
+        if (a.indexOf(b) >= 0 || b.indexOf(a) >= 0) return 0.8;
+        // 一方包含另一方前 2~4 字符（处理首字母缩写/简称）
+        for (var len = 4; len >= 2; len--) {
+          var seg = a.slice(0, len);
+          if (seg.length >= 2 && b.indexOf(seg) >= 0) return 0.5;
+          seg = b.slice(0, len);
+          if (seg.length >= 2 && a.indexOf(seg) >= 0) return 0.5;
+        }
+        return 0;
+      }
 
       var nameScore = 0;
-      var hn = (io.homeTeam || '').toLowerCase();
-      var an = (io.awayTeam || '').toLowerCase();
-      var h4 = (jc.homeTeam || '').slice(0, 3).toLowerCase();
-      var a4 = (jc.awayTeam || '').slice(0, 3).toLowerCase();
-      if (h4 && (hn.indexOf(h4) >= 0 || h4.indexOf(hn.slice(0, 3)) >= 0)) nameScore += 0.5;
-      if (a4 && (an.indexOf(a4) >= 0 || a4.indexOf(an.slice(0, 3)) >= 0)) nameScore += 0.5;
+      nameScore += nameSimilar(io.homeTeam, jc.homeTeam) * 0.35;
+      nameScore += nameSimilar(io.awayTeam, jc.awayTeam) * 0.35;
 
-      var total = timeScore + nameScore;
+      // 联赛映射 bonus：如果该国际赔率来自我们映射的 sport key，额外加分
+      var leagueBonus = 0;
+      var jcLeague = (jc.league || jc.leagueFull || '').trim();
+      if (jcLeague && LEAGUE_MAP[jcLeague] && io.sportKey === LEAGUE_MAP[jcLeague]) {
+        leagueBonus = 0.15;
+      }
+
+      var total = timeScore + nameScore + leagueBonus;
       if (total > bestScore) {
         bestScore = total;
         bestMatch = io;
       }
     });
 
-    if (bestMatch && bestScore >= 0.3) {
+    // 阈值：>=0.5（时间<=3h 即可；或时间<=6h+队名一队匹配）
+    if (bestMatch && bestScore >= 0.5) {
       results.push({ jcMatch: jc, intOdd: bestMatch, score: bestScore });
     }
   });
