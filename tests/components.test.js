@@ -77,7 +77,7 @@ test('空列表显示空状态', () => {
 console.log('\n🧠 renderAIRecommendations 测试');
 test('生成 AI 推荐', () => {
   renderAIRecommendations(mockMatches);
-  const items = document.querySelectorAll('#aiRecList .recommend-item');
+  const items = document.querySelectorAll('#aiRecList .rec-card');
   assert.strictEqual(items.length, 2);
 });
 

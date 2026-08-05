@@ -18,6 +18,12 @@ function syncSourceToPublic() {
       cpSync(src, dst, { recursive: true });
     }
   }
+  // app.js（入口）单独同步 —— 否则 public 里是旧拷贝，dist 永远拿到旧版
+  const appSrc = resolve(__dirname, 'js/app.js');
+  const appDst = resolve(__dirname, 'public/js/app.js');
+  if (existsSync(appSrc)) {
+    cpSync(appSrc, appDst);
+  }
   // config/ 复制
   const cfgSrc = resolve(__dirname, 'config');
   const cfgDst = resolve(__dirname, 'public/config');

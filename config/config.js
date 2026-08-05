@@ -3,7 +3,9 @@
  * 竞彩智选 Pro · 所有魔法数字/阈值集中于此
  */
 
-const CONFIG = {
+/* 用 var 而非 const：多个 <script> 之间顶层 var 可重复声明且不会触发
+   "Identifier 'CONFIG' has already been declared" 的 SyntaxError */
+var CONFIG = {
   /* 版本 */
   version: '2.0.0',
 
@@ -12,7 +14,8 @@ const CONFIG = {
     sporttery: {
       base: 'webapi.sporttery.cn',
       paths: {
-        calculator: '/gateway/jc/football/getMatchCalculatorV1.qry',
+        // 官网同款接口（uniform 版）：竞彩在售场次（含胜平负/让球/比分/总进球/半全场）
+        calculator: '/gateway/uniform/football/getMatchCalculatorV1.qry',
         uniformResult: '/gateway/uniform/football/getUniformMatchResultV1.qry'
       },
       channel: 'c_web',

@@ -49,6 +49,7 @@
           <div class="card"><div class="page-subtitle">德比/焦点</div><div class="page-title" id="kpiFeatured">--</div></div>
           <div class="card"><div class="page-subtitle">数据源</div><div class="page-title" id="statSource">--</div></div>
         </div>
+        <div id="diagPanel"></div>
         <div class="grid" style="margin-top:16px;">
           <div class="card">
             <div class="page-subtitle" style="margin-bottom:12px;">⚽ 比赛列表（点击进入深度分析）</div>
@@ -77,6 +78,7 @@
             <div class="page-subtitle">6 大博彩公司赔率对比 · 凯利指数分析</div>
           </div>
         </div>
+        <div id="oddsMatchHeader" style="margin-bottom:16px;"></div>
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <div style="font-size:14px;font-weight:600;">📊 胜平负赔率对比</div>
@@ -133,7 +135,10 @@
           <div id="aiRecList"></div>
         </div>
         <div class="card" style="margin-top:16px;">
-          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">💎 价值注检测</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="font-size:14px;font-weight:600;">💎 价值注检测</div>
+            <div id="oddsQuotaBar"></div>
+          </div>
           <div id="valueBetListModular" style="min-height:40px;color:var(--text-muted);font-size:12px;">配置 The Odds API Key 后点击"扫描价值注"</div>
         </div>
       </div>
@@ -143,9 +148,10 @@
         <div class="page-header">
           <div>
             <div class="page-title">个人工具箱</div>
-            <div class="page-subtitle">投注记录 · localStorage 持久化</div>
+            <div class="page-subtitle">近 30 天预测准确率 · 投注记录（localStorage 持久化）</div>
           </div>
         </div>
+        <div id="toolboxAccuracy" style="margin-bottom:16px;"></div>
         <div class="grid grid-4" style="margin-bottom:16px;">
           <div class="card"><div class="page-subtitle">总投注</div><div class="page-title" id="toolboxTotal">0</div></div>
           <div class="card"><div class="page-subtitle">命中</div><div class="page-title" id="toolboxWin" style="color:var(--c-green);">0</div></div>
@@ -183,6 +189,11 @@
         <input type="text" class="form-input" id="settingsOddsKey" placeholder="免费注册：the-odds-api.com" style="font-size:12px;font-family:var(--font-mono);">
         <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">免费版 500 次/月 · <a href="https://the-odds-api.com/" target="_blank" style="color:var(--c-blue);">立即注册</a></div>
       </div>
+      <div style="margin-bottom:14px;">
+        <label class="form-label" style="font-size:12px;color:var(--text-secondary);">⚽ football-data.org API Key（实时比赛数据）</label>
+        <input type="text" class="form-input" id="settingsFootballKey" placeholder="free 档 10 次/分 · football-data.org" style="font-size:12px;font-family:var(--font-mono);">
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">留空使用内置 Key · <a href="https://www.football-data.org/" target="_blank" style="color:var(--c-blue);">football-data.org</a></div>
+      </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px;">
         <button class="btn" onclick="closeSettings()" style="font-size:12px;">取消</button>
         <button class="btn btn-primary" onclick="saveSettings()" style="font-size:12px;">💾 保存设置</button>
@@ -200,9 +211,11 @@
   <script src="js/engine/fundamentals.js"></script>
   <script src="js/engine/mlModel.js"></script>
   <script src="js/engine/calibration.js"></script>
+  <script src="js/engine/recommend.js"></script>
   <script src="js/api/sporttery.js"></script>
   <script src="js/api/oddsApi.js"></script>
   <script src="js/api/corsProxy.js"></script>
+  <script src="js/api/footballData.js"></script>
   <script src="js/components/dashboard.js"></script>
   <script src="js/components/aiAnalysis.js"></script>
   <script src="js/components/oddsMonitor.js"></script>

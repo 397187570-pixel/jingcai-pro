@@ -3,8 +3,11 @@
  * 竞彩智选 Pro · API 层（唯一允许 fetch 的地方）
  */
 
+(function() {
 /* 配置获取：浏览器用全局 CONFIG，Node 用 require */
-let CONFIG;
+/* 用 var 而非 let：避免与 config.js 的 const CONFIG 触发
+   SyntaxError: Identifier 'CONFIG' has already been declared */
+var CONFIG;
 if (typeof window !== 'undefined' && window.CONFIG) {
   CONFIG = window.CONFIG;
 } else {
@@ -24,8 +27,27 @@ async function request(path, options = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), options.timeout || cfg.timeout);
 
+  // URL 三模式（统一通过 window.JC_API_BASE 控制）：
+  //   1) JC_API_BASE 为代理域名（如 SCF 云函数）→ 走代理: {BASE}/api/sporttery/*
+  //   2) JC_API_BASE 为空字符串且设置了 JC_DIRECT（云端静态部署）→ 直连竞彩官网（CORS 开放, Access-Control-Allow-Origin:*）
+  //   3) 其他（Node 环境）→ 直接 https://webapi.sporttery.cn/*
+  let url;
+  if (typeof window !== 'undefined') {
+    const base = window.JC_API_BASE || '';
+    if (base) {
+      url = base + '/api/sporttery' + path;
+    } else if (window.JC_DIRECT) {
+      url = 'https://' + cfg.base + path;
+    } else {
+      // 本地预览：同源走 local_server.py 代理
+      url = '/api/sporttery' + path;
+    }
+  } else {
+    url = 'https://' + cfg.base + path;
+  }
+
   try {
-    const res = await fetch('https://' + cfg.base + path, {
+    const res = await fetch(url, {
       signal: controller.signal,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
@@ -118,3 +140,5 @@ if (typeof module !== 'undefined' && module.exports) {
 if (typeof window !== 'undefined') {
   window.SportteryApi = { getMatches, getHistory, normalizeMatches };
 }
+
+})();

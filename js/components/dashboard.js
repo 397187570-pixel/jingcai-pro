@@ -4,6 +4,7 @@
  * 依赖：utils.js (esc/deVigOdds)、predictor.js (eloPredict)、CONFIG
  */
 
+(function() {
 /* 依赖解析：浏览器用全局，Node 用 require */
 let esc, deVigOdds, eloPredict, calibrateProbability;
 if (typeof window !== 'undefined' && window.esc) {
@@ -36,7 +37,12 @@ function renderDashboard(matches) {
   if (!ml) return;
 
   if (!list.length) {
-    ml.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px;">暂无比赛数据，点击刷新</div>';
+    // 只展示中国竞彩选定的比赛；竞彩无在售场次时如实提示
+    ml.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px;">' +
+      '今日中国竞彩暂无在售场次<br>' +
+      '<span style="font-size:11px;opacity:.7;">（竞彩官网每日 9:00-23:00 更新场次，赛季间隙可能为空）</span><br><br>' +
+      '<button class="btn btn-primary" onclick="loadMatches()" style="font-size:12px;">🔄 刷新场次</button>' +
+      '</div>';
     return;
   }
 
@@ -106,3 +112,5 @@ if (typeof module !== 'undefined' && module.exports) {
 if (typeof window !== 'undefined') {
   window.renderDashboard = renderDashboard;
 }
+
+})();

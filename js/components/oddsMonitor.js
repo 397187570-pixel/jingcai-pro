@@ -4,6 +4,7 @@
  * 依赖：utils.js (esc/deVigOdds)、predictor.js (eloPredict/poissonScoreMatrix)、CONFIG
  */
 
+(function() {
 /* 依赖解析：浏览器用全局，Node 用 require */
 let esc;
 if (typeof window !== 'undefined' && window.esc) {
@@ -56,6 +57,29 @@ const ODDS_STATIC = {
 function renderOddsMonitor(matches, selectedIndex) {
   const match = matches[selectedIndex] || matches[0];
   if (!match) return;
+
+  /* 比赛信息标题栏 — 用户明确反馈"没有体现是哪场比赛的" */
+  const headerEl = document.getElementById('oddsMatchHeader');
+  if (headerEl) {
+    const h = match.homeTeam || match.homeName || '主队';
+    const a = match.awayTeam || match.awayName || '客队';
+    headerEl.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-size:16px;font-weight:700;">${esc(h)} <span style="color:var(--text-muted);font-weight:400;">vs</span> ${esc(a)}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">
+            <span class="badge badge-blue" style="font-size:10px;">${esc(match.code || '')}</span>
+            ${esc(match.league || '')} · ${esc(match.time || '')}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span style="font-size:12px;color:var(--text-muted);">切换比赛：</span>
+          <button class="btn" style="font-size:11px;padding:4px 10px;" onclick="switchOddsMatch(-1)">‹ 上一场</button>
+          <span style="font-size:11px;color:var(--text-muted);">${(selectedIndex >= 0 ? selectedIndex : 0) + 1} / ${matches.length}</span>
+          <button class="btn" style="font-size:11px;padding:4px 10px;" onclick="switchOddsMatch(1)">下一场 ›</button>
+        </div>
+      </div>`;
+  }
 
   const odds = match.odds || {};
   const jcOdds = { h: odds.h || 1.85, d: odds.d || 3.6, a: odds.a || 4.2 };
@@ -175,3 +199,5 @@ if (typeof window !== 'undefined') {
   window.renderOddsMonitor = renderOddsMonitor;
   window.ODDS_STATIC = ODDS_STATIC;
 }
+
+})();

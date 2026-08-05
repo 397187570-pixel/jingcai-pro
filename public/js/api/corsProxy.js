@@ -3,6 +3,7 @@
  * 竞彩智选 Pro · 解决浏览器跨域限制
  */
 
+(function() {
 const PROXIES = [
   { name: '直连', wrap: u => u },
   { name: 'cors.sh', wrap: u => 'https://cors.sh/' + u },
@@ -59,3 +60,5 @@ if (typeof module !== 'undefined' && module.exports) {
 if (typeof window !== 'undefined') {
   window.CorsProxyApi = { fetchWithProxy, testAll, PROXIES };
 }
+
+})();

@@ -1,0 +1,2052 @@
+[
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Mineiro",
+  "away_team": "SE Palmeiras",
+  "date": "2026-01-28",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554740
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Coritiba FBC",
+  "away_team": "RB Bragantino",
+  "date": "2026-01-28",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554744
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "CA Paranaense",
+  "date": "2026-01-28",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554746
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Vitória",
+  "away_team": "Clube do Remo",
+  "date": "2026-01-28",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554749
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "Grêmio FBPA",
+  "date": "2026-01-28",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554745
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Chapecoense AF",
+  "away_team": "Santos FC",
+  "date": "2026-01-28",
+  "home_goals": 4,
+  "away_goals": 2,
+  "label": 0,
+  "match_id": 554742
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "EC Bahia",
+  "date": "2026-01-28",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554743
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "São Paulo FC",
+  "away_team": "CR Flamengo",
+  "date": "2026-01-29",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554748
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "CR Vasco da Gama",
+  "date": "2026-01-29",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554747
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Botafogo FR",
+  "away_team": "Cruzeiro EC",
+  "date": "2026-01-30",
+  "home_goals": 4,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554741
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "RB Bragantino",
+  "away_team": "CA Mineiro",
+  "date": "2026-02-04",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554752
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Flamengo",
+  "away_team": "SC Internacional",
+  "date": "2026-02-04",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554754
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Clube do Remo",
+  "away_team": "Mirassol FC",
+  "date": "2026-02-04",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554757
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "São Paulo FC",
+  "date": "2026-02-04",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554758
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Grêmio FBPA",
+  "away_team": "Botafogo FR",
+  "date": "2026-02-05",
+  "home_goals": 5,
+  "away_goals": 3,
+  "label": 0,
+  "match_id": 554755
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SE Palmeiras",
+  "away_team": "EC Vitória",
+  "date": "2026-02-05",
+  "home_goals": 5,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554756
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "Fluminense FC",
+  "date": "2026-02-05",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554751
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "Chapecoense AF",
+  "date": "2026-02-05",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554759
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "Coritiba FBC",
+  "date": "2026-02-06",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554753
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Vitória",
+  "away_team": "CR Flamengo",
+  "date": "2026-02-11",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554769
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Chapecoense AF",
+  "away_team": "Coritiba FBC",
+  "date": "2026-02-11",
+  "home_goals": 3,
+  "away_goals": 3,
+  "label": 1,
+  "match_id": 554762
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "Cruzeiro EC",
+  "date": "2026-02-11",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554766
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Mineiro",
+  "away_team": "Clube do Remo",
+  "date": "2026-02-11",
+  "home_goals": 3,
+  "away_goals": 3,
+  "label": 1,
+  "match_id": 554761
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "São Paulo FC",
+  "away_team": "Grêmio FBPA",
+  "date": "2026-02-12",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554767
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "EC Bahia",
+  "date": "2026-02-12",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554768
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "Santos FC",
+  "date": "2026-02-12",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554760
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "Botafogo FR",
+  "date": "2026-02-12",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554764
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "RB Bragantino",
+  "date": "2026-02-12",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554763
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "SE Palmeiras",
+  "date": "2026-02-13",
+  "home_goals": 1,
+  "away_goals": 3,
+  "label": 2,
+  "match_id": 554765
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "SC Corinthians Paulista",
+  "date": "2026-02-19",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554750
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "RB Bragantino",
+  "away_team": "CA Paranaense",
+  "date": "2026-02-25",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554772
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Clube do Remo",
+  "away_team": "SC Internacional",
+  "date": "2026-02-25",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554778
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Coritiba FBC",
+  "away_team": "São Paulo FC",
+  "date": "2026-02-25",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554773
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "SC Corinthians Paulista",
+  "date": "2026-02-25",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554774
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Grêmio FBPA",
+  "away_team": "CA Mineiro",
+  "date": "2026-02-26",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554776
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SE Palmeiras",
+  "away_team": "Fluminense FC",
+  "date": "2026-02-26",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554777
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "CR Vasco da Gama",
+  "date": "2026-02-26",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554779
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "Santos FC",
+  "date": "2026-03-11",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554786
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Mineiro",
+  "away_team": "SC Internacional",
+  "date": "2026-03-11",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554781
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "EC Vitória",
+  "date": "2026-03-11",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554782
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "Coritiba FBC",
+  "date": "2026-03-12",
+  "home_goals": 0,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554783
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Flamengo",
+  "away_team": "Cruzeiro EC",
+  "date": "2026-03-12",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554784
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Clube do Remo",
+  "away_team": "Fluminense FC",
+  "date": "2026-03-12",
+  "home_goals": 0,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554787
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "SE Palmeiras",
+  "date": "2026-03-12",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554789
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "São Paulo FC",
+  "away_team": "Chapecoense AF",
+  "date": "2026-03-12",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554788
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Grêmio FBPA",
+  "away_team": "RB Bragantino",
+  "date": "2026-03-13",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554785
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Vitória",
+  "away_team": "CA Mineiro",
+  "date": "2026-03-14",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554799
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Botafogo FR",
+  "away_team": "CR Flamengo",
+  "date": "2026-03-14",
+  "home_goals": 0,
+  "away_goals": 3,
+  "label": 2,
+  "match_id": 554790
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "CA Paranaense",
+  "date": "2026-03-15",
+  "home_goals": 3,
+  "away_goals": 2,
+  "label": 0,
+  "match_id": 554795
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "EC Bahia",
+  "date": "2026-03-15",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554796
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "SC Corinthians Paulista",
+  "date": "2026-03-15",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554798
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Coritiba FBC",
+  "away_team": "Clube do Remo",
+  "date": "2026-03-15",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554793
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SE Palmeiras",
+  "away_team": "Mirassol FC",
+  "date": "2026-03-15",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554797
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "RB Bragantino",
+  "away_team": "São Paulo FC",
+  "date": "2026-03-15",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554791
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "CR Vasco da Gama",
+  "date": "2026-03-15",
+  "home_goals": 3,
+  "away_goals": 3,
+  "label": 1,
+  "match_id": 554794
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Chapecoense AF",
+  "away_team": "Grêmio FBPA",
+  "date": "2026-03-16",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554792
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "RB Bragantino",
+  "date": "2026-03-18",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554802
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SE Palmeiras",
+  "away_team": "Botafogo FR",
+  "date": "2026-03-18",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554807
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "Cruzeiro EC",
+  "date": "2026-03-18",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554800
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Mineiro",
+  "away_team": "São Paulo FC",
+  "date": "2026-03-18",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554801
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "Coritiba FBC",
+  "date": "2026-03-18",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554806
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "SC Internacional",
+  "date": "2026-03-19",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554808
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "Fluminense FC",
+  "date": "2026-03-19",
+  "home_goals": 3,
+  "away_goals": 2,
+  "label": 0,
+  "match_id": 554809
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Grêmio FBPA",
+  "away_team": "EC Vitória",
+  "date": "2026-03-19",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554805
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Flamengo",
+  "away_team": "Clube do Remo",
+  "date": "2026-03-19",
+  "home_goals": 3,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554804
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Chapecoense AF",
+  "away_team": "SC Corinthians Paulista",
+  "date": "2026-03-20",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554803
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "RB Bragantino",
+  "away_team": "Botafogo FR",
+  "date": "2026-03-21",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554811
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "CA Mineiro",
+  "date": "2026-03-21",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554814
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "São Paulo FC",
+  "away_team": "SE Palmeiras",
+  "date": "2026-03-22",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554817
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "Coritiba FBC",
+  "date": "2026-03-22",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554810
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "Santos FC",
+  "date": "2026-03-22",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554813
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Clube do Remo",
+  "away_team": "EC Bahia",
+  "date": "2026-03-22",
+  "home_goals": 4,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554816
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "Grêmio FBPA",
+  "date": "2026-03-22",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554818
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "Chapecoense AF",
+  "date": "2026-03-22",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554815
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Vitória",
+  "away_team": "Mirassol FC",
+  "date": "2026-03-22",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554819
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "CR Flamengo",
+  "date": "2026-03-22",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554812
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "Botafogo FR",
+  "date": "2026-03-29",
+  "home_goals": 4,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554780
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Botafogo FR",
+  "away_team": "Mirassol FC",
+  "date": "2026-04-01",
+  "home_goals": 3,
+  "away_goals": 2,
+  "label": 0,
+  "match_id": 554821
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "São Paulo FC",
+  "date": "2026-04-01",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554827
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "CA Paranaense",
+  "date": "2026-04-01",
+  "home_goals": 3,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554820
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "EC Vitória",
+  "date": "2026-04-01",
+  "home_goals": 3,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554825
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Coritiba FBC",
+  "away_team": "CR Vasco da Gama",
+  "date": "2026-04-01",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554824
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "SC Corinthians Paulista",
+  "date": "2026-04-02",
+  "home_goals": 3,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554826
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Chapecoense AF",
+  "away_team": "CA Mineiro",
+  "date": "2026-04-02",
+  "home_goals": 0,
+  "away_goals": 4,
+  "label": 2,
+  "match_id": 554823
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "Clube do Remo",
+  "date": "2026-04-02",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554829
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "RB Bragantino",
+  "away_team": "CR Flamengo",
+  "date": "2026-04-03",
+  "home_goals": 3,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554822
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SE Palmeiras",
+  "away_team": "Grêmio FBPA",
+  "date": "2026-04-03",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554828
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "São Paulo FC",
+  "away_team": "Cruzeiro EC",
+  "date": "2026-04-04",
+  "home_goals": 4,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554838
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Coritiba FBC",
+  "away_team": "Fluminense FC",
+  "date": "2026-04-04",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554834
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "Botafogo FR",
+  "date": "2026-04-05",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554839
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Chapecoense AF",
+  "away_team": "EC Vitória",
+  "date": "2026-04-05",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554832
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Mineiro",
+  "away_team": "CA Paranaense",
+  "date": "2026-04-05",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554830
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Flamengo",
+  "away_team": "Santos FC",
+  "date": "2026-04-05",
+  "home_goals": 3,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554835
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "SE Palmeiras",
+  "date": "2026-04-05",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554831
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "SC Internacional",
+  "date": "2026-04-05",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554833
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "RB Bragantino",
+  "date": "2026-04-05",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554837
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Grêmio FBPA",
+  "away_team": "Clube do Remo",
+  "date": "2026-04-05",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554836
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Clube do Remo",
+  "away_team": "CR Vasco da Gama",
+  "date": "2026-04-11",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554847
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Vitória",
+  "away_team": "São Paulo FC",
+  "date": "2026-04-11",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554849
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "EC Bahia",
+  "date": "2026-04-11",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554846
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "CA Mineiro",
+  "date": "2026-04-11",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554848
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "Grêmio FBPA",
+  "date": "2026-04-11",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554845
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "Chapecoense AF",
+  "date": "2026-04-12",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554840
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Botafogo FR",
+  "away_team": "Coritiba FBC",
+  "date": "2026-04-12",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554841
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "CR Flamengo",
+  "date": "2026-04-12",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554844
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "SE Palmeiras",
+  "date": "2026-04-12",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554842
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "RB Bragantino",
+  "date": "2026-04-12",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554843
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Chapecoense AF",
+  "away_team": "Botafogo FR",
+  "date": "2026-04-18",
+  "home_goals": 1,
+  "away_goals": 4,
+  "label": 2,
+  "match_id": 554851
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "São Paulo FC",
+  "date": "2026-04-18",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554858
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Vitória",
+  "away_team": "SC Corinthians Paulista",
+  "date": "2026-04-18",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554859
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "Grêmio FBPA",
+  "date": "2026-04-18",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554853
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "Mirassol FC",
+  "date": "2026-04-19",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554855
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Coritiba FBC",
+  "away_team": "CA Mineiro",
+  "date": "2026-04-19",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554852
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "Fluminense FC",
+  "date": "2026-04-19",
+  "home_goals": 2,
+  "away_goals": 3,
+  "label": 2,
+  "match_id": 554857
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "RB Bragantino",
+  "away_team": "Clube do Remo",
+  "date": "2026-04-19",
+  "home_goals": 4,
+  "away_goals": 2,
+  "label": 0,
+  "match_id": 554850
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SE Palmeiras",
+  "away_team": "CA Paranaense",
+  "date": "2026-04-19",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554856
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Flamengo",
+  "away_team": "EC Bahia",
+  "date": "2026-04-19",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554854
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "Santos FC",
+  "date": "2026-04-25",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554862
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Botafogo FR",
+  "away_team": "SC Internacional",
+  "date": "2026-04-25",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554863
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Clube do Remo",
+  "away_team": "Cruzeiro EC",
+  "date": "2026-04-25",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554868
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "São Paulo FC",
+  "away_team": "Mirassol FC",
+  "date": "2026-04-26",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554869
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "CR Vasco da Gama",
+  "date": "2026-04-26",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554865
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Grêmio FBPA",
+  "away_team": "Coritiba FBC",
+  "date": "2026-04-26",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554867
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "EC Vitória",
+  "date": "2026-04-26",
+  "home_goals": 3,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554860
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "RB Bragantino",
+  "away_team": "SE Palmeiras",
+  "date": "2026-04-26",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554864
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Mineiro",
+  "away_team": "CR Flamengo",
+  "date": "2026-04-26",
+  "home_goals": 0,
+  "away_goals": 4,
+  "label": 2,
+  "match_id": 554861
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "Chapecoense AF",
+  "date": "2026-04-26",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554866
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Botafogo FR",
+  "away_team": "Clube do Remo",
+  "date": "2026-05-02",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554871
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SE Palmeiras",
+  "away_team": "Santos FC",
+  "date": "2026-05-02",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554877
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Vitória",
+  "away_team": "Coritiba FBC",
+  "date": "2026-05-02",
+  "home_goals": 4,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554879
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "Grêmio FBPA",
+  "date": "2026-05-02",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554870
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "CA Mineiro",
+  "date": "2026-05-03",
+  "home_goals": 1,
+  "away_goals": 3,
+  "label": 2,
+  "match_id": 554873
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Flamengo",
+  "away_team": "CR Vasco da Gama",
+  "date": "2026-05-03",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554874
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "São Paulo FC",
+  "away_team": "EC Bahia",
+  "date": "2026-05-03",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554878
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Chapecoense AF",
+  "away_team": "RB Bragantino",
+  "date": "2026-05-03",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554872
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "Fluminense FC",
+  "date": "2026-05-03",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554875
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "SC Corinthians Paulista",
+  "date": "2026-05-03",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554876
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Coritiba FBC",
+  "away_team": "SC Internacional",
+  "date": "2026-05-09",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554883
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "EC Vitória",
+  "date": "2026-05-09",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554884
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "Cruzeiro EC",
+  "date": "2026-05-10",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554881
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Mineiro",
+  "away_team": "Botafogo FR",
+  "date": "2026-05-10",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554880
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Clube do Remo",
+  "away_team": "SE Palmeiras",
+  "date": "2026-05-10",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554887
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "São Paulo FC",
+  "date": "2026-05-10",
+  "home_goals": 3,
+  "away_goals": 2,
+  "label": 0,
+  "match_id": 554882
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "Chapecoense AF",
+  "date": "2026-05-10",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554886
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "RB Bragantino",
+  "date": "2026-05-10",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554888
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Grêmio FBPA",
+  "away_team": "CR Flamengo",
+  "date": "2026-05-10",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554885
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "CA Paranaense",
+  "date": "2026-05-10",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554889
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Mineiro",
+  "away_team": "Mirassol FC",
+  "date": "2026-05-16",
+  "home_goals": 3,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554891
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "CR Vasco da Gama",
+  "date": "2026-05-16",
+  "home_goals": 4,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554897
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "São Paulo FC",
+  "date": "2026-05-16",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554896
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SE Palmeiras",
+  "away_team": "Cruzeiro EC",
+  "date": "2026-05-17",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554898
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "Coritiba FBC",
+  "date": "2026-05-17",
+  "home_goals": 0,
+  "away_goals": 3,
+  "label": 2,
+  "match_id": 554899
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "Grêmio FBPA",
+  "date": "2026-05-17",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554892
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Botafogo FR",
+  "away_team": "SC Corinthians Paulista",
+  "date": "2026-05-17",
+  "home_goals": 3,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554893
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "RB Bragantino",
+  "away_team": "EC Vitória",
+  "date": "2026-05-17",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554894
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Chapecoense AF",
+  "away_team": "Clube do Remo",
+  "date": "2026-05-17",
+  "home_goals": 2,
+  "away_goals": 3,
+  "label": 2,
+  "match_id": 554895
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "CR Flamengo",
+  "date": "2026-05-17",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554890
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "São Paulo FC",
+  "away_team": "Botafogo FR",
+  "date": "2026-05-23",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554907
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Vitória",
+  "away_team": "SC Internacional",
+  "date": "2026-05-23",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554909
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Grêmio FBPA",
+  "away_team": "Santos FC",
+  "date": "2026-05-23",
+  "home_goals": 3,
+  "away_goals": 2,
+  "label": 0,
+  "match_id": 554904
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "Fluminense FC",
+  "date": "2026-05-23",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554905
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Flamengo",
+  "away_team": "SE Palmeiras",
+  "date": "2026-05-24",
+  "home_goals": 0,
+  "away_goals": 3,
+  "label": 2,
+  "match_id": 554903
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "Chapecoense AF",
+  "date": "2026-05-24",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554902
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Clube do Remo",
+  "away_team": "CA Paranaense",
+  "date": "2026-05-24",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554906
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "CA Mineiro",
+  "date": "2026-05-24",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554900
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "RB Bragantino",
+  "date": "2026-05-24",
+  "home_goals": 0,
+  "away_goals": 3,
+  "label": 2,
+  "match_id": 554908
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Coritiba FBC",
+  "away_team": "EC Bahia",
+  "date": "2026-05-25",
+  "home_goals": 3,
+  "away_goals": 2,
+  "label": 0,
+  "match_id": 554901
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "Mirassol FC",
+  "date": "2026-05-30",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554910
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Flamengo",
+  "away_team": "Coritiba FBC",
+  "date": "2026-05-30",
+  "home_goals": 3,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554914
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "Botafogo FR",
+  "date": "2026-05-30",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554911
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Grêmio FBPA",
+  "away_team": "SC Corinthians Paulista",
+  "date": "2026-05-30",
+  "home_goals": 1,
+  "away_goals": 3,
+  "label": 2,
+  "match_id": 554915
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "EC Vitória",
+  "date": "2026-05-30",
+  "home_goals": 3,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554918
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "RB Bragantino",
+  "away_team": "SC Internacional",
+  "date": "2026-05-31",
+  "home_goals": 3,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554912
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SE Palmeiras",
+  "away_team": "Chapecoense AF",
+  "date": "2026-05-31",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554916
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "CA Mineiro",
+  "date": "2026-05-31",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554919
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "Fluminense FC",
+  "date": "2026-05-31",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554913
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Clube do Remo",
+  "away_team": "São Paulo FC",
+  "date": "2026-05-31",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554917
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Botafogo FR",
+  "away_team": "Santos FC",
+  "date": "2026-07-16",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554921
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Vitória",
+  "away_team": "CR Vasco da Gama",
+  "date": "2026-07-16",
+  "home_goals": 1,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554929
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "Chapecoense AF",
+  "date": "2026-07-17",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554770
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "RB Bragantino",
+  "date": "2026-07-17",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554925
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "Grêmio FBPA",
+  "date": "2026-07-17",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554927
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Mineiro",
+  "away_team": "EC Bahia",
+  "date": "2026-07-21",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554920
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Coritiba FBC",
+  "away_team": "SE Palmeiras",
+  "date": "2026-07-22",
+  "home_goals": 1,
+  "away_goals": 3,
+  "label": 2,
+  "match_id": 554924
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Chapecoense AF",
+  "away_team": "CR Flamengo",
+  "date": "2026-07-23",
+  "home_goals": 0,
+  "away_goals": 4,
+  "label": 2,
+  "match_id": 554922
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "Cruzeiro EC",
+  "date": "2026-07-23",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554926
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "São Paulo FC",
+  "away_team": "CA Paranaense",
+  "date": "2026-07-23",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554928
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Botafogo FR",
+  "away_team": "EC Vitória",
+  "date": "2026-07-23",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554771
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "Clube do Remo",
+  "date": "2026-07-23",
+  "home_goals": 3,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554923
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CA Paranaense",
+  "away_team": "SC Internacional",
+  "date": "2026-07-25",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554930
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Santos FC",
+  "away_team": "Chapecoense AF",
+  "date": "2026-07-25",
+  "home_goals": 2,
+  "away_goals": 2,
+  "label": 1,
+  "match_id": 554938
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Vasco da Gama",
+  "away_team": "Mirassol FC",
+  "date": "2026-07-25",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554939
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Bahia",
+  "away_team": "SC Corinthians Paulista",
+  "date": "2026-07-26",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554931
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Cruzeiro EC",
+  "away_team": "Botafogo FR",
+  "date": "2026-07-26",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554933
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "RB Bragantino",
+  "away_team": "Coritiba FBC",
+  "date": "2026-07-26",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554932
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "CR Flamengo",
+  "away_team": "São Paulo FC",
+  "date": "2026-07-26",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554934
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Grêmio FBPA",
+  "away_team": "Fluminense FC",
+  "date": "2026-07-26",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554935
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SE Palmeiras",
+  "away_team": "CA Mineiro",
+  "date": "2026-07-26",
+  "home_goals": 1,
+  "away_goals": 2,
+  "label": 2,
+  "match_id": 554936
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Clube do Remo",
+  "away_team": "EC Vitória",
+  "date": "2026-07-26",
+  "home_goals": 2,
+  "away_goals": 0,
+  "label": 0,
+  "match_id": 554937
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Internacional",
+  "away_team": "CR Flamengo",
+  "date": "2026-07-29",
+  "home_goals": 1,
+  "away_goals": 1,
+  "label": 1,
+  "match_id": 554946
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Mirassol FC",
+  "away_team": "Clube do Remo",
+  "date": "2026-07-29",
+  "home_goals": 2,
+  "away_goals": 1,
+  "label": 0,
+  "match_id": 554947
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Fluminense FC",
+  "away_team": "EC Bahia",
+  "date": "2026-07-30",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554945
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "EC Vitória",
+  "away_team": "SE Palmeiras",
+  "date": "2026-07-30",
+  "home_goals": 0,
+  "away_goals": 4,
+  "label": 2,
+  "match_id": 554949
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "SC Corinthians Paulista",
+  "away_team": "CA Paranaense",
+  "date": "2026-07-30",
+  "home_goals": 0,
+  "away_goals": 0,
+  "label": 1,
+  "match_id": 554943
+ },
+ {
+  "competition": "Campeonato Brasileiro Série A",
+  "home_team": "Coritiba FBC",
+  "away_team": "Cruzeiro EC",
+  "date": "2026-07-31",
+  "home_goals": 0,
+  "away_goals": 1,
+  "label": 2,
+  "match_id": 554944
+ }
+]

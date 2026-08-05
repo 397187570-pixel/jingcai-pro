@@ -4,6 +4,7 @@
  * 依赖：utils.js (esc)
  */
 
+(function() {
 /* 依赖解析：浏览器用全局，Node 用 require */
 let esc;
 if (typeof window !== 'undefined' && window.esc) {
@@ -55,9 +56,35 @@ function addBetRecord(record) {
 
 /**
  * 渲染工具箱
+ * 注：投注记录功能暂时保留，后续将改为"近 1 个月预测准确率统计"
  */
 function renderToolbox() {
   const records = getBetRecords();
+
+  /* 准确率统计占位（用户明确说缓后执行，先做 UI 骨架） */
+  const accEl = document.getElementById('toolboxAccuracy');
+  if (accEl) {
+    /* 统计近 30 天有结果的记录 */
+    var now = new Date();
+    var recent = records.filter(function(r) {
+      if (r.result === 'pending') return false;
+      var d = new Date(r.date);
+      return (now - d) <= 30 * 86400000;
+    });
+    var wins = recent.filter(function(r) { return r.result === 'win'; }).length;
+    var total = recent.length;
+    var rate = total ? Math.round(wins / total * 100) : 0;
+
+    accEl.innerHTML =
+      '<div class="grid grid-3" style="margin-bottom:12px;">' +
+        '<div class="card"><div class="page-subtitle">近 30 天预测</div><div class="page-title">' + total + ' 场</div></div>' +
+        '<div class="card"><div class="page-subtitle">命中</div><div class="page-title" style="color:var(--c-green);">' + wins + ' 场</div></div>' +
+        '<div class="card"><div class="page-subtitle">准确率</div><div class="page-title" style="color:' + (rate >= 60 ? 'var(--c-green)' : rate >= 40 ? 'var(--c-amber)' : 'var(--c-red)') + ';">' + rate + '%</div></div>' +
+      '</div>' +
+      (total === 0
+        ? '<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:12px;">暂无已开奖记录 — 此功能需积累真实预测数据后自动统计</div>'
+        : '<div style="font-size:11px;color:var(--text-muted);text-align:center;">数据来源：已记录的预测结果（localStorage，不涉及真实下注）</div>');
+  }
 
   // 投注记录表
   const betBody = document.getElementById('betTableBody');
@@ -138,3 +165,5 @@ if (typeof window !== 'undefined') {
   window.getBetRecords = getBetRecords;
   window.getFollowTeams = getFollowTeams;
 }
+
+})();

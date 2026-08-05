@@ -1,46 +1,30 @@
 /**
  * analysis.js — 深度分析组件
  * 竞彩智选 Pro · 模块化版
- * 依赖：utils.js (esc/deVigOdds)、predictor.js (eloPredict)
+ * 依赖：utils.js (esc/deVigOdds)、predictor.js (eloPredict)、calibration.js
  */
 
+(function() {
 /* 依赖解析：浏览器用全局，Node 用 require */
-let esc, deVigOdds;
+let esc, deVigOdds, eloPredict, calibrateProbability;
 if (typeof window !== 'undefined' && window.esc) {
-  esc = window.esc; deVigOdds = window.deVigOdds;
+  esc = window.esc; deVigOdds = window.deVigOdds; eloPredict = window.eloPredict;
+  calibrateProbability = window.Calibration ? window.Calibration.calibrateProbability : null;
 } else {
   const utils = require('../core/utils.js');
-  esc = utils.esc; deVigOdds = utils.deVigOdds;
+  const predictor = require('../engine/predictor.js');
+  esc = utils.esc; deVigOdds = utils.deVigOdds; eloPredict = predictor.eloPredict;
+  try { calibrateProbability = require('../engine/calibration.js').calibrateProbability; } catch (e) { calibrateProbability = null; }
 }
 
-/* 静态分析数据（示例） */
-const ANALYSIS_STATIC = {
-  factors: [
-    { name: '近期状态', val: 0.92, color: 'var(--c-blue)' },
-    { name: '主场优势', val: 0.85, color: 'var(--c-cyan)' },
-    { name: '攻防能力', val: 0.78, color: 'var(--c-green)' },
-    { name: '历史交锋', val: 0.65, color: 'var(--c-amber)' },
-    { name: '战意评估', val: 0.60, color: 'var(--c-purple)' }
-  ],
-  metrics: [
-    { label: '进球数', home: 1.9, away: 1.3 },
-    { label: '失球数', home: 0.8, away: 1.1 },
-    { label: '射门', home: 14, away: 11 },
-    { label: '控球率', home: 58, away: 42 },
-    { label: '角球', home: 6.2, away: 4.8 }
-  ],
-  h2h: [
-    { date: '2026-05-15', event: '巴西杯', home: '米拉索尔', score: '2:1', away: '格雷米奥', result: 'W' },
-    { date: '2025-11-03', event: '巴西杯', home: '格雷米奥', score: '1:1', away: '米拉索尔', result: 'D' },
-    { date: '2025-08-20', event: '巴西杯', home: '米拉索尔', score: '0:2', away: '格雷米奥', result: 'L' }
-  ]
-};
+/* 全局选中索引（用于高亮） */
+let selectedAnalysisIdx = -1;
 
 /**
  * 渲染深度分析列表
  * @param {Array} matches 比赛列表
  */
-function renderAnalysisList(matches, onSelect) {
+function renderAnalysisList(matches) {
   const listEl = document.getElementById('analysisList');
   if (!listEl) return;
 
@@ -60,8 +44,17 @@ function renderAnalysisList(matches, onSelect) {
       conf = Math.max(p.pH, p.pD, p.pA) * 100;
     }
 
+    /* 真实置信度（校准后） */
+    let realConf = conf;
+    if (calibrateProbability) {
+      const cal = calibrateProbability(conf / 100);
+      if (cal.calibrated !== conf / 100) realConf = cal.calibrated * 100;
+    }
+
+    const isSel = idx === selectedAnalysisIdx;
+
     return `
-    <div class="analysis-item" onclick="${onSelect ? 'window.__selectAnalysis(' + idx + ')' : ''}">
+    <div class="analysis-item ${isSel ? 'selected' : ''}" onclick="openAnalysisDetail(${idx})" style="cursor:pointer;${isSel ? 'background:var(--bg-card-hover);border-left:3px solid var(--c-blue);' : ''}">
       <div class="ai-num">${esc(m.code || '')}</div>
       <div class="ai-teams">
         ${esc(h)} <span style="color:var(--text-muted);font-weight:400;">vs</span> ${esc(a)}
@@ -73,7 +66,7 @@ function renderAnalysisList(matches, onSelect) {
         <span style="color:var(--c-green);">${(odds.a||0).toFixed(2)}</span>` : '暂无赔率'}
       </div>
       <div class="ai-conf">
-        <span class="badge ${conf >= 65 ? 'badge-green' : conf >= 50 ? 'badge-amber' : 'badge-blue'}">${conf.toFixed(0)}%</span>
+        <span class="badge ${realConf >= 65 ? 'badge-green' : realConf >= 50 ? 'badge-amber' : 'badge-blue'}">${realConf.toFixed(0)}%</span>
       </div>
       <div class="ai-arrow">›</div>
     </div>`;
@@ -81,11 +74,84 @@ function renderAnalysisList(matches, onSelect) {
 }
 
 /**
- * 渲染单场分析详情
+ * 从赔率推导分析因子（不用硬编码静态数据）
+ */
+function deriveFactors(odds) {
+  if (!odds || !odds.h || odds.h <= 1) {
+    return [
+      { name: '近期状态', val: 0.50, color: 'var(--c-blue)', note: '赔率反推' },
+      { name: '主场优势', val: 0.50, color: 'var(--c-cyan)', note: '赔率反推' },
+      { name: '攻防能力', val: 0.50, color: 'var(--c-green)', note: '赔率反推' },
+      { name: '历史交锋', val: 0.50, color: 'var(--c-amber)', note: '无数据' },
+      { name: '战意评估', val: 0.50, color: 'var(--c-purple)', note: '赔率反推' }
+    ];
+  }
+  var p = deVigOdds(odds.h, odds.d || 3.3, odds.a || 3.4);
+  /* 主胜概率高 → 近期状态/主场优势高 */
+  var homeStrength = p.pH;
+  var awayStrength = p.pA;
+  /* 总进球期望：用赔率反推大致进球区间 */
+  var totalImplied = (1/odds.h + 1/odds.d + 1/odds.a);
+  var returnRate = 1 / totalImplied;
+  /* 平局概率高 → 攻防均衡，进球少 */
+  var drawRate = p.pD;
+  var attackFactor = 0.5 + (0.4 - drawRate) * 1.5; /* 平局越少，攻防越活跃 */
+
+  return [
+    { name: '近期状态', val: Math.max(0.2, Math.min(0.95, homeStrength + 0.1)), color: 'var(--c-blue)', note: '赔率反推' },
+    { name: '主场优势', val: Math.max(0.25, Math.min(0.9, homeStrength - awayStrength + 0.5)), color: 'var(--c-cyan)', note: '赔率反推' },
+    { name: '攻防能力', val: Math.max(0.2, Math.min(0.85, attackFactor)), color: 'var(--c-green)', note: '赔率反推' },
+    { name: '历史交锋', val: 0.50, color: 'var(--c-amber)', note: '暂无数据' },
+    { name: '战意评估', val: Math.max(0.3, Math.min(0.8, 0.5 + (homeStrength - 0.45) * 0.6)), color: 'var(--c-purple)', note: '赔率反推' }
+  ];
+}
+
+/**
+ * 从赔率推导估算攻防数据（标注"模型估算"）
+ */
+function deriveMetrics(odds) {
+  if (!odds || !odds.h || odds.h <= 1) {
+    return [
+      { label: '预估进球', home: '--', away: '--', note: '模型估算' },
+      { label: '预估失球', home: '--', away: '--', note: '模型估算' },
+      { label: '预估射门', home: '--', away: '--', note: '模型估算' },
+      { label: '控球率', home: '--', away: '--', note: '模型估算' },
+      { label: '预估角球', home: '--', away: '--', note: '模型估算' }
+    ];
+  }
+  var p = deVigOdds(odds.h, odds.d || 3.3, odds.a || 3.4);
+  /* 主胜概率 → 估算主队进球偏多 */
+  var homeGoals = (p.pH * 2.2 + p.pD * 1.1).toFixed(1);
+  var awayGoals = (p.pA * 2.2 + p.pD * 1.1).toFixed(1);
+  /* 射门估算：进球期望 × 7（足球平均 ~7 射门/进球） */
+  var homeShots = Math.round(parseFloat(homeGoals) * 7);
+  var awayShots = Math.round(parseFloat(awayGoals) * 7);
+  /* 控球率：按实力分配 */
+  var homePoss = Math.round(p.pH * 100 / (p.pH + p.pA));
+  var awayPoss = 100 - homePoss;
+  /* 角球估算 */
+  var homeCorners = (parseFloat(homeGoals) * 2.5 + 3).toFixed(1);
+  var awayCorners = (parseFloat(awayGoals) * 2.5 + 3).toFixed(1);
+
+  return [
+    { label: '预估进球', home: homeGoals, away: awayGoals, note: '模型估算' },
+    { label: '预估失球', home: awayGoals, away: homeGoals, note: '模型估算' },
+    { label: '预估射门', home: homeShots, away: awayShots, note: '模型估算' },
+    { label: '控球率', home: homePoss + '%', away: awayPoss + '%', note: '模型估算' },
+    { label: '预估角球', home: homeCorners, away: awayCorners, note: '模型估算' }
+  ];
+}
+
+/**
+ * 渲染单场分析详情（用选中比赛的真实数据）
  */
 function renderAnalysisDetail(match) {
   const container = document.getElementById('analysisDetail');
   if (!container) return;
+  if (!match) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:30px;">点击上方比赛查看深度分析</div>';
+    return;
+  }
 
   const h = match.homeTeam || '主队';
   const a = match.awayTeam || '客队';
@@ -96,46 +162,52 @@ function renderAnalysisDetail(match) {
   const conf = Math.max(probs.pH, probs.pD, probs.pA);
   const pred = probs.pH >= probs.pD && probs.pH >= probs.pA ? '主胜' : probs.pD >= probs.pA ? '平局' : '客胜';
 
+  /* 真实置信度 */
+  let realConf = conf, calNote = '';
+  if (calibrateProbability) {
+    const cal = calibrateProbability(conf);
+    if (cal.calibrated !== conf) {
+      realConf = cal.calibrated;
+      calNote = `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">真实置信度 ${Math.round(realConf * 100)}%（校准样本 ${cal.count || 0} 场）</div>`;
+    }
+  }
+
+  /* 从赔率推导因子 + 指标 */
+  const factors = deriveFactors(odds);
+  const metrics = deriveMetrics(odds);
+
   // 因子
-  const factorsHtml = ANALYSIS_STATIC.factors.map(f => `
+  const factorsHtml = factors.map(f => `
     <div class="factor-row">
-      <div class="factor-name">${esc(f.name)}</div>
+      <div class="factor-name">${esc(f.name)}<span style="font-size:9px;color:var(--text-muted);margin-left:4px;">${esc(f.note)}</span></div>
       <div class="factor-bar-wrap"><div class="factor-bar" style="width:${f.val * 100}%;background:${f.color};"></div></div>
       <div class="factor-pct" style="color:${f.color};">${(f.val * 100).toFixed(0)}%</div>
     </div>`).join('');
 
   // 攻防对比
-  const metricsHtml = ANALYSIS_STATIC.metrics.map(mt => {
-    const max = Math.max(mt.home, mt.away) * 1.2;
+  const metricsHtml = metrics.map(mt => {
+    var hv = parseFloat(mt.home) || 0;
+    var av = parseFloat(mt.away) || 0;
+    var max = Math.max(hv, av, 1) * 1.2;
     return `<div class="metric-row">
       <div class="metric-label">${esc(mt.label)}</div>
       <div class="metric-bar-wrap">
-        <div class="metric-bar-l" style="width:${(mt.home / max * 100).toFixed(0)}%;background:var(--c-blue);">${mt.home}</div>
+        <div class="metric-bar-l" style="width:${(hv / max * 100).toFixed(0)}%;background:var(--c-blue);">${mt.home}</div>
         <div style="flex:1;height:1px;background:var(--border-color);"></div>
-        <div class="metric-bar-r" style="width:${(mt.away / max * 100).toFixed(0)}%;background:var(--c-red);">${mt.away}</div>
+        <div class="metric-bar-r" style="width:${(av / max * 100).toFixed(0)}%;background:var(--c-red);">${mt.away}</div>
       </div>
     </div>`;
   }).join('');
 
-  // 交锋记录
-  const h2hHtml = ANALYSIS_STATIC.h2h.map(x => `
-    <tr>
-      <td style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;">${esc(x.date)}</td>
-      <td>${esc(x.event)}</td>
-      <td>${esc(x.home)}</td>
-      <td style="font-family:var(--font-mono);font-weight:600;">${esc(x.score)}</td>
-      <td>${esc(x.away)}</td>
-      <td><span class="result-tag ${x.result}">${x.result === 'W' ? '主胜' : x.result === 'D' ? '平局' : '客胜'}</span></td>
-    </tr>`).join('');
-
   container.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:12px;background:var(--bg-card-hover);border-radius:8px;">
       <div>
         <div style="font-size:18px;font-weight:700;">${esc(h)} <span style="color:var(--text-muted);font-weight:400;">vs</span> ${esc(a)}</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${esc(match.league || '')} · ${esc(match.time || '')}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${esc(match.league || '')} · ${esc(match.code || '')} · ${esc(match.time || '')}</div>
       </div>
-      <span class="badge ${conf >= 65 ? 'badge-green' : 'badge-amber'}">置信度 ${(conf * 100).toFixed(0)}%</span>
+      <span class="badge ${realConf >= 0.65 ? 'badge-green' : realConf >= 0.5 ? 'badge-amber' : 'badge-blue'}">置信度 ${Math.round(realConf * 100)}%</span>
     </div>
+    ${calNote}
 
     <div class="grid grid-3" style="margin-bottom:16px;">
       <div class="card"><div class="page-subtitle">主胜</div><div class="page-title" style="color:var(--c-green);">${(probs.pH * 100).toFixed(0)}%</div></div>
@@ -149,17 +221,17 @@ function renderAnalysisDetail(match) {
     </div>
 
     <div class="card" style="margin-bottom:16px;">
-      <div style="font-size:14px;font-weight:600;margin-bottom:12px;">⚔️ 攻防数据对比</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px;">⚔️ 攻防数据对比 <span style="font-size:10px;color:var(--text-muted);font-weight:400;">（模型估算）</span></div>
       ${metricsHtml}
     </div>
 
-    <div class="card">
-      <div style="font-size:14px;font-weight:600;margin-bottom:12px;">📜 近 3 次交锋</div>
-      <table class="table"><tbody>${h2hHtml}</tbody></table>
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px;">📜 历史交锋</div>
+      <div style="text-align:center;color:var(--text-muted);padding:20px;font-size:12px;">暂无历史交锋数据 — 当前数据源（竞彩官网）不提供历史记录</div>
     </div>
 
-    <div style="margin-top:16px;padding:10px;background:var(--c-blue-dim);border-radius:8px;font-size:13px;">
-      🎯 AI 研判：推荐 <strong>${esc(pred)}</strong>（置信度 ${(conf * 100).toFixed(0)}%）
+    <div style="margin-top:16px;padding:12px;background:var(--c-blue-dim);border-radius:8px;font-size:13px;">
+      🎯 AI 研判：推荐 <strong>${esc(pred)}</strong>（置信度 ${Math.round(realConf * 100)}%）
     </div>`;
 }
 
@@ -167,10 +239,11 @@ function renderAnalysisDetail(match) {
    导出
    ============================================ */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { renderAnalysisList, renderAnalysisDetail, ANALYSIS_STATIC };
+  module.exports = { renderAnalysisList, renderAnalysisDetail };
 }
 if (typeof window !== 'undefined') {
   window.renderAnalysisList = renderAnalysisList;
   window.renderAnalysisDetail = renderAnalysisDetail;
-  window.ANALYSIS_STATIC = ANALYSIS_STATIC;
 }
+
+})();

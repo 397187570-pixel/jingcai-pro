@@ -1,46 +1,52 @@
 {
   "type": "confidence_calibration",
-  "version": "1.0.0",
+  "version": "2.0.0-real",
   "n_matches": 4399,
   "brier_score": 0.0005,
-  "generated_at": "2026-08-03 21:11",
+  "generated_at": "2026-08-05 18:10",
+  "note": "predicted=竞彩隐含概率, actual=真实命中率; 前端用 actual 作为真实置信度。",
   "table": [
     {
       "range": "0.3-0.4",
       "predicted": 0.3761,
       "actual": 0.398,
-      "count": 696
+      "count": 696,
+      "bias": 0.0219
     },
     {
       "range": "0.4-0.5",
       "predicted": 0.4466,
       "actual": 0.435,
-      "count": 1439
+      "count": 1439,
+      "bias": -0.0116
     },
     {
       "range": "0.5-0.6",
       "predicted": 0.5498,
       "actual": 0.5161,
-      "count": 1089
+      "count": 1089,
+      "bias": -0.0337
     },
     {
       "range": "0.6-0.7",
       "predicted": 0.6466,
       "actual": 0.6604,
-      "count": 745
+      "count": 745,
+      "bias": 0.0138
     },
     {
       "range": "0.7-0.8",
       "predicted": 0.7464,
       "actual": 0.7637,
-      "count": 419
+      "count": 419,
+      "bias": 0.0173
     },
     {
       "range": "0.8-0.9",
       "predicted": 0.8151,
       "actual": 0.8182,
-      "count": 11
+      "count": 11,
+      "bias": 0.0031
     }
-  ],
-  "note": "predicted=模型预测概率, actual=实际命中率, 前端用 actual 作为真实置信度"
+  ]
 }

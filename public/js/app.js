@@ -13,6 +13,9 @@ const AppState = {
   settings: {}
 };
 
+/* football-data.org 默认 Key（用户提供；可在设置里覆盖） */
+const FOOTBALL_DATA_DEFAULT_KEY = '3fe18ae6596b42d68ce5fafc8c98f2fb';
+
 /* ============================================
    页面路由
    ============================================ */
@@ -33,18 +36,47 @@ function switchPage(page) {
    ============================================ */
 async function loadMatches() {
   try {
-    // 优先 SCF 代理，其次直连
+    // 页面上可见的诊断（不依赖 console）
+    const diag = window.__jcDiag = { steps: [], dataSource: '?', error: null };
+    const logStep = (msg, ok) => {
+      diag.steps.push((ok ? '✅' : '❌') + ' ' + msg);
+      try { console.log('[jc] ' + msg); } catch (e) {}
+      updateDiagPanel();
+    };
+    logStep('开始加载，fdKey: ' + (AppState.settings.footballKey || FOOTBALL_DATA_DEFAULT_KEY).slice(0,6) + '...', true);
+
     const proxyUrl = AppState.settings.proxyUrl || '';
     let result;
+    let dataSource = 'sporttery';
+
     if (proxyUrl) {
+      // 优先 SCF 代理
+      logStep('SCF 代理: ' + proxyUrl, true);
       const res = await fetch(proxyUrl + '/api/matches');
       result = { ok: res.ok, data: await res.json(), isProxy: true };
+      dataSource = 'scf-proxy';
     } else {
+      // 唯一数据源：中国竞彩官网（经本地/云端代理）
+      // 规则：只展示中国竞彩选定的比赛，其他联赛一律不展示
+      logStep('竞彩官网（经代理）...', true);
       result = await SportteryApi.getMatches('HAD');
+      logStep('竞彩 → ' + (result.ok ? (result.data ? result.data.length + ' 场' : '0 场') : ('ERR: ' + result.error)), result.ok && result.data && result.data.length > 0);
+      if (result.ok && result.data && result.data.length) {
+        dataSource = 'sporttery';
+      } else {
+        // 竞彩无在售场次（如休赛期/时段无场次）→ 如实提示，不拿其他联赛充数
+        logStep('今日无竞彩在售场次', false);
+        result = { ok: false, error: '今日中国竞彩暂无在售场次（竞彩未选定比赛）' };
+      }
     }
 
+    // 竞彩无在售场次 = 正常空态（不报错），渲染"今日无竞彩场次"界面
     if (!result.ok || !result.data) {
-      toast('error', '❌', '加载失败: ' + (result.error || '数据源不可用'));
+      AppState.matches = [];
+      AppState.dataSource = dataSource;
+      updateDiagPanel();
+      renderAll();
+      toast('info', '📭', result.error || '今日中国竞彩暂无在售场次');
       return;
     }
 
@@ -61,16 +93,52 @@ async function loadMatches() {
         odds: m.had ? { h: parseFloat(m.had.h), d: parseFloat(m.had.d), a: parseFloat(m.had.a) } : null,
         handicap: m.hhad ? m.hhad.goalLine : ''
       }));
+    } else if (dataSource.startsWith('football-data')) {
+      matches = result.data || [];
     } else {
       matches = result.data || [];
     }
 
     AppState.matches = matches;
+    AppState.dataSource = dataSource;
+    // 更新"数据源"KPI 卡片
+    const srcEl = document.getElementById('statSource');
+    if (srcEl) srcEl.textContent = dataSource.startsWith('football-data')
+      ? 'football-data · ' + dataSource.split(':')[1]
+      : (dataSource === 'scf-proxy' ? 'SCF 代理' : '竞彩官方');
+    updateDiagPanel();
     renderAll();
-    toast('success', '✅', `已加载 ${matches.length} 场比赛`);
+    const srcLabel = dataSource.startsWith('football-data')
+      ? `（${dataSource.split(':')[1]} 联赛）`
+      : (dataSource === 'scf-proxy' ? '（SCF 代理）' : '（竞彩官方）');
+    if (matches.length === 0) {
+      toast('info', '📭', '今日中国竞彩暂无在售场次，稍后刷新试试');
+    } else {
+      toast('success', '✅', `已加载 ${matches.length} 场竞彩场次（${srcLabel}）`);
+    }
   } catch (e) {
     toast('error', '❌', '加载失败: ' + e.message);
+    try { if (window.__jcDiag) window.__jcDiag.error = e.message; updateDiagPanel(); } catch (_) {}
   }
+}
+
+/**
+ * 页面内诊断面板：把数据加载过程渲染到"数据源"KPI 卡片下方
+ * 不依赖 console，任何浏览器都能看到
+ */
+function updateDiagPanel() {
+  const el = document.getElementById('diagPanel');
+  if (!el) return;
+  const d = window.__jcDiag || { steps: [], dataSource: '?', error: null };
+  const err = d.error ? `<div style="color:var(--c-red);">❌ 异常: ${esc(d.error)}</div>` : '';
+  const steps = d.steps.length
+    ? d.steps.map(s => `<div style="font-size:10px;line-height:1.5;">${s}</div>`).join('')
+    : '<div style="font-size:10px;color:var(--text-muted);">等待加载...</div>';
+  el.innerHTML = `<div style="margin-top:10px;padding:10px;background:var(--bg-card-hover);border:1px solid var(--border-color);border-radius:8px;">
+    <div style="font-size:11px;font-weight:600;margin-bottom:6px;">🔍 数据源诊断</div>
+    ${err}
+    ${steps}
+  </div>`;
 }
 
 /* ============================================
@@ -83,8 +151,13 @@ function renderAll() {
   renderAIRecommendations(AppState.matches);
   renderToolbox();
 
-  // KPI 补充
-  setText('statSource', '竞彩官方');
+  // KPI 补充（用 AppState.dataSource 显示真实来源）
+  if (AppState.dataSource) {
+    const src = AppState.dataSource;
+    setText('statSource', src.startsWith('football-data') ? 'football-data' : (src === 'scf-proxy' ? 'SCF 代理' : '竞彩官方'));
+  } else {
+    setText('statSource', '竞彩官方');
+  }
 }
 
 function setText(id, val) {
@@ -205,11 +278,19 @@ function init() {
     AppState.settings = saved;
   } catch (e) { /* 无设置 */ }
 
-  // 从 URL 参数读取 proxy
+  // 从 URL 参数读取 proxy / direct
   try {
     const params = new URLSearchParams(location.search);
     if (params.get('proxy')) AppState.settings.proxyUrl = params.get('proxy');
+    if (params.get('direct') === '1') AppState.settings.direct = true;
   } catch (e) { /* 忽略 */ }
+
+  // 代理基地址（本地/云端统一）：
+  //   - 本地预览：proxyUrl 为空 → JC_API_BASE='' → 同源 /api/sporttery、/api/football 走 local_server.py
+  //   - 云端 SCF：proxyUrl=云函数域名 → JC_API_BASE=该域名 → /api/sporttery、/api/football 走云函数
+  //   - 云端纯静态直连：?direct=1 → JC_API_BASE='' + JC_DIRECT=true → 直连竞彩官网（CORS 开放）
+  window.JC_API_BASE = (AppState.settings.proxyUrl || '').replace(/\/+$/, '');
+  window.JC_DIRECT = AppState.settings.direct === true;
 
   // 路由绑定
   document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -264,6 +345,8 @@ function openSettings() {
   if (proxyInput) proxyInput.value = AppState.settings.proxyUrl || '';
   const keyInput = document.getElementById('settingsOddsKey');
   if (keyInput) keyInput.value = AppState.settings.oddsKey || '';
+  const fdInput = document.getElementById('settingsFootballKey');
+  if (fdInput) fdInput.value = AppState.settings.footballKey || '';
   modal.style.display = 'flex';
 }
 
@@ -278,6 +361,8 @@ function saveSettings() {
   const keyInput = document.getElementById('settingsOddsKey');
   if (proxyInput) AppState.settings.proxyUrl = proxyInput.value.trim();
   if (keyInput) AppState.settings.oddsKey = keyInput.value.trim();
+  const fdInput = document.getElementById('settingsFootballKey');
+  if (fdInput) AppState.settings.footballKey = fdInput.value.trim();
   try {
     localStorage.setItem('jc_settings', JSON.stringify(AppState.settings));
   } catch (e) { /* 存储失败忽略 */ }

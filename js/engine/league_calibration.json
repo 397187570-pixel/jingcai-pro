@@ -1,0 +1,174 @@
+{
+  "version": "2.0.0-real",
+  "leagues": {
+    "挪威超级联赛": {
+      "n": 106,
+      "top_pick_hit_rate": 0.5472,
+      "mean_bias": -0.0102,
+      "edge_flag": "efficient"
+    },
+    "瑞典超级联赛": {
+      "n": 118,
+      "top_pick_hit_rate": 0.4831,
+      "mean_bias": -0.0292,
+      "edge_flag": "efficient"
+    },
+    "芬兰超级联赛": {
+      "n": 101,
+      "top_pick_hit_rate": 0.5347,
+      "mean_bias": 0.0109,
+      "edge_flag": "efficient"
+    },
+    "韩国职业联赛": {
+      "n": 131,
+      "top_pick_hit_rate": 0.4122,
+      "mean_bias": -0.055,
+      "edge_flag": "underdog_underpriced"
+    },
+    "美国职业大联盟": {
+      "n": 87,
+      "top_pick_hit_rate": 0.5172,
+      "mean_bias": 0.0005,
+      "edge_flag": "efficient"
+    },
+    "欧罗巴联赛": {
+      "n": 145,
+      "top_pick_hit_rate": 0.6,
+      "mean_bias": 0.0531,
+      "edge_flag": "favorite_underpriced"
+    },
+    "欧洲冠军联赛": {
+      "n": 171,
+      "top_pick_hit_rate": 0.614,
+      "mean_bias": 0.0415,
+      "edge_flag": "favorite_underpriced"
+    },
+    "世界杯": {
+      "n": 85,
+      "top_pick_hit_rate": 0.6118,
+      "mean_bias": 0.038,
+      "edge_flag": "favorite_underpriced"
+    },
+    "国际赛": {
+      "n": 93,
+      "top_pick_hit_rate": 0.5806,
+      "mean_bias": 0.0136,
+      "edge_flag": "efficient"
+    },
+    "日本职业联赛": {
+      "n": 122,
+      "top_pick_hit_rate": 0.5328,
+      "mean_bias": 0.0649,
+      "edge_flag": "favorite_underpriced"
+    },
+    "法国甲级联赛": {
+      "n": 195,
+      "top_pick_hit_rate": 0.5026,
+      "mean_bias": -0.0449,
+      "edge_flag": "underdog_underpriced"
+    },
+    "葡萄牙超级联赛": {
+      "n": 123,
+      "top_pick_hit_rate": 0.5447,
+      "mean_bias": -0.0187,
+      "edge_flag": "efficient"
+    },
+    "欧洲协会联赛": {
+      "n": 45,
+      "top_pick_hit_rate": 0.5778,
+      "mean_bias": 0.0303,
+      "edge_flag": "favorite_underpriced"
+    },
+    "德国乙级联赛": {
+      "n": 142,
+      "top_pick_hit_rate": 0.4718,
+      "mean_bias": -0.007,
+      "edge_flag": "efficient"
+    },
+    "德国甲级联赛": {
+      "n": 256,
+      "top_pick_hit_rate": 0.5508,
+      "mean_bias": 0.0369,
+      "edge_flag": "favorite_underpriced"
+    },
+    "西班牙甲级联赛": {
+      "n": 315,
+      "top_pick_hit_rate": 0.5333,
+      "mean_bias": 0.0314,
+      "edge_flag": "favorite_underpriced"
+    },
+    "意大利甲级联赛": {
+      "n": 329,
+      "top_pick_hit_rate": 0.535,
+      "mean_bias": 0.0072,
+      "edge_flag": "efficient"
+    },
+    "荷兰甲级联赛": {
+      "n": 149,
+      "top_pick_hit_rate": 0.4362,
+      "mean_bias": -0.1049,
+      "edge_flag": "underdog_underpriced"
+    },
+    "英格兰超级联赛": {
+      "n": 304,
+      "top_pick_hit_rate": 0.4737,
+      "mean_bias": -0.0509,
+      "edge_flag": "underdog_underpriced"
+    },
+    "英格兰甲级联赛": {
+      "n": 59,
+      "top_pick_hit_rate": 0.5593,
+      "mean_bias": 0.0793,
+      "edge_flag": "favorite_underpriced"
+    },
+    "荷兰乙级联赛": {
+      "n": 90,
+      "top_pick_hit_rate": 0.4667,
+      "mean_bias": -0.0592,
+      "edge_flag": "underdog_underpriced"
+    },
+    "英格兰冠军联赛": {
+      "n": 231,
+      "top_pick_hit_rate": 0.4286,
+      "mean_bias": -0.0381,
+      "edge_flag": "underdog_underpriced"
+    },
+    "澳大利亚超级联赛": {
+      "n": 134,
+      "top_pick_hit_rate": 0.3881,
+      "mean_bias": -0.0894,
+      "edge_flag": "underdog_underpriced"
+    },
+    "沙特职业联赛": {
+      "n": 135,
+      "top_pick_hit_rate": 0.6074,
+      "mean_bias": 0.0232,
+      "edge_flag": "efficient"
+    },
+    "法国乙级联赛": {
+      "n": 104,
+      "top_pick_hit_rate": 0.5288,
+      "mean_bias": 0.0632,
+      "edge_flag": "favorite_underpriced"
+    },
+    "亚洲冠军精英联赛": {
+      "n": 69,
+      "top_pick_hit_rate": 0.5797,
+      "mean_bias": 0.0261,
+      "edge_flag": "efficient"
+    },
+    "世界杯预选赛": {
+      "n": 109,
+      "top_pick_hit_rate": 0.5413,
+      "mean_bias": -0.0447,
+      "edge_flag": "underdog_underpriced"
+    },
+    "非洲杯": {
+      "n": 44,
+      "top_pick_hit_rate": 0.6136,
+      "mean_bias": 0.0686,
+      "edge_flag": "favorite_underpriced"
+    }
+  },
+  "inefficient_count": 18
+}
