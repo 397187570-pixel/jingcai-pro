@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/verdict.css">
 </head>
 <body>
   <div class="app-shell">
@@ -20,6 +21,7 @@
         <button class="nav-tab" data-page="analysis">📈 <span>深度分析</span></button>
         <button class="nav-tab" data-page="odds">🎲 <span>赔率监测</span></button>
         <button class="nav-tab" data-page="ai">🧠 <span>AI 研判</span></button>
+        <button class="nav-tab" data-page="verdict">🎯 <span>研判结论</span></button>
         <button class="nav-tab" data-page="toolbox">🛠️ <span>个人工具箱</span></button>
       </nav>
     </aside>
@@ -143,6 +145,78 @@
         </div>
       </div>
 
+      <!-- 🎯 研判结论 -->
+      <div id="page-verdict" class="page">
+        <div class="verdict-header">
+          <div>
+            <div class="verdict-eyebrow">竞彩智选 Pro · AI研判系统</div>
+            <div class="verdict-title">研判结论</div>
+          </div>
+          <div class="verdict-meta">
+            <div class="verdict-date" id="verdictDate">--</div>
+            <div class="verdict-update">数据更新 <span id="verdictUpdateTime">--:--</span> · 竞彩官网实时</div>
+          </div>
+        </div>
+        <div class="verdict-divider"></div>
+
+        <div id="verdictKpiStrip" class="verdict-kpi-grid"></div>
+
+        <div class="verdict-section-title-row">
+          <div class="verdict-section-title">今日赛事研判结论</div>
+          <span class="badge badge-green" id="verdictMatchTag">0 场在售 · 实时校准</span>
+        </div>
+        <div id="verdictMatchGrid" class="verdict-match-grid"></div>
+
+        <div class="verdict-section-title-row">
+          <div class="verdict-section-title">多维预测分解</div>
+          <span class="badge badge-green" id="verdictMultiTag">胜平负 · 让球 · 进球 · 比分 · Top5</span>
+        </div>
+        <div id="verdictMatchSelector" class="verdict-match-selector"></div>
+        <div id="verdictMultiDimGrid" class="verdict-multidim-grid"></div>
+        <div id="verdictTop5" class="card verdict-top5"></div>
+
+        <div class="verdict-section-title-row">
+          <div class="verdict-section-title">研判方法论 · 双闸门</div>
+          <span class="badge badge-red">纪律约束</span>
+        </div>
+        <div class="verdict-method-grid">
+          <div class="card">
+            <div class="verdict-method-title">方向闸门</div>
+            <div class="verdict-method-body">edge ≥ +5% 且 校准置信 ≥ 55%，双闸门同时满足才出手；任一不满足则不出手。</div>
+          </div>
+          <div class="card">
+            <div class="verdict-method-title">价值闸门</div>
+            <div class="verdict-method-body">模型价值边际 ≥ +5% 才标记；超过该联赛历史 p90 分布为极强信号。无欧盘时以欧盘历史先验作标尺。</div>
+          </div>
+          <div class="card">
+            <div class="verdict-method-title">仓位纪律</div>
+            <div class="verdict-method-body">单场 ≤ 本金 3%、半 Kelly 下注、累计回撤 15% 即停手。竞彩固定抽水 12.9%，长期必负 EV，仅抓局部偶发价值。</div>
+          </div>
+        </div>
+
+        <div class="verdict-section-title-row">
+          <div class="verdict-section-title">回测验证结论</div>
+          <span class="badge badge-green">1046 场真实样本</span>
+        </div>
+        <div class="card verdict-backtest">
+          <div class="verdict-backtest-sub">价值信号路径对比（竞彩 + 欧盘 + 赛果，三件套齐全）</div>
+          <table class="table">
+            <thead><tr><th>指标</th><th>无欧盘 A</th><th>有欧盘 B</th></tr></thead>
+            <tbody>
+              <tr><td>方向胜率</td><td>48.7%</td><td>48.7%</td></tr>
+              <tr><td>价值信号跑赢定价</td><td style="color:var(--c-green);font-weight:700;">+2.3pp</td><td style="color:var(--c-red);font-weight:700;">-0.6pp</td></tr>
+              <tr><td>价值信号 ROI（参考）</td><td>-8.2%</td><td style="color:var(--c-red);font-weight:700;">-16.8%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="verdict-callout">
+          <div class="verdict-callout-text">
+            关键发现：① 欧盘对方向准确率无提升（A / B 均为 48.7%）；② 无欧盘模型价值边际(+2.3pp)反而优于有欧盘(-0.6pp)；③ 旧版「有欧盘」信号存在符号反转 bug（实测为反向亏损信号），已修复。当前以无欧盘模型信号为准，不依赖 The Odds API。
+          </div>
+        </div>
+      </div>
+
       <!-- 🛠️ 个人工具箱 -->
       <div id="page-toolbox" class="page">
         <div class="page-header">
@@ -219,6 +293,7 @@
   <script src="js/api/footballData.js"></script>
   <script src="js/components/dashboard.js"></script>
   <script src="js/components/aiAnalysis.js"></script>
+  <script src="js/components/verdict.js"></script>
   <script src="js/components/oddsMonitor.js"></script>
   <script src="js/components/analysis.js"></script>
   <script src="js/components/toolbox.js"></script>

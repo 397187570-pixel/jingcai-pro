@@ -4,6 +4,8 @@
  * 职责：数据加载、页面路由、事件绑定、组件调度
  */
 
+/* global renderVerdict */
+
 /* ============================================
    全局状态
    ============================================ */
@@ -27,6 +29,7 @@ function switchPage(page) {
   // 进入页面时刷新对应内容
   if (page === 'odds' && AppState.matches.length) renderOddsMonitor(AppState.matches, AppState.selectedIndex);
   if (page === 'ai' && AppState.matches.length) renderAIRecommendations(AppState.matches);
+  if (page === 'verdict' && AppState.matches.length) renderVerdict(AppState.matches);
   if (page === 'analysis' && AppState.matches.length) {
     renderAnalysisList(AppState.matches);
     /* 如果有选中比赛，同步渲染详情 */
@@ -155,6 +158,7 @@ function renderAll() {
   renderAnalysisList(AppState.matches);
   renderOddsMonitor(AppState.matches, AppState.selectedIndex);
   renderAIRecommendations(AppState.matches);
+  renderVerdict(AppState.matches);
   renderToolbox();
 
   // KPI 补充（用 AppState.dataSource 显示真实来源）

@@ -1,0 +1,402 @@
+/* ============================================
+   verdict.css — 「研判结论」功能页专用样式
+   对齐 Ardot 设计稿：浅色主题 + 白卡片 + 语义色概率条
+   ============================================ */
+
+/* 页面级容器 */
+#page-verdict {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-bottom: var(--space-8);
+}
+
+/* 顶部标题区 */
+.verdict-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.verdict-eyebrow {
+  font-size: var(--fs-sm);
+  color: var(--c-green);
+  font-weight: 500;
+  margin-bottom: var(--space-1);
+}
+
+.verdict-title {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: .5px;
+}
+
+.verdict-meta {
+  text-align: right;
+}
+
+.verdict-date {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.verdict-update {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+.verdict-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin-bottom: var(--space-6);
+}
+
+/* 分区标题行 */
+.verdict-section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--space-8) 0 var(--space-4);
+}
+
+.verdict-section-title {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* KPI 带 */
+.verdict-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+.verdict-kpi-card {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.verdict-kpi-label {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.verdict-kpi-value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.verdict-kpi-sub {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+/* 赛事研判网格 */
+.verdict-match-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+.verdict-match-card {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.verdict-match-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.verdict-match-toprow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.verdict-match-teams {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.verdict-match-conf-label {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.verdict-match-conf-value {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+}
+
+.verdict-direction {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.verdict-value-badge {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.verdict-value-badge.amber {
+  background: var(--c-amber-dim);
+  color: var(--c-amber);
+  border: 1px solid rgba(245, 158, 11, .3);
+}
+
+.verdict-value-badge.gray {
+  background: var(--bg-card-hover);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+/* 概率条 */
+.vd-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.vd-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width .6s var(--ease-premium);
+}
+
+/* 比赛选择器 */
+.verdict-match-selector {
+  margin-bottom: var(--space-4);
+}
+
+.verdict-match-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.verdict-pill {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: var(--bg-card-hover);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.verdict-pill:hover {
+  background: var(--border-color);
+}
+
+.verdict-pill.active {
+  background: var(--c-blue-dim);
+  color: var(--c-blue);
+  border-color: rgba(59, 130, 246, .3);
+  font-weight: 600;
+}
+
+/* 多维预测网格 */
+.verdict-multidim-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.verdict-dim-card {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.verdict-dim-title {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.verdict-dim-sub {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  margin-top: calc(-1 * var(--space-1));
+}
+
+.verdict-dim-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.verdict-dim-label {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.verdict-dim-row .vd-bar-track {
+  width: 150px;
+  flex-shrink: 0;
+}
+
+/* Top5 卡片 */
+.verdict-top5 {
+  padding: var(--space-4);
+}
+
+.verdict-top5-header {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.verdict-top5-sub {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.verdict-top5-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.verdict-top5-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.verdict-top5-row:last-child {
+  border-bottom: none;
+}
+
+.verdict-top5-rank {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-card-hover);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.verdict-top5-name {
+  flex: 1;
+  margin-left: var(--space-3);
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.verdict-top5-pct {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.verdict-top5-pct.green { color: var(--c-green); }
+.verdict-top5-pct.blue { color: var(--c-blue); }
+.verdict-top5-pct.red { color: var(--c-red); }
+.verdict-top5-pct.amber { color: var(--c-amber); }
+.verdict-top5-pct.muted { color: var(--text-muted); }
+
+/* 方法论 */
+.verdict-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.verdict-method-grid .card {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.verdict-method-title {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.verdict-method-body {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 回测 */
+.verdict-backtest {
+  padding: var(--space-4);
+}
+
+.verdict-backtest-sub {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: var(--space-3);
+}
+
+/* 关键发现 */
+.verdict-callout {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: var(--c-green-dim);
+  border: 1px solid rgba(16, 185, 129, .3);
+  border-radius: var(--radius-lg);
+}
+
+.verdict-callout-text {
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .verdict-kpi-grid,
+  .verdict-multidim-grid { grid-template-columns: repeat(2, 1fr); }
+  .verdict-method-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .verdict-header { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+  .verdict-meta { text-align: left; }
+  .verdict-kpi-grid,
+  .verdict-match-grid,
+  .verdict-multidim-grid,
+  .verdict-method-grid { grid-template-columns: 1fr; }
+  .verdict-match-pills { flex-direction: column; align-items: stretch; }
+  .verdict-pill { text-align: left; }
+}
