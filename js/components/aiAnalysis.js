@@ -41,7 +41,7 @@ function renderAIRecommendations(matches) {
   if (haveModel) {
     banner = '<div style="padding:10px 12px;margin-bottom:12px;background:var(--c-amber-dim);border:1px solid var(--c-amber);border-radius:8px;font-size:11px;line-height:1.7;color:var(--text-secondary);">'
       + '<b style="color:var(--c-amber);">📌 预测依据</b>：方向 = 竞彩隐含概率经 4399 场真实校准（Brier≈0.0005）；'
-      + '价值信号 = 竞彩 vs 欧盘历史偏差（仅当今日实时偏差突破该联赛历史 90 分位才标记）。'
+      + '价值信号 = 未拉取实时欧盘时, 采用「模型概率 − 竞彩市场概率」的模型价值边际(欧盘历史先验 eu_jc_gap.json 作参考标尺, ≥+5% 才标记, 超过历史 p90 为极强); 拉取实时欧盘后升级为竞彩 vs 欧盘实时偏差(突破历史 p90 标记)。'
       + '<br><b style="color:var(--c-red);">⚠️ 风险提示</b>：竞彩固定抽水约 12.9%，长期数学期望为负（负 EV）。本面板为概率参考，'
       + '任何单场都不构成「稳赚」，请严格仓位管理、切勿追高。'
       + '</div>';
@@ -69,19 +69,27 @@ function renderAIRecommendations(matches) {
       const barColor = r.directionConfidence >= 0.6 ? 'var(--c-green)' : r.directionConfidence >= 0.5 ? 'var(--c-amber)' : 'var(--c-red)';
 
       // 价值信号
-      let valueHtml = '<div style="font-size:11px;color:var(--text-muted);margin-top:6px;">📡 价值信号：未拉取欧盘（点击「扫描价值注」后显示）</div>';
+      let valueHtml = '<div style="font-size:11px;color:var(--text-muted);margin-top:6px;">📡 价值信号：未加载模型校准数据</div>';
       if (r.valueSignal) {
-        if (r.valueSignal.flagged[r.valueSignal.bestValueSide]) {
-          const side = r.valueSignal.bestValueSide;
-          const sideZh = side === 'home' ? '主胜' : side === 'draw' ? '平' : '客胜';
-          const pct = r.valueSignal.percentile && r.valueSignal.percentile[side] != null ? ('历史分位 ' + r.valueSignal.percentile[side] + '%') : '';
-          const z = r.valueSignal.zscore && r.valueSignal.zscore[side] != null ? ('z=' + r.valueSignal.zscore[side]) : '';
-          valueHtml = '<div style="font-size:11px;color:var(--c-green);margin-top:6px;font-weight:600;">'
-            + '💎 价值信号：' + sideZh + ' 竞彩优于欧盘 +' + (r.valueSignal.bestValue * 100).toFixed(1) + '%（'
-            + pct + ' ' + z + '，突破历史 p90）'
-            + (r.valueSignal.priorSource === 'history' ? ' · 历史先验' : ' · 软阈值') + '</div>';
+        const vs = r.valueSignal;
+        const side = vs.bestValueSide;
+        const sideZh = side === 'home' ? '主胜' : side === 'draw' ? '平' : '客胜';
+        const pct = vs.percentile && vs.percentile[side] != null ? ('历史分位 ' + vs.percentile[side] + '%') : '';
+        const z = vs.zscore && vs.zscore[side] != null ? ('z=' + vs.zscore[side]) : '';
+        if (vs.flagged[side]) {
+          if (vs.euFree) {
+            const strong = (vs.strong && vs.strong[side]) ? '💎💎 超欧盘历史 p90' : '💎 模型价值';
+            valueHtml = '<div style="font-size:11px;color:var(--c-green);margin-top:6px;font-weight:600;">'
+              + strong + '：' + sideZh + ' 模型概率高于竞彩定价 +' + (vs.bestValue * 100).toFixed(1) + '%（'
+              + pct + ' ' + z + ' · 欧盘历史先验作标尺）</div>';
+          } else {
+            valueHtml = '<div style="font-size:11px;color:var(--c-green);margin-top:6px;font-weight:600;">'
+              + '💎 价值信号：' + sideZh + ' 竞彩优于欧盘 +' + (vs.bestValue * 100).toFixed(1) + '%（'
+              + pct + ' ' + z + '，突破历史 p90）'
+              + (vs.priorSource === 'history' ? ' · 历史先验' : ' · 软阈值') + '</div>';
+          }
         } else {
-          valueHtml = '<div style="font-size:11px;color:var(--text-muted);margin-top:6px;">📡 价值信号：无显著偏离（竞彩与欧盘接近，无 edge）</div>';
+          valueHtml = '<div style="font-size:11px;color:var(--text-muted);margin-top:6px;">📡 价值信号：无显著模型价值（模型与市场定价接近）</div>';
         }
       }
 

@@ -116,6 +116,9 @@ function confidence(probs) {
    ============================================ */
 /**
  * 对比竞彩与国际赔率，检测价值注
+ * 价值定义(投注者视角): 国际(更 sharp)隐含概率 − 竞彩隐含概率 > 0
+ *   => 竞彩在该方向给出比国际更长的赔率 => 对投注者更有利(价值)。
+ *  注: 旧定义 value = jc − int 是反的(挑出的是竞彩高估/赔率更短的注, 实测跑输定价)。
  * @param {Object} jcOdds 竞彩赔率 {h,d,a}
  * @param {Object} intOdds 国际赔率 {h,d,a}
  * @param {number} [threshold=0.04] 价值阈值
@@ -129,7 +132,7 @@ function findValueBets(jcOdds, intOdds, threshold = 0.04) {
   const results = [];
 
   picks.forEach(k => {
-    const value = jc[k] - int[k];
+    const value = int[k] - jc[k]; // 国际 − 竞彩; >0 表示竞彩该方向赔率更优(更长)
     if (value > threshold) {
       results.push({
         pick: labels[k],
