@@ -310,9 +310,10 @@ async function scanValueBetsModular(jcMatches, getIntOdds) {
         detail += '已尝试 broad-search 兜底：' + (diag.broadFound ? '找到数据' : '未找到') + '<br>';
       }
       detail += '</div>';
-      listEl.innerHTML = '<div style="padding:10px;color:var(--text-muted);font-size:12px;">' +
-        '📋 国际赔率已获取 ' + intOdds.length + ' 场，但未匹配到当前竞彩比赛。<br>' +
-        '<span style="font-size:11px;">已放宽时间窗口到24小时并启用联赛匹配，若仍无匹配，通常是 The Odds API 不覆盖该杯赛/资格赛。</span>' +
+      listEl.innerHTML = '<div style="padding:10px;color:var(--c-amber);font-size:12px;">' +
+        '⚠️ 国际赔率已获取 ' + intOdds.length + ' 场，但未匹配到当前竞彩比赛。<br>' +
+        '<span style="font-size:11px;">从上方联赛分布可见，返回的全是联赛盘口，而当前竞彩场次为杯赛/资格赛（巴西杯、欧冠资格赛），<b>The Odds API 免费版不覆盖这些赛事</b>。这是数据源覆盖问题，非匹配错误。</span>' +
+        '<span style="font-size:11px;color:var(--c-green);display:block;margin-top:4px;">✅ 已自动改用「今日推荐」面板中的<b>模型价值信号 💎</b>（不依赖国际赔率，基于竞彩历史校准 + 欧盘历史先验），请直接参考上方推荐。</span>' +
         detail + '</div>';
       return;
     }
