@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "n_matches": 16,
   "brier_score": 0.2712,
-  "generated_at": "2026-08-16 03:41",
+  "generated_at": "2026-08-23 03:43",
   "table": [
     {
       "range": "0.4-0.5",
