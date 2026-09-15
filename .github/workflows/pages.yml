@@ -44,20 +44,19 @@ jobs:
         uses: actions/deploy-pages@v4
 
   # 双托管：若仓库设置了 VERCEL_TOKEN 等密钥，则同时部署到 Vercel（jingcai-seven.vercel.app）。
-  # 未设置密钥时此 job 自动跳过，仅走 GitHub Pages。
+  # 注意：secrets 上下文不能用于 job 级 if（会导致整个 workflow 判为非法），
+  # 因此在 job 级 env 中转，再在步骤级 if 用 env 判断；未设置密钥时自动跳过。
   deploy-vercel:
     needs: build
-    if: ${{ secrets.VERCEL_TOKEN != '' }}
     runs-on: ubuntu-latest
-    environment:
-      name: vercel
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
       - name: Deploy to Vercel
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        if: ${{ env.VERCEL_TOKEN != '' }}
         run: |
           npm i -g vercel
           vercel deploy --prod --token "$VERCEL_TOKEN" --yes
