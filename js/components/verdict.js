@@ -11,6 +11,11 @@
     recs: []
   };
 
+  function getOddsForCell(cell, m) {
+    if (typeof window !== 'undefined' && window.getOddsForCell) return window.getOddsForCell(cell, m);
+    return null;
+  }
+
   function esc(s) {
     return String(s === null || s === undefined ? '' : s).replace(/[&<>"]/g, function (c) {
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c];
@@ -167,7 +172,7 @@
     });
 
     return renderDimCard('胜平负', null, wdlRows) +
-      renderDimCard('让胜平负', md.lineLabel + (md.lineSuggested ? ' · 模型建议' : ' · 竞彩盘口'), ahRows) +
+      renderDimCard('让胜平负', '让球 ' + md.lineLabel + (md.lineSuggested ? ' · 模型建议' : ' · 竞彩盘口'), ahRows) +
       renderDimCard('进球数', null, goalRows) +
       renderDimCard('比分', null, scoreRows);
   }
@@ -190,9 +195,12 @@
 
     const rows = top5.map(function (c, i) {
       const rank = i + 1;
+      const odd = getOddsForCell(c, m);
+      const oddTxt = odd ? ('@ ' + Number(odd).toFixed(2)) : '';
       return `<div class="verdict-top5-row">
         <span class="verdict-top5-rank">${rank}</span>
         <span class="verdict-top5-name">${esc(c.label)} · ${esc(c.dim)}</span>
+        <span class="verdict-top5-odds">${esc(oddTxt)}</span>
         <span class="${rankColorClass(rank)}">${pct(c.p)}</span>
       </div>`;
     }).join('');

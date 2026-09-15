@@ -330,6 +330,14 @@
 .verdict-top5-pct.amber { color: var(--c-amber); }
 .verdict-top5-pct.muted { color: var(--text-muted); }
 
+.verdict-top5-odds {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-right: var(--space-3);
+  white-space: nowrap;
+}
+
 /* 方法论 */
 .verdict-method-grid {
   display: grid;

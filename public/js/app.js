@@ -4,6 +4,8 @@
  * 职责：数据加载、页面路由、事件绑定、组件调度
  */
 
+/* global renderVerdict, renderQuotaBar */
+
 /* ============================================
    全局状态
    ============================================ */
@@ -27,7 +29,14 @@ function switchPage(page) {
   // 进入页面时刷新对应内容
   if (page === 'odds' && AppState.matches.length) renderOddsMonitor(AppState.matches, AppState.selectedIndex);
   if (page === 'ai' && AppState.matches.length) renderAIRecommendations(AppState.matches);
-  if (page === 'analysis' && AppState.matches.length) renderAnalysisList(AppState.matches, null);
+  if (page === 'verdict' && AppState.matches.length) renderVerdict(AppState.matches);
+  if (page === 'analysis' && AppState.matches.length) {
+    renderAnalysisList(AppState.matches);
+    /* 如果有选中比赛，同步渲染详情 */
+    if (AppState.selectedIndex >= 0 && AppState.matches[AppState.selectedIndex]) {
+      renderAnalysisDetail(AppState.matches[AppState.selectedIndex]);
+    }
+  }
   if (page === 'toolbox') renderToolbox();
 }
 
@@ -103,9 +112,9 @@ async function loadMatches() {
     AppState.dataSource = dataSource;
     // 更新"数据源"KPI 卡片
     const srcEl = document.getElementById('statSource');
-    if (srcEl) srcEl.textContent = dataSource.startsWith('football-data')
+    if (srcEl) {srcEl.textContent = dataSource.startsWith('football-data')
       ? 'football-data · ' + dataSource.split(':')[1]
-      : (dataSource === 'scf-proxy' ? 'SCF 代理' : '竞彩官方');
+      : (dataSource === 'scf-proxy' ? 'SCF 代理' : '竞彩官方');}
     updateDiagPanel();
     renderAll();
     const srcLabel = dataSource.startsWith('football-data')
@@ -146,9 +155,10 @@ function updateDiagPanel() {
    ============================================ */
 function renderAll() {
   renderDashboard(AppState.matches);
-  renderAnalysisList(AppState.matches, null);
+  renderAnalysisList(AppState.matches);
   renderOddsMonitor(AppState.matches, AppState.selectedIndex);
   renderAIRecommendations(AppState.matches);
+  renderVerdict(AppState.matches);
   renderToolbox();
 
   // KPI 补充（用 AppState.dataSource 显示真实来源）
@@ -185,8 +195,27 @@ function toast(type, icon, msg) {
 /* eslint-disable-next-line no-unused-vars */
 function openAnalysisDetail(idx) {
   AppState.selectedIndex = idx;
-  switchPage('analysis');
+  /* 同步刷新：赔率监测 + AI 研判 + 深度分析详情 */
+  renderOddsMonitor(AppState.matches, idx);
+  renderAnalysisList(AppState.matches);
   renderAnalysisDetail(AppState.matches[idx]);
+  /* 如果当前不在深度分析页，切换过去 */
+  const analysisPage = document.getElementById('page-analysis');
+  if (analysisPage && !analysisPage.classList.contains('active')) {
+    switchPage('analysis');
+  }
+}
+
+/* 赔率监测页：切换比赛 */
+/* eslint-disable-next-line no-unused-vars */
+function switchOddsMatch(dir) {
+  const n = AppState.matches.length;
+  if (!n) return;
+  AppState.selectedIndex = (AppState.selectedIndex + dir + n) % n;
+  renderOddsMonitor(AppState.matches, AppState.selectedIndex);
+  /* 同步刷新深度分析 */
+  renderAnalysisList(AppState.matches);
+  renderAnalysisDetail(AppState.matches[AppState.selectedIndex]);
 }
 
 /* ============================================
@@ -201,8 +230,16 @@ async function scanValueBets() {
     return;
   }
   await scanValueBetsModular(AppState.matches, async () => {
-    const r = await OddsApi.getOdds('soccer_epl', key);
-    return r.ok ? r.data : [];
+    // 传入竞彩比赛列表 → 自动检测联赛 → 多运动并行拉取
+    // 返回完整结果对象（含 ok/error/diagnosis/quota），由 scanValueBetsModular 处理
+    const r = await OddsApi.getOdds(null, key, AppState.matches);
+    if (r.ok) {
+      r._data = r.data;
+      return r;
+    }
+    // 传播真实错误 + 诊断信息
+    r._error = r.error || '未知错误';
+    return r;
   });
 }
 
@@ -248,16 +285,20 @@ async function saveOddsKey() {
     return;
   }
   status.innerHTML = '<span style="color:var(--text-muted);">⏳ 验证 Key...</span>';
-  // 真实验证（实时调用一次 API）
-  const r = await OddsApi.getOdds('soccer_epl', key);
+  // 真实验证：传入竞彩比赛自动检测联赛
+  const r = await OddsApi.getOdds(null, key, AppState.matches);
   if (r.ok) {
     AppState.settings.oddsKey = key;
     localStorage.setItem('jc_settings', JSON.stringify(AppState.settings));
-    status.innerHTML = `<span style="color:var(--c-green);">✅ Key 有效（找到 ${r.data.length} 场比赛）</span>`;
+    const sportInfo = r.sportKeys ? '（' + r.sportKeys.join(', ') + '）' : '';
+    const quotaInfo = r.quota ? ' · 本月已用 ' + r.quota.used + '/' + r.quota.total + ' 次' : '';
+    status.innerHTML = `<span style="color:var(--c-green);">✅ Key 有效，找到 ${r.data.length} 场国际赔率${sportInfo}${quotaInfo}</span>`;
+    if (typeof renderQuotaBar === 'function') renderQuotaBar(r.quota);
     toast('success', '✅', 'API Key 已保存，可扫描价值注');
     setTimeout(() => scanValueBets(), 1000);
   } else {
-    status.innerHTML = `<span style="color:var(--c-red);">❌ Key 无效：${esc(r.error)}</span>`;
+    status.innerHTML = `<span style="color:var(--c-red);">❌ ${esc(r.error)}</span>`;
+    if (r.quota && typeof renderQuotaBar === 'function') renderQuotaBar(r.quota);
   }
 }
 
@@ -266,6 +307,33 @@ function clearOddsKey() {
   localStorage.removeItem('jc_settings');
   showKeySetup();
   toast('info', '🗑', 'API Key 已清除');
+}
+
+/* ============================================
+   今日推荐模型加载（真实校准 + 欧盘历史偏差先验）
+   ============================================ */
+async function loadRecommendModel() {
+  const files = {
+    calib: 'js/engine/calibration.json',
+    leagueCal: 'js/engine/league_calibration.json',
+    asian: 'js/engine/asian_handicap.json',
+    euGap: 'js/engine/eu_jc_gap.json'
+  };
+  try {
+    const entries = await Promise.all(
+      Object.entries(files).map(async ([k, url]) => {
+        const res = await fetch(url);
+        return [k, res.ok ? await res.json() : null];
+      })
+    );
+    const model = {};
+    entries.forEach(([k, v]) => { model[k] = v; });
+    window.JC_MODEL = model;
+    console.log('[jc] 今日推荐模型已加载', Object.keys(model).filter(k => model[k]).join('/'));
+  } catch (e) {
+    console.warn('[jc] 今日推荐模型加载失败', e.message);
+    window.JC_MODEL = null;
+  }
 }
 
 /* ============================================
@@ -291,6 +359,16 @@ function init() {
   //   - 云端纯静态直连：?direct=1 → JC_API_BASE='' + JC_DIRECT=true → 直连竞彩官网（CORS 开放）
   window.JC_API_BASE = (AppState.settings.proxyUrl || '').replace(/\/+$/, '');
   window.JC_DIRECT = AppState.settings.direct === true;
+
+  // 自动检测：非 localhost 且未设代理时，自动启用直连模式（竞彩官网 CORS 全开放）
+  if (!window.JC_API_BASE && !window.JC_DIRECT) {
+    const host = location.hostname || '';
+    const isLocal = (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '');
+    if (!isLocal) {
+      window.JC_DIRECT = true;
+      console.log('[jc] 非本地环境，自动启用直连模式');
+    }
+  }
 
   // 路由绑定
   document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -327,6 +405,10 @@ function init() {
       })
       .catch(() => { /* 降级：继续用 Elo */ });
   }
+
+  // 加载「今日推荐」真实模型：校准表 + 联赛校准 + 亚盘分布 + 欧盘历史偏差先验
+  // 这些 JSON 由 ml/build_real_model.py 与 ml/build_eu_history.py 生成（基于 4399 场真实竞彩 + 1157 场欧盘历史）
+  loadRecommendModel();
 
   // 首屏加载
   loadMatches();

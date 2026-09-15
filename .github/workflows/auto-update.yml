@@ -1,0 +1,71 @@
+name: 自动更新（赛果回填 + 校准 + 每周重训）
+
+# 完全运行在 GitHub 云端，与你本机是否在线无关。
+# 每日：回填竞彩赛果 + 重算校准 + 升版本戳 → 提交并推送 → 触发 Pages/Vercel 自动部署。
+# 每周一：重训 P8 模型（强导出 scheme B，9 特征，端上可供应）→ 提交并推送。
+
+on:
+  schedule:
+    # 每日 北京 12:00 = UTC 04:00：回填赛果 + 重算校准
+    - cron: '0 4 * * *'
+    # 每周一 北京 02:00 = UTC 周日 18:00：重训 P8 模型
+    - cron: '0 18 * * 0'
+  workflow_dispatch:  # 支持手动触发（手动触发时同时跑赛果回填与 P8 重训）
+
+permissions:
+  contents: write   # 允许提交更新
+
+concurrency:
+  group: auto-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps (P8 重训需要)
+        run: pip install -r ml/requirements.txt
+
+      # 每日必跑：缺口自愈（从已记录最后一场向后补齐）+ 重算校准 + 升版本戳
+      - name: 每日 · 回填赛果 + 重算校准
+        run: |
+          python3 ml/daily_pipeline.py
+          python3 ml/bump_version.py
+
+      # 每周一（或手动触发）才跑：重训 P8，强导出 scheme B
+      - name: 每周一 · 重训 P8 模型
+        if: ${{ github.event.schedule == '0 18 * * 0' || github.event_name == 'workflow_dispatch' }}
+        run: |
+          python3 ml/p8_train.py
+          python3 ml/bump_version.py
+
+      - name: 提交并推送（若有变更）
+        run: |
+          git config user.name "JCZ Bot"
+          git config user.email "bot@jingcai-pro.local"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git add \
+            ml/data/history_matches.json \
+            ml/data/eu_odds_history.json \
+            ml/data/eu_jc_gap.json \
+            ml/data/team_alias.json \
+            ml/data/calibration_log.jsonl \
+            ml/data/p8_retrain_log.jsonl \
+            js/engine/calibration.json \
+            ml/p8_model_lr.json \
+            index.html
+          if git diff --cached --quiet; then
+            echo "无变更，跳过提交"
+          else
+            git commit -m "chore: 自动更新（赛果回填/校准${{ github.event.schedule == '0 18 * * 0' && '/P8重训' || '' }}）$(date +%Y-%m-%d)"
+            git push
+          fi

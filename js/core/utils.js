@@ -128,6 +128,33 @@ function truncate(str, maxLen = 20) {
 }
 
 /**
+ * 根据多维预测单元 key，从比赛数据中提取对应竞彩赔率
+ * @param {{dim:string,key:string,label:string,p:number}} cell 多维选项单元
+ * @param {Object} m 比赛数据（含 odds/hhad/ttg/crs）
+ * @returns {number|null} 赔率，无数据返回 null
+ */
+function getOddsForCell(cell, m) {
+  if (!cell || !m) return null;
+  if (cell.dim === '胜平负') {
+    const map = { '1x2-home': 'h', '1x2-draw': 'd', '1x2-away': 'a' };
+    return m.odds && m.odds[map[cell.key]];
+  }
+  if (cell.dim === '让胜平负') {
+    const map = { 'ah-home': 'h', 'ah-draw': 'd', 'ah-away': 'a' };
+    return m.hhad && m.hhad[map[cell.key]];
+  }
+  if (cell.dim === '进球数') {
+    const g = String(cell.key).replace('goals-', '');
+    return m.ttg && m.ttg[g];
+  }
+  if (cell.dim === '比分') {
+    const s = String(cell.key).replace('score-', '').replace('-', ':');
+    return m.crs && m.crs[s];
+  }
+  return null;
+}
+
+/**
  * 转百分比：接受小数(0.654)或整数(65.4)，统一输出百分比字符串
  * @param {number} n 小数或百分数
  * @param {number} [digits=1] 小数位
@@ -142,7 +169,7 @@ function toPct(n, digits = 1) {
    导出（浏览器 + Node 双环境）
    ============================================ */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { esc, safeHtml, safeNum, deVigOdds, kellyIndex, expectedValue, fmtDate, fmtTime, fmtMoney, uniq, groupBy, truncate, toPct };
+  module.exports = { esc, safeHtml, safeNum, deVigOdds, kellyIndex, expectedValue, fmtDate, fmtTime, fmtMoney, uniq, groupBy, truncate, toPct, getOddsForCell };
 }
 /* 浏览器全局挂载：确保 function 声明在 window 上可用 */
 if (typeof window !== 'undefined') {
@@ -156,4 +183,5 @@ if (typeof window !== 'undefined') {
   window.fmtMoney = fmtMoney;
   window.uniq = uniq;
   window.toPct = toPct;
+  window.getOddsForCell = getOddsForCell;
 }

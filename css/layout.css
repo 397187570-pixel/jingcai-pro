@@ -28,6 +28,8 @@ body {
   top: 0; left: 0; bottom: 0;
   z-index: 100;
   padding: var(--space-5) var(--space-3);
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar .brand {
@@ -36,6 +38,14 @@ body {
   padding: var(--space-2) var(--space-3);
   margin-bottom: var(--space-6);
   letter-spacing: .5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar .brand .brand-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-blue), var(--c-green));
+  box-shadow: 0 0 12px rgba(59,130,246,.6);
 }
 
 /* 导航 */
@@ -53,6 +63,7 @@ body {
   border-radius: var(--radius-md);
   transition: all var(--transition);
   text-align: left;
+  position: relative;
 }
 
 .nav-tab:hover {
@@ -61,9 +72,27 @@ body {
 }
 
 .nav-tab.active {
-  background: rgba(59, 130, 246, .2);
+  background: linear-gradient(90deg, rgba(59, 130, 246, .22), rgba(59, 130, 246, .04));
   color: #fff;
   font-weight: 600;
+}
+.nav-tab.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 18%;
+  width: 3px; height: 64%;
+  border-radius: 3px;
+  background: var(--c-blue);
+  box-shadow: 0 0 10px rgba(59,130,246,.7);
+}
+
+/* 侧边栏底部主题切换 */
+.sidebar .sidebar-foot {
+  margin-top: auto;
+  padding-top: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 主内容 */
@@ -127,3 +156,21 @@ body {
   .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .page-header { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
 }
+
+/* ============================================
+   JCZ Pro 暗色：侧边栏 / 主区 premium
+   ============================================ */
+[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #0E0E13, #08080B);
+  border-right: 1px solid rgba(255, 255, 255, .05);
+}
+[data-theme="dark"] .nav-tab { color: rgba(245, 246, 248, .62); }
+[data-theme="dark"] .nav-tab:hover { background: rgba(255, 255, 255, .06); color: #fff; }
+[data-theme="dark"] .sidebar .brand { color: #fff; }
+[data-theme="dark"] .main-content { background: transparent; }
+[data-theme="dark"] .page-title {
+  background: linear-gradient(90deg, #FFFFFF, #A9BBD9);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+[data-theme="dark"] .page-subtitle { color: var(--text-muted); }

@@ -1,0 +1,1 @@
+{"date": "2026-09-15", "trained_on_n": 2167, "lr_acc": 0.5058, "value_roi_pct": 3.96, "logloss": 1.0074, "best_scheme_research": "C", "best_scheme_roi_pct": 4.91, "export_scheme": "B", "note": "固定导出方案B(9特征,前端可供应);方案C含b365端上无数据源不部署。价值ROI+3.96%但正EV样本命中率仅~25%,属噪声/局部窗口,非稳定edge。", "deploy": "success"}

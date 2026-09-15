@@ -70,15 +70,53 @@
   --ease-premium: cubic-bezier(.16, 1, .3, 1);
 }
 
-/* 暗色主题 */
+/* ============================================
+   暗色主题 = JCZ Pro 设计令牌（premium 玻璃风）
+   来源：Ardot 设计稿「JCZ Pro」变量集（Dark 模式）
+   ============================================ */
 [data-theme="dark"] {
-  --bg-primary: #0f172a;
-  --bg-card: #1e293b;
-  --bg-card-hover: #334155;
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #64748b;
-  --border-color: #334155;
-  --border-strong: #475569;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
+  /* 背景层级 */
+  --bg-primary: #0B0B0C;        /* bgBase */
+  --bg-card: #15151A;           /* bgSurface */
+  --bg-card-solid: #15151A;
+  --bg-elevated: #1C1C22;       /* bgElevated */
+  --bg-card-hover: #1F1F26;
+  --bg-sidebar: #0A0A0D;
+
+  /* 文字 */
+  --text-primary: #F5F6F8;      /* textPrimary */
+  --text-secondary: #C7CBD1;
+  --text-muted: #9AA0AB;        /* textMuted */
+  --text-inverse: #F5F6F8;
+
+  /* 边框 */
+  --border-color: #26262E;      /* borderSubtle */
+  --border-strong: #34343E;
+
+  /* 语义色（JCZ Pro 精确值） */
+  --c-blue: #3B82F6;            /* accent */
+  --c-green: #2EC98A;           /* positive */
+  --c-amber: #FAAC3E;           /* caution */
+  --c-red: #F6586B;             /* danger */
+  --c-blue-dim: rgba(59, 130, 246, .16);
+  --c-green-dim: rgba(46, 201, 138, .14);
+  --c-amber-dim: rgba(250, 172, 62, .14);
+  --c-red-dim: rgba(246, 88, 107, .14);
+  --accent-muted: #15315A;
+
+  /* 圆角（JCZ Pro：lg16 / md12 / sm8） */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  /* 阴影（多层，暗色更柔和） */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .4);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, .45);
+  --shadow-lg: 0 18px 50px rgba(0, 0, 0, .55);
+
+  /* 玻璃拟态专用（premium 表面） */
+  --glass-bg: linear-gradient(180deg, rgba(28, 28, 34, .66), rgba(21, 21, 26, .52));
+  --glass-border: rgba(255, 255, 255, .07);
+  --glass-highlight: rgba(255, 255, 255, .05);
+  --glass-blur: blur(22px) saturate(160%);
 }

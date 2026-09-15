@@ -5,25 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>竞彩智选 Pro · 模块化版</title>
 
+  <!-- 主题无闪烁预设置（在 CSS 应用前确定 data-theme） -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('jc-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) { document.documentElement.setAttribute('data-theme', 'dark'); }
+    })();
+  </script>
+
+  <!-- 应用版本号：每次重发同步 +1，供数据请求(赛果复盘)做缓存戳，避免浏览器读旧快照 -->
+  <script>window.APP_VERSION = '20260915';</script>
+
   <!-- 样式模块化引入 -->
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/verdict.css">
+  <link rel="stylesheet" href="css/variables.css?20260915">
+  <link rel="stylesheet" href="css/layout.css?20260915">
+  <link rel="stylesheet" href="css/components.css?20260915">
+  <link rel="stylesheet" href="css/verdict.css?20260915">
 </head>
 <body>
   <div class="app-shell">
     <!-- 侧边导航 -->
     <aside class="sidebar">
-      <div class="brand">⚽ 竞彩智选</div>
+      <div class="brand"><span class="brand-dot"></span><span>竞彩智选</span></div>
       <nav>
         <button class="nav-tab active" data-page="dashboard">📊 <span>数据看板</span></button>
         <button class="nav-tab" data-page="analysis">📈 <span>深度分析</span></button>
         <button class="nav-tab" data-page="odds">🎲 <span>赔率监测</span></button>
+        <button class="nav-tab" data-page="intelligence">🛰️ <span>情报矩阵</span></button>
         <button class="nav-tab" data-page="ai">🧠 <span>AI 研判</span></button>
         <button class="nav-tab" data-page="verdict">🎯 <span>研判结论</span></button>
+        <button class="nav-tab" data-page="compare">📅 <span>赛果复盘</span></button>
         <button class="nav-tab" data-page="toolbox">🛠️ <span>个人工具箱</span></button>
       </nav>
+      <div class="sidebar-foot">
+        <div class="theme-switch" id="themeSwitch">
+          <button data-theme-set="light" title="亮色">☀️</button>
+          <button data-theme-set="dark" title="暗色">🌙</button>
+          <button data-theme-set="system" title="跟随系统">🖥️</button>
+        </div>
+      </div>
     </aside>
 
     <!-- 主内容 -->
@@ -45,18 +67,54 @@
             <button class="btn" id="settingsBtn" title="数据源设置">⚙️ 设置</button>
           </div>
         </div>
-        <div class="grid grid-4">
-          <div class="card"><div class="page-subtitle">今日比赛</div><div class="page-title" id="kpiTotal">--</div></div>
-          <div class="card"><div class="page-subtitle">高置信推荐</div><div class="page-title" id="kpiHigh">--</div></div>
-          <div class="card"><div class="page-subtitle">德比/焦点</div><div class="page-title" id="kpiFeatured">--</div></div>
-          <div class="card"><div class="page-subtitle">数据源</div><div class="page-title" id="statSource">--</div></div>
+
+        <!-- 联赛筛选栏 -->
+        <div class="league-filter" id="leagueFilter">
+          <button class="league-chip on" data-league="all">全部</button>
+          <button class="league-chip" data-league="英超">英超</button>
+          <button class="league-chip" data-league="西甲">西甲</button>
+          <button class="league-chip" data-league="德甲">德甲</button>
+          <button class="league-chip" data-league="意甲">意甲</button>
+          <button class="league-chip" data-league="中超">中超</button>
+          <button class="league-chip" data-league="法甲">法甲</button>
         </div>
+
+        <!-- KPI 指标行 -->
+        <div class="grid grid-4" style="margin-top:16px;">
+          <div class="card kpi-card">
+            <div class="kpi-label">今日赛事</div>
+            <div class="kpi-value" id="kpiTotal">--</div>
+            <div class="kpi-foot" id="kpiTotalFoot">竞彩在售</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-label">高置信推荐</div>
+            <div class="kpi-value" id="kpiHigh">--</div>
+            <div class="kpi-foot" id="kpiHighFoot">真实置信 ≥ 65%</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-label">价值注回报</div>
+            <div class="kpi-value" id="kpiValueRoi">--</div>
+            <div class="kpi-foot" id="kpiValueRoiFoot">模型估算 · 样本内</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-label">模型命中率</div>
+            <div class="kpi-value" id="kpiModelAcc">--</div>
+            <div class="kpi-foot" id="kpiModelAccFoot">2159 场回测</div>
+          </div>
+        </div>
+
         <div id="diagPanel"></div>
-        <div class="grid" style="margin-top:16px;">
-          <div class="card">
+
+        <!-- 主内容区：左赛事列表 + 右情报侧栏 -->
+        <div class="dash-main">
+          <div class="card dash-list">
             <div class="page-subtitle" style="margin-bottom:12px;">⚽ 比赛列表（点击进入深度分析）</div>
             <div id="matchList"></div>
           </div>
+          <aside class="card dash-side">
+            <div class="page-subtitle" style="margin-bottom:12px;font-weight:600;">🛰️ 情报速览</div>
+            <div id="dashIntelSide"></div>
+          </aside>
         </div>
       </div>
 
@@ -67,9 +125,18 @@
             <div class="page-title">深度分析</div>
             <div class="page-subtitle">Elo + 泊松融合预测 · 点击比赛下钻</div>
           </div>
+          <div class="header-actions">
+            <select class="match-select" id="analysisMatchSelect"></select>
+          </div>
         </div>
         <div id="analysisList" class="card"></div>
         <div id="analysisDetail" style="margin-top:16px;"></div>
+        <div class="section-head" style="margin-top:24px;">
+          <span class="sh-bar"></span>
+          <span class="sh-title">单场深度拆解</span>
+          <span class="sh-sub">AI 预测总览 · 维度贡献 · 攻防对比 · H2H</span>
+        </div>
+        <div id="analysisBreakdown" class="analysis-breakdown"></div>
       </div>
 
       <!-- 🎲 赔率监测 -->
@@ -81,6 +148,24 @@
           </div>
         </div>
         <div id="oddsMatchHeader" style="margin-bottom:16px;"></div>
+
+        <div class="section-head">
+          <span class="sh-bar"></span>
+          <span class="sh-title">实时监测仪表盘</span>
+          <span class="sh-sub">国内外赔率偏差 · 市场热度 · 异动预警</span>
+        </div>
+        <div class="bento-grid">
+          <div id="oddsTrendAdvice"></div>
+          <div id="oddsHeatPanel"></div>
+          <div id="oddsAlertCard"></div>
+          <div id="oddsAlertCenter"></div>
+        </div>
+
+        <div class="section-head" style="margin-top:24px;">
+          <span class="sh-bar"></span>
+          <span class="sh-title">赔率全景数据</span>
+          <span class="sh-sub">竞彩官方 + 主流机构对比</span>
+        </div>
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <div style="font-size:14px;font-weight:600;">📊 胜平负赔率对比</div>
@@ -119,6 +204,15 @@
           <div style="font-size:14px;font-weight:600;margin-bottom:12px;">⚠️ 诱盘/风险信号</div>
           <div class="trap-list" id="trapList"></div>
         </div>
+
+        <div class="section-head" style="margin-top:24px;">
+          <span class="sh-bar"></span>
+          <span class="sh-title">深度分析模型</span>
+          <span class="sh-sub">权重规律 · ML 概率排名 · 串关推荐</span>
+        </div>
+        <div class="card"><div id="oddsPatternsPanel"></div></div>
+        <div class="card"><div id="oddsModelPanel"></div></div>
+        <div class="card"><div id="oddsParlayPanel"></div></div>
       </div>
 
       <!-- 🧠 AI 研判 -->
@@ -143,6 +237,20 @@
           </div>
           <div id="valueBetListModular" style="min-height:40px;color:var(--text-muted);font-size:12px;">配置 The Odds API Key 后点击"扫描价值注"</div>
         </div>
+      </div>
+
+      <!-- 🛰️ 情报矩阵 -->
+      <div id="page-intelligence" class="page">
+        <div class="page-header">
+          <div>
+            <div class="page-title">情报矩阵</div>
+            <div class="page-subtitle">球队战意 · 身价 · 伤病 · 天气 · 裁判 · 德比 — 多维情报交叉验证</div>
+          </div>
+          <div class="header-actions">
+            <select class="match-select" id="intelMatchSelect"></select>
+          </div>
+        </div>
+        <div id="intelGrid" class="intel-grid"></div>
       </div>
 
       <!-- 🎯 研判结论 -->
@@ -174,6 +282,17 @@
         <div id="verdictMatchSelector" class="verdict-match-selector"></div>
         <div id="verdictMultiDimGrid" class="verdict-multidim-grid"></div>
         <div id="verdictTop5" class="card verdict-top5"></div>
+
+        <div class="section-head" style="margin-top:24px;">
+          <span class="sh-bar"></span>
+          <span class="sh-title">AI 串关推荐</span>
+          <span class="sh-sub">稳妥型 / 冷门型 · 与上方 Top5 同属当日研判</span>
+        </div>
+        <div class="parlay-toggle-row">
+          <label class="switch-label"><input type="checkbox" id="parlayDoubleToggle"> 单场双选（提升命中率）</label>
+          <span class="parlay-toggle-hint">开启后「稳妥型」每腿选两个结果（如 主胜/平），组合命中率显著抬高、赔率下降</span>
+        </div>
+        <div class="card"><div id="oddsParlayPanelAi"></div></div>
 
         <div class="verdict-section-title-row">
           <div class="verdict-section-title">研判方法论 · 双闸门</div>
@@ -217,31 +336,65 @@
         </div>
       </div>
 
+      <!-- 📅 赛果复盘 -->
+      <div id="page-compare" class="page">
+        <div class="page-header">
+          <div>
+            <div class="page-title">赛果复盘</div>
+            <div class="page-subtitle">选定日期模型推荐方案 · 与实际赛果对比验证</div>
+          </div>
+          <div class="header-actions">
+            <input type="date" id="compareDate" class="form-input" style="padding:6px 10px;font-size:13px;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border-color);border-radius:8px;">
+            <button class="btn" id="compareBtn" onclick="if(window.renderCompare)renderCompare(document.getElementById('compareDate').value,true)">🔍 查看对比</button>
+            <span id="compareStatus" class="cmp-status"></span>
+          </div>
+        </div>
+        <div id="compareSummary" class="compare-summary"></div>
+        <div class="section-head" style="margin-top:8px;">
+          <span class="sh-bar"></span>
+          <span class="sh-title">概率最高 Top5 · 推荐 vs 赛果</span>
+          <span class="sh-sub">基于当日最终赔率回溯重建</span>
+        </div>
+        <div class="card"><div id="compareTop5"></div></div>
+        <div class="section-head" style="margin-top:24px;">
+          <span class="sh-bar"></span>
+          <span class="sh-title">AI 串关推荐 · 推荐 vs 赛果</span>
+          <span class="sh-sub">稳妥型 / 冷门型</span>
+        </div>
+        <div class="parlay-toggle-row">
+          <label class="switch-label"><input type="checkbox" id="compareDoubleToggle"> 单场双选（提升命中率）</label>
+          <span class="parlay-toggle-hint">开启后「稳妥型」每腿选两个结果（如 主胜/平），组合命中率显著抬高、赔率下降</span>
+        </div>
+        <div class="card"><div id="compareParlay"></div></div>
+      </div>
+
       <!-- 🛠️ 个人工具箱 -->
       <div id="page-toolbox" class="page">
         <div class="page-header">
           <div>
             <div class="page-title">个人工具箱</div>
-            <div class="page-subtitle">近 30 天预测准确率 · 投注记录（localStorage 持久化）</div>
+            <div class="page-subtitle">投注记录与关注管理（localStorage 持久化）</div>
           </div>
         </div>
         <div id="toolboxAccuracy" style="margin-bottom:16px;"></div>
         <div class="grid grid-4" style="margin-bottom:16px;">
-          <div class="card"><div class="page-subtitle">总投注</div><div class="page-title" id="toolboxTotal">0</div></div>
-          <div class="card"><div class="page-subtitle">命中</div><div class="page-title" id="toolboxWin" style="color:var(--c-green);">0</div></div>
-          <div class="card"><div class="page-subtitle">未中</div><div class="page-title" id="toolboxLoss" style="color:var(--c-red);">0</div></div>
-          <div class="card"><div class="page-subtitle">净盈亏</div><div class="page-title" id="toolboxProfit" style="color:var(--c-amber);">¥0</div></div>
+          <div class="card kpi-card"><div class="kpi-label">总投注</div><div class="kpi-value" id="toolboxTotal">0</div><div class="kpi-foot">已记录场次</div></div>
+          <div class="card kpi-card"><div class="kpi-label">胜率</div><div class="kpi-value" id="toolboxRate" style="color:var(--c-green);">--</div><div class="kpi-foot" id="toolboxWinLoss">0 中 / 0 未</div></div>
+          <div class="card kpi-card"><div class="kpi-label">ROI</div><div class="kpi-value" id="toolboxRoi" style="color:var(--c-amber);">--</div><div class="kpi-foot">净盈亏 / 本金</div></div>
+          <div class="card kpi-card"><div class="kpi-label">价值注命中</div><div class="kpi-value" id="toolboxValueWin" style="color:var(--c-blue);">0</div><div class="kpi-foot">EV 正向场次</div></div>
         </div>
-        <div class="card">
-          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">📋 投注记录</div>
-          <table class="table">
-            <thead><tr><th>日期</th><th>比赛</th><th>玩法</th><th>赔率</th><th>金额</th><th>结果</th><th>盈亏</th></tr></thead>
-            <tbody id="betTableBody"></tbody>
-          </table>
-        </div>
-        <div class="card" style="margin-top:16px;">
-          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">⭐ 关注球队</div>
-          <div id="followList"></div>
+        <div class="toolbox-main">
+          <div class="card">
+            <div style="font-size:14px;font-weight:600;margin-bottom:12px;">📋 投注记录</div>
+            <table class="table">
+              <thead><tr><th>日期</th><th>比赛</th><th>玩法</th><th>赔率</th><th>金额</th><th>结果</th><th>盈亏</th></tr></thead>
+              <tbody id="betTableBody"></tbody>
+            </table>
+          </div>
+          <aside class="card">
+            <div style="font-size:14px;font-weight:600;margin-bottom:12px;">⭐ 关注球队</div>
+            <div id="followList"></div>
+          </aside>
         </div>
       </div>
     </main>
@@ -279,24 +432,33 @@
   <div id="toastContainer"></div>
 
   <!-- 模块化引入（顺序：core → config → engine → api → components → app） -->
-  <script src="js/core/utils.js"></script>
-  <script src="config/config.js"></script>
-  <script src="js/engine/predictor.js"></script>
-  <script src="js/engine/fundamentals.js"></script>
-  <script src="js/engine/mlModel.js"></script>
-  <script src="js/engine/calibration.js"></script>
-  <script src="js/engine/recommend.js"></script>
-  <script src="js/engine/multiDim.js"></script>
-  <script src="js/api/sporttery.js"></script>
-  <script src="js/api/oddsApi.js"></script>
-  <script src="js/api/corsProxy.js"></script>
-  <script src="js/api/footballData.js"></script>
-  <script src="js/components/dashboard.js"></script>
-  <script src="js/components/aiAnalysis.js"></script>
-  <script src="js/components/verdict.js"></script>
-  <script src="js/components/oddsMonitor.js"></script>
-  <script src="js/components/analysis.js"></script>
-  <script src="js/components/toolbox.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/core/utils.js?20260915"></script>
+  <script src="config/config.js?20260915"></script>
+  <script src="js/engine/predictor.js?20260915"></script>
+  <script src="js/engine/fundamentals.js?20260915"></script>
+  <script src="js/engine/mlModel.js?20260915"></script>
+  <script src="js/engine/calibration.js?20260915"></script>
+  <script src="js/engine/recommend.js?20260915"></script>
+  <script src="js/engine/multiDim.js?20260915"></script>
+  <script src="js/engine/oddsHistory.js?20260915"></script>
+  <script src="js/engine/oddsTrend.js?20260915"></script>
+  <script src="js/engine/oddsHeat.js?20260915"></script>
+  <script src="js/engine/oddsAlert.js?20260915"></script>
+  <script src="js/engine/oddsPatterns.js?20260915"></script>
+  <script src="js/engine/oddsModel.js?20260915"></script>
+  <script src="js/engine/oddsParlay.js?20260915"></script>
+  <script src="js/api/sporttery.js?20260915"></script>
+  <script src="js/api/oddsApi.js?20260915"></script>
+  <script src="js/api/corsProxy.js?20260915"></script>
+  <script src="js/api/footballData.js?20260915"></script>
+  <script src="js/components/dashboard.js?20260915"></script>
+  <script src="js/components/aiAnalysis.js?20260915"></script>
+  <script src="js/components/verdict.js?20260915"></script>
+  <script src="js/components/compare.js?20260915"></script>
+  <script src="js/components/oddsMonitor.js?20260915"></script>
+  <script src="js/components/analysis.js?20260915"></script>
+  <script src="js/components/intelligence.js?20260915"></script>
+  <script src="js/components/toolbox.js?20260915"></script>
+  <script src="js/app.js?20260915"></script>
 </body>
 </html>

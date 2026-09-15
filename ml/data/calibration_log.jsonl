@@ -1,0 +1,6 @@
+{"date": "2026-09-08", "added": 64, "cumulative_total": 4463, "valid_n": 4463, "brier": 0.0005, "mean_abs_bias": 0.0198, "max_bias": 0.0365}
+{"date": "2026-09-08", "added": 0, "cumulative_total": 4463, "valid_n": 4463, "brier": 0.0005, "mean_abs_bias": 0.0198, "max_bias": 0.0365}
+{"date": "2026-09-11", "added": 31, "cumulative_total": 4494, "valid_n": 4494, "brier": 0.0005, "mean_abs_bias": 0.0195, "max_bias": 0.0445}
+{"date": "2026-09-15", "added": 65, "cumulative_total": 4559, "valid_n": 4559, "brier": 0.0005, "mean_abs_bias": 0.0192, "max_bias": 0.0792}
+{"date": "2026-09-15", "added": 0, "cumulative_total": 4559, "valid_n": 4559, "brier": 0.0005, "mean_abs_bias": 0.0192, "max_bias": 0.0792}
+{"date": "2026-09-15", "added": 0, "cumulative_total": 4559, "valid_n": 4559, "brier": 0.0005, "mean_abs_bias": 0.0192, "max_bias": 0.0792}

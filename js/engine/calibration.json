@@ -1,52 +1,48 @@
 {
   "type": "confidence_calibration",
-  "version": "2.0.0-real",
-  "n_matches": 4399,
+  "version": "2.0.0-daily",
+  "n_matches": 4559,
+  "cumulative_total": 4559,
   "brier_score": 0.0005,
-  "generated_at": "2026-08-05 18:10",
-  "note": "predicted=竞彩隐含概率, actual=真实命中率; 前端用 actual 作为真实置信度。",
+  "mean_abs_bias": 0.0192,
+  "generated_at": "2026-09-15 12:02",
   "table": [
     {
       "range": "0.3-0.4",
-      "predicted": 0.3761,
-      "actual": 0.398,
-      "count": 696,
-      "bias": 0.0219
+      "predicted": 0.376,
+      "actual": 0.3961,
+      "count": 717
     },
     {
       "range": "0.4-0.5",
-      "predicted": 0.4466,
-      "actual": 0.435,
-      "count": 1439,
-      "bias": -0.0116
+      "predicted": 0.4465,
+      "actual": 0.4343,
+      "count": 1492
     },
     {
       "range": "0.5-0.6",
-      "predicted": 0.5498,
-      "actual": 0.5161,
-      "count": 1089,
-      "bias": -0.0337
+      "predicted": 0.5499,
+      "actual": 0.516,
+      "count": 1128
     },
     {
       "range": "0.6-0.7",
-      "predicted": 0.6466,
-      "actual": 0.6604,
-      "count": 745,
-      "bias": 0.0138
+      "predicted": 0.6464,
+      "actual": 0.655,
+      "count": 774
     },
     {
       "range": "0.7-0.8",
       "predicted": 0.7464,
-      "actual": 0.7637,
-      "count": 419,
-      "bias": 0.0173
+      "actual": 0.7667,
+      "count": 433
     },
     {
       "range": "0.8-0.9",
-      "predicted": 0.8151,
-      "actual": 0.8182,
-      "count": 11,
-      "bias": 0.0031
+      "predicted": 0.8125,
+      "actual": 0.7333,
+      "count": 15
     }
-  ]
+  ],
+  "note": "predicted=赔率隐含概率; actual=实际命中率; 前端用 actual 作为真实置信度。样本每日累计增长并自动重校准。"
 }

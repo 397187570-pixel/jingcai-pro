@@ -5,7 +5,7 @@
 
 /* 用 var 而非 const：多个 <script> 之间顶层 var 可重复声明且不会触发
    "Identifier 'CONFIG' has already been declared" 的 SyntaxError */
-var CONFIG = {
+const CONFIG = {
   /* 版本 */
   version: '2.0.0',
 

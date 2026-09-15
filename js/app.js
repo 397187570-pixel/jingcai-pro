@@ -4,7 +4,7 @@
  * 职责：数据加载、页面路由、事件绑定、组件调度
  */
 
-/* global renderVerdict */
+/* global renderVerdict, renderQuotaBar */
 
 /* ============================================
    全局状态
@@ -18,6 +18,10 @@ const AppState = {
 /* football-data.org 默认 Key（用户提供；可在设置里覆盖） */
 const FOOTBALL_DATA_DEFAULT_KEY = '3fe18ae6596b42d68ce5fafc8c98f2fb';
 
+/* 默认 SCF 代理（腾讯云广州区，CORS 已开放 *，返回中国竞彩网当日场次）。
+   线上/本地未手动配置 proxyUrl 时自动启用，确保串关展示真实的当日竞彩而非历史演示。 */
+const DEFAULT_PROXY_URL = 'https://1301319324-0rhvwc1if1.ap-guangzhou.tencentscf.com';
+
 /* ============================================
    页面路由
    ============================================ */
@@ -28,8 +32,16 @@ function switchPage(page) {
   if (el) el.classList.add('active');
   // 进入页面时刷新对应内容
   if (page === 'odds' && AppState.matches.length) renderOddsMonitor(AppState.matches, AppState.selectedIndex);
-  if (page === 'ai' && AppState.matches.length) renderAIRecommendations(AppState.matches);
-  if (page === 'verdict' && AppState.matches.length) renderVerdict(AppState.matches);
+  if (page === 'ai') {
+    renderAIRecommendations(AppState.matches);
+  }
+  if (page === 'verdict' && AppState.matches.length) {
+    renderVerdict(AppState.matches);
+    /* AI 串关推荐面板已移至研判结论页（Top5 之下），随该页一并刷新 */
+    const vp = document.getElementById('oddsParlayPanelAi');
+    if (vp && window.OddsParlay) window.OddsParlay.renderParlayPanel(vp, 3, AppState.matches);
+  }
+  if (page === 'compare' && typeof renderCompare === 'function') renderCompare();
   if (page === 'analysis' && AppState.matches.length) {
     renderAnalysisList(AppState.matches);
     /* 如果有选中比赛，同步渲染详情 */
@@ -37,7 +49,55 @@ function switchPage(page) {
       renderAnalysisDetail(AppState.matches[AppState.selectedIndex]);
     }
   }
+  if (page === 'intelligence' && AppState.matches.length) renderIntelligence(AppState.matches);
   if (page === 'toolbox') renderToolbox();
+  // 进场递进动画（每切页播放一次）
+  playEntrance(el);
+}
+
+/* 页面进场递进动画：一次性播放，避免数据重渲染时重复触发 */
+function playEntrance(pageEl) {
+  if (!pageEl) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const sel = '.section-head, .kpi-card, .card, .intel-card, .breakdown-col, .rank-item, .parlay-card';
+  const nodes = pageEl.querySelectorAll(sel);
+  let i = 0;
+  nodes.forEach(el => {
+    // 跳过嵌套在另一卡片内的卡片，避免双重动画
+    if (el.classList.contains('card') && el.parentElement && el.parentElement.closest('.card')) return;
+    el.style.animation = 'none';
+    void el.offsetWidth; // 强制重排以重置动画
+    el.style.animation = 'cardIn .55s var(--ease-premium) backwards';
+    el.style.animationDelay = (i * 45) + 'ms';
+    i++;
+  });
+}
+
+/* 磁吸微交互：按钮 / 导航随光标轻微位移（premium 手感） */
+function setupMotion() {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const sel = '.btn, .nav-tab';
+  const MAX = 6;
+  const easeIn = 'transform .12s cubic-bezier(.16,1,.3,1)';
+  const easeOut = 'transform .45s cubic-bezier(.16,1,.3,1)';
+  document.addEventListener('mousemove', (e) => {
+    const el = e.target.closest && e.target.closest(sel);
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const mx = e.clientX - r.left - r.width / 2;
+    const my = e.clientY - r.top - r.height / 2;
+    const tx = Math.max(-MAX, Math.min(MAX, mx * 0.22));
+    const ty = Math.max(-MAX, Math.min(MAX, my * 0.34));
+    el.style.transition = easeIn;
+    el.style.transform = 'translate(' + tx + 'px,' + ty + 'px)';
+  }, { passive: true });
+  document.addEventListener('mouseout', (e) => {
+    const el = e.target.closest && e.target.closest(sel);
+    if (!el) return;
+    if (el.contains(e.relatedTarget)) return; // 在子元素间移动不重置
+    el.style.transition = easeOut;
+    el.style.transform = '';
+  });
 }
 
 /* ============================================
@@ -54,7 +114,7 @@ async function loadMatches() {
     };
     logStep('开始加载，fdKey: ' + (AppState.settings.footballKey || FOOTBALL_DATA_DEFAULT_KEY).slice(0,6) + '...', true);
 
-    const proxyUrl = AppState.settings.proxyUrl || '';
+    const proxyUrl = AppState.settings.proxyUrl || DEFAULT_PROXY_URL;
     let result;
     let dataSource = 'sporttery';
 
@@ -112,11 +172,12 @@ async function loadMatches() {
     AppState.dataSource = dataSource;
     // 更新"数据源"KPI 卡片
     const srcEl = document.getElementById('statSource');
-    if (srcEl) srcEl.textContent = dataSource.startsWith('football-data')
+    if (srcEl) {srcEl.textContent = dataSource.startsWith('football-data')
       ? 'football-data · ' + dataSource.split(':')[1]
-      : (dataSource === 'scf-proxy' ? 'SCF 代理' : '竞彩官方');
+      : (dataSource === 'scf-proxy' ? 'SCF 代理' : '竞彩官方');}
     updateDiagPanel();
     renderAll();
+    recordOddsTick(); // P1+P2：把当前国内外赔率写入时序存储，供偏差/背离/热度分析
     const srcLabel = dataSource.startsWith('football-data')
       ? `（${dataSource.split(':')[1]} 联赛）`
       : (dataSource === 'scf-proxy' ? '（SCF 代理）' : '（竞彩官方）');
@@ -153,13 +214,29 @@ function updateDiagPanel() {
 /* ============================================
    渲染调度
    ============================================ */
+let _entrancePlayed = false;
 function renderAll() {
   renderDashboard(AppState.matches);
   renderAnalysisList(AppState.matches);
+  renderIntelligence(AppState.matches);
   renderOddsMonitor(AppState.matches, AppState.selectedIndex);
   renderAIRecommendations(AppState.matches);
+  // 串关面板必须跟随当日数据刷新：switchPage('ai') 只在切页瞬间渲染一次，
+  // 若 AI 页在 loadMatches 完成前打开会残留历史 fallback，故这里补刷 AI 串关面板。
+  // （赔率页 #oddsParlayPanel 已由 renderOddsMonitor 一并刷新）
+  if (window.OddsParlay) {
+    const pai = document.getElementById('oddsParlayPanelAi');
+    if (pai) window.OddsParlay.renderParlayPanel(pai, 3, AppState.matches);
+  }
   renderVerdict(AppState.matches);
   renderToolbox();
+
+  // 首屏进场动画（仅首次渲染触发一次）
+  if (!_entrancePlayed) {
+    const ap = document.querySelector('.page.active');
+    if (ap) playEntrance(ap);
+    _entrancePlayed = true;
+  }
 
   // KPI 补充（用 AppState.dataSource 显示真实来源）
   if (AppState.dataSource) {
@@ -170,10 +247,115 @@ function renderAll() {
   }
 }
 
-function setText(id, val) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = val;
-}
+  function setText(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  /* ============================================
+     赔率时序记录（P1 存储层 + P2 采集轮询）
+     把每一时刻的国内外赔率写入 OddsHistory，形成可按比赛查询的时间序列，
+     供后续「偏差/背离/收敛」分析、市场热度监测、异动预警使用。
+       - 国内(竞彩): 每次刷新都记录，无外部请求、零成本。
+       - 国际: 需 The Odds API Key，免费配额仅 500/月，默认关闭(opt-in)，
+               开启后节流(默认 15 分钟一次)以保命配额。
+     ============================================ */
+  let _lastIntlFetch = 0;
+
+  /**
+   * 采集一次快照：国内必记，国际按需节流
+   */
+  async function recordOddsTick() {
+    if (typeof OddsHistory === 'undefined') return;
+    if (!AppState.matches || !AppState.matches.length) return;
+
+    // 国内快照：每场竞彩 odds（始终记录）
+    const recs = AppState.matches.map(function (m) {
+      const mid = m.code || (m.homeTeam + '_vs_' + m.awayTeam);
+      return {
+        matchId: mid,
+        jc: m.odds ? { h: m.odds.h, d: m.odds.d, a: m.odds.a } : null,
+        meta: {
+          league: m.league, homeTeam: m.homeTeam, awayTeam: m.awayTeam,
+          handicap: m.handicap, kickoff: m.time
+        }
+      };
+    });
+
+    // 国际快照：可选 + 节流（保护配额）
+    const intlByMatch = {};
+    const key = AppState.settings.oddsKey || '';
+    const wantIntl = AppState.settings.recordIntl === true;
+    const intlIntervalMs = (AppState.settings.intlInterval || 15) * 60 * 1000;
+    const now = Date.now();
+    if (wantIntl && key && typeof OddsApi !== 'undefined' && (now - _lastIntlFetch) >= intlIntervalMs) {
+      _lastIntlFetch = now;
+      try {
+        const r = await OddsApi.getOdds(null, key, AppState.matches);
+        if (r.ok && r.data && r.data.length) {
+          const matched = OddsApi.matchByTime(AppState.matches, r.data);
+          matched.forEach(function (item) {
+            const mid = item.jcMatch.code || (item.jcMatch.homeTeam + '_vs_' + item.jcMatch.awayTeam);
+            intlByMatch[mid] = [{
+              book: '国际均值',
+              h: item.intOdd.odds.h, d: item.intOdd.odds.d, a: item.intOdd.odds.a
+            }];
+          });
+        }
+      } catch (e) { /* 国际拉取失败：降级为仅国内记录 */ }
+    }
+
+    await Promise.all(recs.map(function (rec) {
+      rec.intl = intlByMatch[rec.matchId] || [];
+      return OddsHistory.record(rec.matchId, rec).catch(function () {});
+    }));
+
+    // P6 异动提醒：比对本次与上次赔率，跨越阈值则第一时间站内 toast（带去重）
+    if (typeof OddsAlert !== 'undefined') {
+      const prevOdds = AppState._prevOdds || {};
+      const wasMove = AppState._prevMove || {};
+      const now = Date.now();
+      const newlyMoving = [];
+      AppState.matches.forEach(function (m) {
+        const mid = m.code || (m.homeTeam + '_vs_' + m.awayTeam);
+        const p = prevOdds[mid];
+        if (p && m.odds) {
+          const mv = OddsAlert.detectFromOdds(p, m.odds, { fromTs: 0, toTs: now });
+          const key = mid + '|' + (mv ? mv.side : '');
+          if (mv && !wasMove[key]) newlyMoving.push({ m: m, mv: mv });
+          wasMove[key] = !!mv;
+        }
+        prevOdds[mid] = m.odds;
+      });
+      AppState._prevOdds = prevOdds;
+      AppState._prevMove = wasMove;
+      newlyMoving.forEach(function (item) {
+        const m = item.m, mv = item.mv;
+        const label = (m.homeTeam || '') + ' vs ' + (m.awayTeam || '');
+        const dirText = mv.direction === 'in' ? '资金流入（赔率压低）' : '资金流出（赔率上升）';
+        const action = mv.direction === 'in' ? 'follow' : 'fade';
+        OddsAlert.showToast({
+          matchLabel: label, sideZh: mv.sideZh, direction: mv.direction,
+          impDeltaPp: mv.impDeltaPp, action: action,
+          body: mv.sideZh + ' ' + dirText + ' ' + Math.abs(mv.impDeltaPp).toFixed(1) + 'pp（' + mv.fromOdds.toFixed(2) + '→' + mv.toOdds.toFixed(2) + '）',
+          headline: label + ' ' + mv.sideZh + '异动', ttl: 9000
+        });
+      });
+    }
+  }
+
+  /**
+   * 启动时序记录：初始化存储 + 周期轮询（国内连续、国际由 recordOddsTick 内部节流）
+   */
+  function initOddsRecording() {
+    if (typeof OddsHistory === 'undefined') return;
+    OddsHistory.init().catch(function () {});
+    // 首屏稍后记录一次（等比赛列表就绪）
+    setTimeout(function () { recordOddsTick(); }, 2000);
+    // 周期性记录
+    const recInterval = (AppState.settings.recordingInterval || 60) * 1000;
+    setInterval(function () { recordOddsTick(); }, recInterval);
+  }
 
 /* ============================================
    Toast
@@ -200,7 +382,7 @@ function openAnalysisDetail(idx) {
   renderAnalysisList(AppState.matches);
   renderAnalysisDetail(AppState.matches[idx]);
   /* 如果当前不在深度分析页，切换过去 */
-  var analysisPage = document.getElementById('page-analysis');
+  const analysisPage = document.getElementById('page-analysis');
   if (analysisPage && !analysisPage.classList.contains('active')) {
     switchPage('analysis');
   }
@@ -209,7 +391,7 @@ function openAnalysisDetail(idx) {
 /* 赔率监测页：切换比赛 */
 /* eslint-disable-next-line no-unused-vars */
 function switchOddsMatch(dir) {
-  var n = AppState.matches.length;
+  const n = AppState.matches.length;
   if (!n) return;
   AppState.selectedIndex = (AppState.selectedIndex + dir + n) % n;
   renderOddsMonitor(AppState.matches, AppState.selectedIndex);
@@ -290,8 +472,8 @@ async function saveOddsKey() {
   if (r.ok) {
     AppState.settings.oddsKey = key;
     localStorage.setItem('jc_settings', JSON.stringify(AppState.settings));
-    var sportInfo = r.sportKeys ? '（' + r.sportKeys.join(', ') + '）' : '';
-    var quotaInfo = r.quota ? ' · 本月已用 ' + r.quota.used + '/' + r.quota.total + ' 次' : '';
+    const sportInfo = r.sportKeys ? '（' + r.sportKeys.join(', ') + '）' : '';
+    const quotaInfo = r.quota ? ' · 本月已用 ' + r.quota.used + '/' + r.quota.total + ' 次' : '';
     status.innerHTML = `<span style="color:var(--c-green);">✅ Key 有效，找到 ${r.data.length} 场国际赔率${sportInfo}${quotaInfo}</span>`;
     if (typeof renderQuotaBar === 'function') renderQuotaBar(r.quota);
     toast('success', '✅', 'API Key 已保存，可扫描价值注');
@@ -339,7 +521,55 @@ async function loadRecommendModel() {
 /* ============================================
    初始化
    ============================================ */
+/* ============================================
+   主题切换（亮 / 暗 / 系统）—— 联动 Ardot「JCZ Pro」暗色令牌
+   ============================================ */
+function setupTheme() {
+  const root = document.documentElement;
+  const sw = document.getElementById('themeSwitch');
+  const mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function stored() {
+    try { return localStorage.getItem('jc-theme') || 'dark'; } catch (e) { return 'dark'; }
+  }
+  function apply(theme) {
+    let t = theme;
+    if (t === 'system') t = (mq && mq.matches) ? 'dark' : 'light';
+    root.setAttribute('data-theme', t);
+    if (sw) sw.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.themeSet === theme));
+  }
+  apply(stored());
+  if (sw) sw.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      const t = b.dataset.themeSet;
+      try { localStorage.setItem('jc-theme', t); } catch (e) {}
+      apply(t);
+    });
+  });
+  if (mq) {
+    const onSys = () => { if (stored() === 'system') apply('system'); };
+    if (mq.addEventListener) mq.addEventListener('change', onSys);
+    else if (mq.addListener) mq.addListener(onSys);
+  }
+}
+
+function setupParlayDouble() {
+  var toggle = document.getElementById('parlayDoubleToggle');
+  if (!toggle) return;
+  var init0 = !!window.OddsParlay && window.OddsParlay.getOption && window.OddsParlay.getOption('useDouble');
+  toggle.checked = !!init0;
+  toggle.addEventListener('change', function () {
+    if (window.OddsParlay && window.OddsParlay.setOption) window.OddsParlay.setOption('useDouble', toggle.checked);
+    var p = document.getElementById('oddsParlayPanelAi');
+    if (p && window.OddsParlay) window.OddsParlay.renderParlayPanel(p, 3, AppState.matches);
+  });
+}
+
 function init() {
+  // 主题（亮/暗/系统）
+  setupTheme();
+  // 磁吸微交互
+  setupMotion();
+
   // 读取设置
   try {
     const saved = JSON.parse(localStorage.getItem('jc_settings') || '{}');
@@ -362,8 +592,8 @@ function init() {
 
   // 自动检测：非 localhost 且未设代理时，自动启用直连模式（竞彩官网 CORS 全开放）
   if (!window.JC_API_BASE && !window.JC_DIRECT) {
-    var host = location.hostname || '';
-    var isLocal = (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '');
+    const host = location.hostname || '';
+    const isLocal = (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '');
     if (!isLocal) {
       window.JC_DIRECT = true;
       console.log('[jc] 非本地环境，自动启用直连模式');
@@ -386,6 +616,12 @@ function init() {
   // 价值注扫描
   const scanBtn = document.getElementById('scanValueBtn');
   if (scanBtn) scanBtn.addEventListener('click', scanValueBets);
+
+  // 赛果复盘（默认日期 + 按钮绑定）
+  if (typeof window.initCompare === 'function') window.initCompare();
+
+  // 串关「单场双选」开关（研判结论页）
+  setupParlayDouble();
 
   // 自动刷新
   let interval = (parseInt(AppState.settings.refreshInterval) || 30) * 1000;
@@ -410,6 +646,9 @@ function init() {
   // 这些 JSON 由 ml/build_real_model.py 与 ml/build_eu_history.py 生成（基于 4399 场真实竞彩 + 1157 场欧盘历史）
   loadRecommendModel();
 
+  // P1+P2：启动赔率时序记录（国内连续、国际节流），为偏差/背离/热度分析积累数据
+  initOddsRecording();
+
   // 首屏加载
   loadMatches();
 }
@@ -424,7 +663,7 @@ function openSettings() {
   if (!modal) return;
   // 填充当前值
   const proxyInput = document.getElementById('settingsProxyUrl');
-  if (proxyInput) proxyInput.value = AppState.settings.proxyUrl || '';
+  if (proxyInput) proxyInput.value = AppState.settings.proxyUrl || DEFAULT_PROXY_URL;
   const keyInput = document.getElementById('settingsOddsKey');
   if (keyInput) keyInput.value = AppState.settings.oddsKey || '';
   const fdInput = document.getElementById('settingsFootballKey');

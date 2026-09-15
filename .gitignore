@@ -28,3 +28,10 @@ coverage/
 # 临时
 *.tmp
 public/
+
+# Python
+__pycache__/
+*.pyc
+
+# 大数据缓存（不入库）
+ml/data/eu_raw_cache/
