@@ -86767,5 +86767,79 @@
   "eu_score": "1:0",
   "low_conf": false,
   "match_method": "exact_offset"
+ },
+ {
+  "leagueName": "英格兰超级联赛",
+  "date": "2026-09-15",
+  "zhHome": "利兹联",
+  "zhAway": "纽卡斯尔",
+  "engHome": "Leeds",
+  "engAway": "Newcastle",
+  "jc_h": 2.13,
+  "jc_d": 3.12,
+  "jc_a": 2.95,
+  "jc_implied": [
+   0.4158477574311778,
+   0.2838960651693617,
+   0.3002561773994606
+  ],
+  "eu_avg": [
+   "2.38",
+   "3.45",
+   "2.81"
+  ],
+  "eu_avg_implied": [
+   0.39419272728751326,
+   0.27193585244761787,
+   0.33387142026486893
+  ],
+  "eu_b365": [
+   "2.38",
+   "3.5",
+   "2.88"
+  ],
+  "eu_ps": null,
+  "referee": "M Salisbury",
+  "jc_score": "4:1",
+  "eu_score": "4:1",
+  "low_conf": false,
+  "match_method": "exact_offset"
+ },
+ {
+  "leagueName": "法国乙级联赛",
+  "date": "2026-09-15",
+  "zhHome": "圣旺红星",
+  "zhAway": "梅斯",
+  "engHome": "Red Star",
+  "engAway": "Metz",
+  "jc_h": 2.4,
+  "jc_d": 2.8,
+  "jc_a": 2.81,
+  "jc_implied": [
+   0.36883555222201386,
+   0.31614475904744044,
+   0.31501968873054564
+  ],
+  "eu_avg": [
+   "2.56",
+   "3.22",
+   "2.56"
+  ],
+  "eu_avg_implied": [
+   0.3577777777777778,
+   0.28444444444444444,
+   0.3577777777777778
+  ],
+  "eu_b365": [
+   "2.5",
+   "3",
+   "2.55"
+  ],
+  "eu_ps": null,
+  "referee": "",
+  "jc_score": "1:0",
+  "eu_score": "1:0",
+  "low_conf": false,
+  "match_method": "score_unique_offset"
  }
 ]
