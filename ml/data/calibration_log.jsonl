@@ -20,3 +20,4 @@
 {"date": "2026-10-18", "added": 44, "cumulative_total": 4925, "valid_n": 4925, "brier": 0.0005, "mean_abs_bias": 0.0195, "max_bias": 0.0312}
 {"date": "2026-10-19", "added": 26, "cumulative_total": 4951, "valid_n": 4951, "brier": 0.0004, "mean_abs_bias": 0.0194, "max_bias": 0.0308}
 {"date": "2026-10-22", "added": 24, "cumulative_total": 4975, "valid_n": 4975, "brier": 0.0004, "mean_abs_bias": 0.0188, "max_bias": 0.0314}
+{"date": "2026-10-22", "added": 0, "cumulative_total": 4975, "valid_n": 4975, "brier": 0.0004, "mean_abs_bias": 0.0188, "max_bias": 0.0314}
