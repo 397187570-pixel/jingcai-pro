@@ -5,7 +5,7 @@
   "cumulative_total": 5097,
   "brier_score": 0.0006,
   "mean_abs_bias": 0.0211,
-  "generated_at": "2026-10-30 12:03",
+  "generated_at": "2026-10-30 10:41",
   "table": [
     {
       "range": "0.3-0.4",
