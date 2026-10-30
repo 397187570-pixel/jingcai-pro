@@ -23,8 +23,5 @@
 {"date": "2026-10-22", "added": 0, "cumulative_total": 4975, "valid_n": 4975, "brier": 0.0004, "mean_abs_bias": 0.0188, "max_bias": 0.0314}
 {"date": "2026-10-23", "added": 9, "cumulative_total": 4984, "valid_n": 4984, "brier": 0.0005, "mean_abs_bias": 0.0194, "max_bias": 0.0314}
 {"date": "2026-10-25", "added": 44, "cumulative_total": 5028, "valid_n": 5028, "brier": 0.0005, "mean_abs_bias": 0.0198, "max_bias": 0.0353}
-{"date": "2026-10-25", "added": 0, "cumulative_total": 5028, "valid_n": 5028, "brier": 0.0005, "mean_abs_bias": 0.0198, "max_bias": 0.0353}
-{"date": "2026-10-26", "added": 0, "cumulative_total": 5028, "valid_n": 5028, "brier": 0.0005, "mean_abs_bias": 0.0198, "max_bias": 0.0353}
-{"date": "2026-10-27", "added": 0, "cumulative_total": 5028, "valid_n": 5028, "brier": 0.0005, "mean_abs_bias": 0.0198, "max_bias": 0.0353}
-{"date": "2026-10-28", "added": 0, "cumulative_total": 5028, "valid_n": 5028, "brier": 0.0005, "mean_abs_bias": 0.0198, "max_bias": 0.0353}
-{"date": "2026-10-29", "added": 0, "cumulative_total": 5028, "valid_n": 5028, "brier": 0.0005, "mean_abs_bias": 0.0198, "max_bias": 0.0353}
+{"date": "2026-10-30", "added": 69, "cumulative_total": 5097, "valid_n": 5097, "brier": 0.0006, "mean_abs_bias": 0.0211, "max_bias": 0.0358}
+{"date": "2026-10-30", "added": 0, "cumulative_total": 5097, "valid_n": 5097, "brier": 0.0006, "mean_abs_bias": 0.0211, "max_bias": 0.0358}
