@@ -32,3 +32,4 @@
 {"date": "2026-11-05", "added": 0, "cumulative_total": 5178, "valid_n": 5178, "brier": 0.0005, "mean_abs_bias": 0.0207, "max_bias": 0.034}
 {"date": "2026-11-06", "added": 0, "cumulative_total": 5178, "valid_n": 5178, "brier": 0.0005, "mean_abs_bias": 0.0207, "max_bias": 0.034}
 {"date": "2026-11-07", "added": 0, "cumulative_total": 5178, "valid_n": 5178, "brier": 0.0005, "mean_abs_bias": 0.0207, "max_bias": 0.034}
+{"date": "2026-11-08", "added": 0, "cumulative_total": 5178, "valid_n": 5178, "brier": 0.0005, "mean_abs_bias": 0.0207, "max_bias": 0.034}
