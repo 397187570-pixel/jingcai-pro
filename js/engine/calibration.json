@@ -1,47 +1,47 @@
 {
   "type": "confidence_calibration",
   "version": "2.0.0-daily",
-  "n_matches": 5271,
-  "cumulative_total": 5271,
-  "brier_score": 0.0006,
-  "mean_abs_bias": 0.0217,
-  "generated_at": "2026-11-14 11:11",
+  "n_matches": 5310,
+  "cumulative_total": 5310,
+  "brier_score": 0.0005,
+  "mean_abs_bias": 0.0212,
+  "generated_at": "2026-11-15 15:19",
   "table": [
     {
       "range": "0.3-0.4",
       "predicted": 0.3762,
-      "actual": 0.4054,
-      "count": 814
+      "actual": 0.4037,
+      "count": 820
     },
     {
       "range": "0.4-0.5",
-      "predicted": 0.4466,
-      "actual": 0.4361,
-      "count": 1699
+      "predicted": 0.4467,
+      "actual": 0.437,
+      "count": 1707
     },
     {
       "range": "0.5-0.6",
       "predicted": 0.5496,
-      "actual": 0.5174,
-      "count": 1295
+      "actual": 0.5181,
+      "count": 1301
     },
     {
       "range": "0.6-0.7",
-      "predicted": 0.6468,
-      "actual": 0.6652,
-      "count": 926
+      "predicted": 0.6467,
+      "actual": 0.6656,
+      "count": 939
     },
     {
       "range": "0.7-0.8",
-      "predicted": 0.7466,
-      "actual": 0.7734,
-      "count": 512
+      "predicted": 0.7467,
+      "actual": 0.7737,
+      "count": 517
     },
     {
       "range": "0.8-0.9",
-      "predicted": 0.8175,
-      "actual": 0.84,
-      "count": 25
+      "predicted": 0.8173,
+      "actual": 0.8462,
+      "count": 26
     }
   ],
   "note": "predicted=赔率隐含概率; actual=实际命中率; 前端用 actual 作为真实置信度。样本每日累计增长并自动重校准。"
