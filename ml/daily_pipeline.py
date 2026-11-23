@@ -53,6 +53,13 @@ except Exception:
     clv_snapshots = None
     clv_export = None
 
+# 竞彩全玩法赔率落库（HAD/HHAD/TTG/CRS/HAFU）；隔离导入，绝不拖垮主校准
+try:
+    from full_markets_collector import collect as full_collect, settle as full_settle
+except Exception:
+    full_collect = None
+    full_settle = None
+
 SPORT_URL = ("https://webapi.sporttery.cn/gateway/uniform/football/"
              "getUniformMatchResultV1.qry")
 HISTORY_PATH = os.path.join(HERE, "data", "history_matches.json")
@@ -123,6 +130,7 @@ def main():
     ap.add_argument('--no-fetch', action='store_true', help='跳过采集，仅基于现有样本重校准')
     ap.add_argument('--no-eu', action='store_true', help='跳过国际赔率回填（方案 B）')
     ap.add_argument('--no-snap', action='store_true', help='跳过赔率时间序列快照采集（方向一）')
+    ap.add_argument('--no-full', action='store_true', help='跳过竞彩全玩法赔率落库')
     args = ap.parse_args()
 
     today = datetime.date.today()
@@ -192,6 +200,24 @@ def main():
                 print("  ⚠️ 快照 feed 模块不可用，跳过")
         except Exception as e:
             print(f"  ⚠️ 赔率快照异常(已隔离，不影响校准): {e}")
+
+    # 1.7 竞彩全玩法赔率落库（HAD/HHAD/TTG/CRS/HAFU → full_markets.jsonl）
+    #     从当前在售场次逐日积累；已结算场次用赛果接口回填 winFlag/比分。
+    #     历史已结算场次的全玩法赔率无法回溯（竞彩无单场历史赔率接口），故仅从今起积累。
+    #     完全隔离：任何异常都不影响主校准。
+    if not args.no_full:
+        print(f"\n[1.7/3] 竞彩全玩法赔率落库（在售五玩法 → full_markets.jsonl）...")
+        try:
+            if full_collect:
+                added, updated, total = full_collect()
+                print(f"  ✅ 全玩法采集: 新增 {added}, 更新 {updated}, 累计 {total} 场")
+                if full_settle:
+                    ns = full_settle()
+                    print(f"  ✅ 全玩法赛果回填: {ns} 场已结算")
+            else:
+                print("  ⚠️ 全玩法采集模块不可用，跳过")
+        except Exception as e:
+            print(f"  ⚠️ 全玩法采集异常(已隔离，不影响校准): {e}")
 
     # 2. 校准（完整累计样本）
     print(f"\n[2/3] 在完整累计样本({len(old)} 场)上重算校准表...")
