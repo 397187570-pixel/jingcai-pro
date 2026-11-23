@@ -111,9 +111,10 @@
         let topOpt = null;
         let md = null;
         if (window.MultiDim && r.directionProbs && r.directionProbs.length === 3) {
+          const hints = (window.buildMarketHints && typeof window.buildMarketHints === 'function') ? window.buildMarketHints(m) : null;
           md = window.MultiDim.buildMultiDim(
             { homeWin: r.directionProbs[0], draw: r.directionProbs[1], awayWin: r.directionProbs[2] },
-            { line: goalLine }
+            { line: goalLine, hints: hints }
           );
           topOpt = md.top5 && md.top5[0] ? Object.assign({}, md.top5[0], { odds: getOddsForCell ? getOddsForCell(md.top5[0], m) : null }) : null;
           multiDimHtml = renderMultiDimBoard(md, idx, m);

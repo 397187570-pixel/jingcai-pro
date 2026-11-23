@@ -63,7 +63,9 @@
     // 盘口严格取竞彩官方 goalLine；处理 undefined/NaN，避免 Number(undefined)=NaN 误判为模型建议盘
     const rawLine = (m.hhad && m.hhad.line != null && m.hhad.line !== '') ? m.hhad.line : m.handicap;
     const line = (rawLine !== null && rawLine !== undefined && rawLine !== '' && !Number.isNaN(Number(rawLine))) ? Number(rawLine) : null;
-    return window.MultiDim.buildMultiDim({ homeWin: probs[0], draw: probs[1], awayWin: probs[2] }, { line: line });
+    // 市场融合提示：用竞彩在售的总进球/让球盘口联合约束 xG（比分/进球数矩阵更贴近市场信息）
+    const hints = (window.buildMarketHints && typeof window.buildMarketHints === 'function') ? window.buildMarketHints(m) : null;
+    return window.MultiDim.buildMultiDim({ homeWin: probs[0], draw: probs[1], awayWin: probs[2] }, { line: line, hints: hints });
   }
 
   /* ---------- 渲染 ---------- */

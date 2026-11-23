@@ -182,10 +182,53 @@ function toPct(n, digits = 1) {
 }
 
 /* ============================================
+   市场盘口提示（用于比分矩阵的 xG 融合拟合）
+   ============================================ */
+/**
+ * 从一场比赛的竞彩在售玩法提取"市场提示"，供 solveXg 联合拟合：
+ * - over25: 总进球大于2.5 的去水概率（由竞彩 TTG s0~s7 去水求和 s3..s7）
+ * - ahLine: 竞彩真实让球盘（主队视角，-2=主让2）
+ * - ahHomeProb: 让球盘主队"有效覆盖概率"= 去水让胜 + 0.5×去水让平（整盘平局退款的近似）
+ * 任一数据缺失时对应字段为 null；全部缺失返回 null（solveXg 自动退回纯 1X2 路径）。
+ * @param {Object} m 标准化比赛对象（含 ttg/hhad/handicap）
+ * @returns {{over25:number|null, ahLine:number|null, ahHomeProb:number|null}|null}
+ */
+function buildMarketHints(m) {
+  if (!m) return null;
+  let over25 = null, ahLine = null, ahHomeProb = null;
+  // 大小球：竞彩 TTG s0..s7（s7=7+球）
+  if (m.ttg && typeof m.ttg === 'object') {
+    const buckets = [];
+    for (let g = 0; g <= 7; g++) {
+      const o = Number(m.ttg['s' + g]);
+      if (o > 1 && !isNaN(o)) buckets.push({ g, o });
+    }
+    if (buckets.length >= 6) {
+      const inv = buckets.map(b => 1 / b.o);
+      const s = inv.reduce((a, b) => a + b, 0);
+      over25 = buckets.reduce((a, b, i) => a + (b.g >= 3 ? inv[i] / s : 0), 0);
+    }
+  }
+  // 让球盘：竞彩 HHAD 整数盘
+  const lineRaw = (m.hhad && m.hhad.line != null && m.hhad.line !== '') ? m.hhad.line : m.handicap;
+  const lineNum = (lineRaw !== null && lineRaw !== undefined && lineRaw !== '') ? Number(String(lineRaw).replace('+', '')) : NaN;
+  const hh = m.hhad;
+  const hhOdds = hh && [Number(hh.h), Number(hh.d), Number(hh.a)];
+  if (!isNaN(lineNum) && hhOdds && hhOdds.every(v => v > 1 && !isNaN(v))) {
+    ahLine = lineNum;
+    const s = 1 / hhOdds[0] + 1 / hhOdds[1] + 1 / hhOdds[2];
+    // 主队有效覆盖 = 去水让胜 + 0.5×去水让平（与拟合口径一致：cover + 0.5×push）
+    ahHomeProb = (1 / hhOdds[0]) / s + 0.5 * (1 / hhOdds[1]) / s;
+  }
+  if (over25 == null && ahLine == null) return null;
+  return { over25: over25, ahLine: ahLine, ahHomeProb: ahHomeProb };
+}
+
+/* ============================================
    导出（浏览器 + Node 双环境）
    ============================================ */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { esc, safeHtml, safeNum, deVigOdds, kellyIndex, expectedValue, fmtDate, fmtTime, fmtMoney, uniq, groupBy, truncate, toPct, getOddsForCell };
+  module.exports = { esc, safeHtml, safeNum, deVigOdds, kellyIndex, expectedValue, fmtDate, fmtTime, fmtMoney, uniq, groupBy, truncate, toPct, getOddsForCell, buildMarketHints };
 }
 /* 浏览器全局挂载：确保 function 声明在 window 上可用 */
 if (typeof window !== 'undefined') {
@@ -200,4 +243,5 @@ if (typeof window !== 'undefined') {
   window.uniq = uniq;
   window.toPct = toPct;
   window.getOddsForCell = getOddsForCell;
+  window.buildMarketHints = buildMarketHints;
 }
