@@ -53,7 +53,11 @@
       const h = m.homeTeam || m.homeName || '主队';
       const a = m.awayTeam || m.awayName || '客队';
       const odds = m.odds || {};
-      const goalLine = m.handicap !== null && m.handicap !== '' ? Number(m.handicap) : null;
+      // 竞彩真实让球盘口（官方 goalLine，如 +1/-2），用于标题标注与概率基底；严格从国内竞彩取值
+      const jcLineRaw = (m.hhad && m.hhad.line != null && m.hhad.line !== '')
+        ? String(m.hhad.line) : (m.handicap != null && m.handicap !== '' ? String(m.handicap) : '');
+      const jcLineNum = jcLineRaw !== '' && !Number.isNaN(Number(jcLineRaw)) ? Number(jcLineRaw) : null;
+      const goalLine = jcLineNum;
 
       // 优先用真实推荐模型
       if (haveModel && odds.h && odds.h > 1) {
@@ -240,11 +244,14 @@
       { l: '客胜', p: findCell('1x2-away').p, c: 'var(--c-red)' }
     ]);
 
-    // 以竞彩可买盘口为准：md.asian 由 m.handicap（竞彩真实整数盘）重算；
-    // 仅当竞彩未开让球盘时退回模型建议，并明确标注不可下单。
+    // 以竞彩可买盘口为准：盘口数字严格取自国内竞彩官方 goalLine（m.hhad.line），如 +1/-2，与欧赔让球区分。
+    // md.asian 由该整数盘重算；仅当竞彩未开让球盘时才退回模型建议并标注不可下单。
+    const jcLine = (m.hhad && m.hhad.line != null && m.hhad.line !== '')
+      ? String(m.hhad.line) : (m.handicap != null && m.handicap !== '' ? String(m.handicap) : '');
+    const jcLineTxt = jcLine !== '' ? (Number(jcLine) > 0 ? '+' + Number(jcLine) : String(Number(jcLine))) : '';
     const ahLabel = md.lineSuggested
       ? '让球 ' + md.lineLabel + '（模型建议·竞彩未开售，不可下单）'
-      : '竞彩让球 ' + md.lineLabel + '（可买）';
+      : '竞彩让球 ' + jcLineTxt + '（' + md.lineLabel + '·可买）';
     const ahBars = bars([
       { l: '让胜', p: md.asian.home, c: 'var(--c-green)' },
       { l: '让平', p: md.asian.draw, c: 'var(--c-amber)' },

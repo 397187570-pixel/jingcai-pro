@@ -60,7 +60,9 @@
     const probs = rec.directionProbs || (m.jc ? [(m.jc[0]||1)/((m.jc[0]||1)+(m.jc[1]||1)+(m.jc[2]||1)),
       (m.jc[1]||1)/((m.jc[0]||1)+(m.jc[1]||1)+(m.jc[2]||1)),
       (m.jc[2]||1)/((m.jc[0]||1)+(m.jc[1]||1)+(m.jc[2]||1))] : [0.33,0.33,0.33]);
-    const line = (m.handicap !== null && m.handicap !== undefined && m.handicap !== '') ? Number(m.handicap) : null;
+    // 盘口严格取竞彩官方 goalLine；处理 undefined/NaN，避免 Number(undefined)=NaN 误判为模型建议盘
+    const rawLine = (m.hhad && m.hhad.line != null && m.hhad.line !== '') ? m.hhad.line : m.handicap;
+    const line = (rawLine !== null && rawLine !== undefined && rawLine !== '' && !Number.isNaN(Number(rawLine))) ? Number(rawLine) : null;
     return window.MultiDim.buildMultiDim({ homeWin: probs[0], draw: probs[1], awayWin: probs[2] }, { line: line });
   }
 
@@ -171,11 +173,14 @@
       return { label: s.score.replace(':', '-') + ' ' + pct(s.p), p: s.p, color: 'var(--c-blue)' };
     });
 
-    // 以竞彩可买盘口为准：AppState.matches 已带真实 handicap，buildMulti 用它重算 md.asian。
-    // 仅当竞彩该场没开让球盘时，才退回模型建议并明确标注"竞彩未开售，不可下单"。
+    // 以竞彩可买盘口为准：盘口数字严格取自国内竞彩官方 goalLine（m.hhad.line），如 +1/-2，与欧赔让球区分。
+    // buildMulti 用该整数盘重算 md.asian；仅当竞彩没开让球盘时才退回模型建议并标注不可下单。
+    const jcLine = (m.hhad && m.hhad.line != null && m.hhad.line !== '')
+      ? String(m.hhad.line) : (m.handicap != null && m.handicap !== '' ? String(m.handicap) : '');
+    const jcLineTxt = jcLine !== '' ? (Number(jcLine) > 0 ? '+' + Number(jcLine) : String(Number(jcLine))) : '';
     const ahSub = md.lineSuggested
       ? '让球 ' + md.lineLabel + ' · 模型建议（竞彩未开售，不可下单）'
-      : '竞彩让球 ' + md.lineLabel + ' · 可买';
+      : '竞彩让球 ' + jcLineTxt + '（' + md.lineLabel + '）· 可买';
     return renderDimCard('胜平负', null, wdlRows) +
       renderDimCard('让胜平负', ahSub, ahRows) +
       renderDimCard('进球数', null, goalRows) +
