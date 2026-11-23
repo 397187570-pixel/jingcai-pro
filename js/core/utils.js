@@ -145,11 +145,19 @@ function getOddsForCell(cell, m) {
   }
   if (cell.dim === '进球数') {
     const g = String(cell.key).replace('goals-', '');
-    return m.ttg && m.ttg[g];
+    // 竞彩官方字段 s0/s1/.../s7；兼容已规范化的纯数字键
+    return m.ttg && (m.ttg['s' + g] != null ? m.ttg['s' + g] : m.ttg[g]);
   }
   if (cell.dim === '比分') {
-    const s = String(cell.key).replace('score-', '').replace('-', ':');
-    return m.crs && m.crs[s];
+    let s = String(cell.key).replace('score-', '');
+    // cell.key 形如 '1:0' / '0-0'；竞彩官方字段 s01s00（主两位+客两位），兼容 '1:0'/'1-0'
+    const mm = s.match(/^(\d+)[:-](\d+)$/);
+    if (mm) {
+      const code = 's' + String(mm[1]).padStart(2, '0') + 's' + String(mm[2]).padStart(2, '0');
+      if (m.crs && m.crs[code] != null) return m.crs[code];
+      s = mm[1] + ':' + mm[2];
+    }
+    return m.crs && (m.crs[s] != null ? m.crs[s] : (m.crs[s.replace(':', '-')] != null ? m.crs[s.replace(':', '-')] : null));
   }
   return null;
 }

@@ -139,8 +139,8 @@ async function loadMatches() {
     if (!result || proxyFailed) {
       // 降级/默认：竞彩官网直连（CORS 开放，静态部署可直接访问）
       // 规则：只展示中国竞彩选定的比赛，其他联赛一律不展示
-      logStep('竞彩官网直连（webapi.sporttery.cn，HAD+HHAD 全玩法）...', true);
-      const direct = await SportteryApi.getMatches('HAD,HHAD');
+      logStep('竞彩官网直连（webapi.sporttery.cn，HAD+HHAD+TTG+CRS+HAFU 全玩法）...', true);
+      const direct = await SportteryApi.getMatches('HAD,HHAD,TTG,CRS,HAFU');
       logStep('竞彩 → ' + (direct.ok ? (direct.data ? direct.data.length + ' 场' : '0 场') : ('ERR: ' + direct.error)), direct.ok && direct.data && direct.data.length > 0);
       if (direct.ok && direct.data && direct.data.length) {
         result = direct;
@@ -179,7 +179,10 @@ async function loadMatches() {
         date: m.matchDate || m.date,
         odds: m.had ? { h: parseFloat(m.had.h), d: parseFloat(m.had.d), a: parseFloat(m.had.a) } : null,
         hhad: m.hhad && m.hhad.h ? { h: +m.hhad.h, d: +m.hhad.d, a: +m.hhad.a, line: m.hhad.goalLine } : null,
-        handicap: m.hhad && m.hhad.goalLine ? Number(String(m.hhad.goalLine).replace('+', '')) : ''
+        handicap: m.hhad && m.hhad.goalLine ? Number(String(m.hhad.goalLine).replace('+', '')) : '',
+        ttg: m.ttg && Object.keys(m.ttg).length ? m.ttg : null,
+        crs: m.crs && Object.keys(m.crs).length ? m.crs : null,
+        hafu: m.hafu && Object.keys(m.hafu).length ? m.hafu : null
       }));
     } else if (dataSource.startsWith('football-data')) {
       matches = result.data || [];
