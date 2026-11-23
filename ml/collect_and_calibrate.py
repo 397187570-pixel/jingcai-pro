@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 collect_and_calibrate.py — 真实数据采集 + 置信度校准（Phase 2C+）
-竞彩智选 Pro
+不惑智选 Pro
 
 核心功能（对应你的需求）：
 1. 采集过去 N 个月竞彩官方历史比赛（赛前赔率 + 赛后结果）
@@ -149,14 +149,14 @@ def calibrate(matches, n_bins=10):
 # ============================================
 
 def main():
-    parser = argparse.ArgumentParser(description='竞彩智选 Pro 数据采集+校准')
+    parser = argparse.ArgumentParser(description='不惑智选 Pro 数据采集+校准')
     parser.add_argument('--months', type=int, default=12, help='采集月数')
     parser.add_argument('--out', default='../js/engine/calibration.json')
     parser.add_argument('--no-fetch', action='store_true', help='跳过采集（仅演示）')
     args = parser.parse_args()
 
     print("=" * 55)
-    print("📊 竞彩智选 Pro — 置信度校准系统")
+    print("📊 不惑智选 Pro — 置信度校准系统")
     print("=" * 55)
 
     # 采集

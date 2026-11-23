@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { existsSync, mkdirSync, cpSync } from 'fs';
 
 /**
- * 竞彩智选 Pro - Vite 配置
+ * 不惑智选 Pro - Vite 配置
  * 渐进式工程化：UMD 模块 + 开发服务器 + 静态构建
  */
 

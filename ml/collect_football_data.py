@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 collect_football_data.py — 用 football-data.org 采集真实历史比赛
-竞彩智选 Pro · 为 ML 训练 + 置信度校准提供真实数据
+不惑智选 Pro · 为 ML 训练 + 置信度校准提供真实数据
 
 用法：
     python3 collect_football_data.py                    # 默认采集巴西+欧洲5大联赛

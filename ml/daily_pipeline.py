@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-daily_pipeline.py — 竞彩智选 Pro 每日自动校准管道（持续学习）
+daily_pipeline.py — 不惑智选 Pro 每日自动校准管道（持续学习）
 ============================================================
 原则（用户要求，长期贯彻）：
   每日将「赛前赔率 + 赛果」并入历史样本(history_matches.json)，
@@ -45,10 +45,13 @@ except Exception:
 
 # 赔率时间序列快照（方向一：开盘→临场 CLV）；隔离导入，绝不拖垮主校准
 try:
-    from odds_snapshots import bootstrap_csv as clv_bootstrap, fetch_live_snapshots as clv_snapshots
+    from odds_snapshots import (bootstrap_csv as clv_bootstrap,
+                                fetch_live_snapshots as clv_snapshots,
+                                export_feed as clv_export)
 except Exception:
     clv_bootstrap = None
     clv_snapshots = None
+    clv_export = None
 
 SPORT_URL = ("https://webapi.sporttery.cn/gateway/uniform/football/"
              "getUniformMatchResultV1.qry")
@@ -137,7 +140,7 @@ def main():
     bs, es = begin.strftime('%Y-%m-%d'), end.strftime('%Y-%m-%d')
 
     print("=" * 56)
-    print(f"竞彩智选 Pro 每日校准管道 — {datetime.datetime.now():%Y-%m-%d %H:%M}")
+    print(f"不惑智选 Pro 每日校准管道 — {datetime.datetime.now():%Y-%m-%d %H:%M}")
     print("=" * 56)
 
     # 1. 采集 + 累计并入
@@ -183,6 +186,10 @@ def main():
                 clv_snapshots(print)
             else:
                 print("  ⚠️ 快照模块不可用，跳过")
+            if clv_export:
+                clv_export(print)  # 聚合成前端可直接 fetch 的首/末赔率
+            else:
+                print("  ⚠️ 快照 feed 模块不可用，跳过")
         except Exception as e:
             print(f"  ⚠️ 赔率快照异常(已隔离，不影响校准): {e}")
 

@@ -1,4 +1,4 @@
-# 竞彩智选 Pro — 静态部署指引（脱离 WorkBuddy 部署网关）
+# 不惑智选 Pro — 静态部署指引（脱离 WorkBuddy 部署网关）
 
 > 现状：WorkBuddy 的 Cloud Studio 部署网关（上传 API）出现 `fetch failed` 平台侧故障，
 > 导致新代码无法推送到云端沙箱。但项目 `dist/` 目录是**纯静态前端**（index.html + css + config + js + engine json），

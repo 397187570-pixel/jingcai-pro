@@ -1,6 +1,6 @@
 /**
  * oddsApi.js — The Odds API 封装（国际赔率）
- * 竞彩智选 Pro · API 层
+ * 不惑智选 Pro · API 层
  *
  * 兼容两个平台（自动探测）：
  *   旧版 the-odds-api.com/v4/  → ?apiKey= 参数认证

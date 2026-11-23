@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 build_real_model.py — 基于真实竞彩历史数据(4399 场)构建预测与校准产物
-竞彩智选 Pro
+不惑智选 Pro
 
 核心产物(全部来自真实数据, 非模拟):
   1. js/engine/calibration.json      全局竞彩隐含概率 → 真实命中率 校准表
@@ -176,7 +176,7 @@ def value_signal(jc, eu):
 # ============================================================
 def main():
     print("=" * 60)
-    print("🏗️  竞彩智选 Pro — 真实模型构建 (4399 场)")
+    print("🏗️  不惑智选 Pro — 真实模型构建 (4399 场)")
     print("=" * 60)
     matches = load()
     n = len(matches)

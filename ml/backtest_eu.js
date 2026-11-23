@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * backtest_eu.js — 无欧盘 vs 有欧盘 价值信号精准度 + 欧盘混合方向 回测
- * 竞彩智选 Pro
+ * 不惑智选 Pro
  *
  * 复用生产代码 js/engine/recommend.js，重放 eu_odds_history.json 中
  * "竞彩 + 欧盘 + 真实赛果" 三件套齐全的历史场次。
@@ -121,7 +121,7 @@ const line = (label, m, extra) =>
   (extra ? ' | ' + extra : '');
 
 console.log('='.repeat(78));
-console.log('📊 竞彩智选 Pro — 无欧盘 vs 有欧盘 回测 (真实生产代码 recommend.js)');
+console.log('📊 不惑智选 Pro — 无欧盘 vs 有欧盘 回测 (真实生产代码 recommend.js)');
 console.log('='.repeat(78));
 console.log(`样本: ${N} 场 (竞彩+欧盘+赛果三件套齐全, 已排除 low_conf)`);
 console.log(`\n--- ① 方向准确率 (选主胜/平/客胜 是否猜中) ---`);

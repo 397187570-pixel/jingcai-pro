@@ -32,6 +32,7 @@ RAW_DIR = os.path.join(DATA, 'eu_raw')
 CACHE_DIR = os.path.join(DATA, 'eu_raw_cache')
 CLV_PATH = os.path.join(DATA, 'clv_history.json')
 SNAP_PATH = os.path.join(DATA, 'odds_snapshots.jsonl')
+FEED_PATH = os.path.join(DATA, 'clv_feed.json')  # 前端 R2 直接消费的首/末赔率聚合
 
 CALC_URL = ('https://webapi.sporttery.cn/gateway/uniform/football/'
             'getMatchCalculatorV1.qry?poolCode=HAD&channel=c_web')
@@ -174,6 +175,74 @@ def fetch_live_snapshots(log=print):
     return added
 
 
+def export_feed(log=print):
+    """把 jsonl 快照按 matchId 聚合成前端可直接 fetch 的首/末赔率 JSON（R2 桥接）。
+    仅 snapshots>=2 的场次才有真正的'开盘→临场移动'；单快照场次仍写入但前端会跳过，
+    以便观察累积进度。任何异常都隔离，不影响主校准。"""
+    groups = {}
+    total = 0
+    if os.path.exists(SNAP_PATH):
+        try:
+            with open(SNAP_PATH, encoding='utf-8') as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    try:
+                        rec = json.loads(line)
+                    except Exception:
+                        continue
+                    mid = str(rec.get('matchId') or rec.get('key', '').split('|')[0] or '')
+                    if not mid:
+                        continue
+                    rec['_ts'] = rec.get('ts') or rec.get('key', '').split('|')[-1] or ''
+                    groups.setdefault(mid, []).append(rec)
+                    total += 1
+        except Exception as e:
+            log(f"  ⚠️ 快照读取失败（feed 跳过）: {e}")
+            return 0
+
+    matches = []
+    for mid, rows in groups.items():
+        rows.sort(key=lambda r: r.get('_ts', ''))
+        first, last = rows[0], rows[-1]
+        o, c = first.get('jc_odds'), last.get('jc_odds')
+        try:
+            if not o or not c or min([float(x) for x in o + c]) <= 1:
+                continue
+            o = [float(x) for x in o]
+            c = [float(x) for x in c]
+        except (TypeError, ValueError):
+            continue
+        matches.append({
+            'matchId': mid,
+            'code': first.get('code', ''),
+            'date': first.get('date', ''),
+            'time': first.get('time', ''),
+            'league': first.get('league', ''),
+            'home': first.get('home', ''),
+            'away': first.get('away', ''),
+            'snapshots': len(rows),
+            'firstTs': first.get('_ts', ''),
+            'lastTs': last.get('_ts', ''),
+            'openOdds': o,
+            'closeOdds': c
+        })
+    matches.sort(key=lambda r: (r.get('date', ''), r.get('time', ''), r.get('code', '')))
+    feed = {
+        'generated_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'source': os.path.basename(SNAP_PATH),
+        'snapshot_records': total,
+        'count': len(matches),
+        'usable': sum(1 for m in matches if m['snapshots'] >= 2),
+        'matches': matches
+    }
+    os.makedirs(DATA, exist_ok=True)
+    with open(FEED_PATH, 'w', encoding='utf-8') as f:
+        json.dump(feed, f, ensure_ascii=False)
+    log(f"  ✅ CLV 前端 feed：{len(matches)} 场（可用 {feed['usable']} 场）→ {FEED_PATH}")
+    return len(matches)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--no-fetch', action='store_true', help='跳过网络抓取，仅做 CSV bootstrap')
@@ -186,6 +255,7 @@ def main():
         n_live = fetch_live_snapshots(print)
     else:
         print("  跳过网络快照采集")
+    export_feed(print)
     print(f"  ✅ 赔率时间序列就绪：CLV 历史新增 {n_boot} 场")
 
 

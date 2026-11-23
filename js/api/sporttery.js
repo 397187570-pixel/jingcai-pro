@@ -1,6 +1,6 @@
 /**
  * sporttery.js — 中国竞彩网官方 API 封装
- * 竞彩智选 Pro · API 层（唯一允许 fetch 的地方）
+ * 不惑智选 Pro · API 层（唯一允许 fetch 的地方）
  */
 
 (function() {

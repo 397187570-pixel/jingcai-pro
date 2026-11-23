@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 update_calibration.py — 一键更新校准数据
-竞彩智选 Pro
+不惑智选 Pro
 
 作用：拉取最新历史数据 → 重新校准 → 更新 calibration.json
 （供本地手动运行或 cron 定时调用）

@@ -1,6 +1,6 @@
 /**
  * mlModel.js — ML 模型推理引擎（Phase 2C）
- * 竞彩智选 Pro · 加载训练好的模型（mlModel.json）做预测
+ * 不惑智选 Pro · 加载训练好的模型（mlModel.json）做预测
  *
  * 模型：Softmax 回归（三分类：胜/平/负）
  * 训练：ml/train_model.py 生成

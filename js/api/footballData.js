@@ -1,6 +1,6 @@
 /**
  * footballData.js — football-data.org API 模块
- * 竞彩智选 Pro · 真实历史比赛数据源（ML 训练 + 置信度校准）
+ * 不惑智选 Pro · 真实历史比赛数据源（ML 训练 + 置信度校准）
  *
  * 认证：HTTP header X-Auth-Token
  * 限流：免费版 10 req/min，必须解析响应头自动节流（邮件特别提醒）

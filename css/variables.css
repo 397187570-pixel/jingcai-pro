@@ -1,6 +1,6 @@
 /* ============================================
    variables.css — 设计令牌（Design Tokens）
-   竞彩智选 Pro · 所有颜色/间距/字体集中定义
+   不惑智选 Pro · 所有颜色/间距/字体集中定义
    ============================================ */
 
 :root {
@@ -71,8 +71,8 @@
 }
 
 /* ============================================
-   暗色主题 = JCZ Pro 设计令牌（premium 玻璃风）
-   来源：Ardot 设计稿「JCZ Pro」变量集（Dark 模式）
+   暗色主题 = BHZ Pro 设计令牌（premium 玻璃风）
+   来源：Ardot 设计稿「BHZ Pro」变量集（Dark 模式）
    ============================================ */
 [data-theme="dark"] {
   /* 背景层级 */
@@ -93,7 +93,7 @@
   --border-color: #26262E;      /* borderSubtle */
   --border-strong: #34343E;
 
-  /* 语义色（JCZ Pro 精确值） */
+  /* 语义色（BHZ Pro 精确值） */
   --c-blue: #3B82F6;            /* accent */
   --c-green: #2EC98A;           /* positive */
   --c-amber: #FAAC3E;           /* caution */
@@ -104,7 +104,7 @@
   --c-red-dim: rgba(246, 88, 107, .14);
   --accent-muted: #15315A;
 
-  /* 圆角（JCZ Pro：lg16 / md12 / sm8） */
+  /* 圆角（BHZ Pro：lg16 / md12 / sm8） */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;

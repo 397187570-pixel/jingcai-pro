@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# local_server.py — 竞彩智选 Pro 本地开发服务器
+# local_server.py — 不惑智选 Pro 本地开发服务器
 # 功能：
 #   1) 静态托管当前目录（index.html / css / js ...）
 #   2) 同源代理，解决浏览器跨域：

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 train_model.py — 轻量 ML 训练脚本（Phase 2C）
-竞彩智选 Pro
+不惑智选 Pro
 
 功能：
 1. 生成/加载历史比赛数据（真实数据接入点）
@@ -176,7 +176,7 @@ class SoftmaxRegression:
 # ============================================
 
 def main():
-    parser = argparse.ArgumentParser(description='竞彩智选 Pro ML 训练')
+    parser = argparse.ArgumentParser(description='不惑智选 Pro ML 训练')
     parser.add_argument('--data', help='真实数据 CSV 路径（可选）')
     parser.add_argument('--samples', type=int, default=10000, help='模拟数据量')
     parser.add_argument('--out', default='../js/engine/mlModel.json', help='模型输出路径')
@@ -184,7 +184,7 @@ def main():
 
     random.seed(42)
     print("=" * 50)
-    print("🤖 竞彩智选 Pro — ML 模型训练")
+    print("🤖 不惑智选 Pro — ML 模型训练")
     print("=" * 50)
 
     # 数据

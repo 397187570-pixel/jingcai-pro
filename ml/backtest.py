@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 backtest.py — 投注策略历史回测（Phase 2D）
-竞彩智选 Pro
+不惑智选 Pro
 
 用过去 12 个月 4,399 场真实比赛（赛前赔率 + 赛后结果）回测多种投注策略，
 量化各策略的长期 ROI、胜率、最大回撤。
@@ -211,7 +211,7 @@ def main():
     CAL_TABLE = load_calibration()
 
     print("=" * 60)
-    print("📊 竞彩智选 Pro — 投注策略回测")
+    print("📊 不惑智选 Pro — 投注策略回测")
     print("=" * 60)
 
     matches = load_matches()

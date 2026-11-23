@@ -1,6 +1,6 @@
 /**
  * corsProxy.js — CORS 代理层
- * 竞彩智选 Pro · 解决浏览器跨域限制
+ * 不惑智选 Pro · 解决浏览器跨域限制
  */
 
 (function() {

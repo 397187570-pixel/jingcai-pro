@@ -108,4 +108,4 @@ git push origin main
 
 ---
 
-*GitHub 接入文档 · 竞彩智选 Pro v2.0*
+*GitHub 接入文档 · 不惑智选 Pro v2.0*

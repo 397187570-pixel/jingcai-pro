@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-bump_version.py — 竞彩智选 Pro 部署前版本戳升级
+bump_version.py — 不惑智选 Pro 部署前版本戳升级
 
 每日校准管道追加新赛果后，调用本脚本把 index.html 里的
 `window.APP_VERSION` 与全部 `?v=...` 资源戳统一改为当天日期 YYYYMMDD，

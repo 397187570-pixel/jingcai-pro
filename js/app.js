@@ -1,6 +1,6 @@
 /**
  * app.js — 应用入口
- * 竞彩智选 Pro · 模块化版 v2.0
+ * 不惑智选 Pro · 模块化版 v2.0
  * 职责：数据加载、页面路由、事件绑定、组件调度
  */
 
@@ -231,32 +231,26 @@ function updateDiagPanel() {
 }
 
 /* ============================================
-   R2 CLV 数据富化：把浏览器时序快照的首条(开盘)与最新(临场)赔率挂到比赛对象上。
-   仅在用户浏览器已记录该场多次快照时生效；无记录则不影响任何推荐（R2 规则自动跳过）。
+   R2 CLV 数据富化：服务端快照 feed + 浏览器本地时序 → 首/末赔率。
+   服务端 feed 只有同场累计 >=2 条快照才有"移动"；否则用浏览器本地快照兜底。
+   无数据不影响推荐（R2 规则自动跳过）。
    ============================================ */
 async function enrichCLV() {
-  if (typeof OddsHistory === 'undefined' || !OddsHistory.getAllSeries || !AppState.matches || !AppState.matches.length) return;
+  if (!AppState.matches || !AppState.matches.length) return;
   try {
-    const all = await OddsHistory.getAllSeries(); // { matchId: [snapshot,...] } 或数组
-    if (!all) return;
-    const map = {};
-    if (Array.isArray(all)) {
-      all.forEach(function (s) { if (s && s.matchId) (map[s.matchId] = map[s.matchId] || []).push(s); });
-    } else if (typeof all === 'object') {
-      Object.keys(all).forEach(function (k) { map[k] = all[k]; });
+    const browserMap = {};
+    if (typeof OddsHistory !== 'undefined' && OddsHistory.getAllSeries) {
+      const all = await OddsHistory.getAllSeries(); // { matchId: [snapshot,...] } 或数组
+      if (Array.isArray(all)) {
+        all.forEach(function (s) { if (s && s.matchId) (browserMap[s.matchId] = browserMap[s.matchId] || []).push(s); });
+      } else if (all && typeof all === 'object') {
+        Object.keys(all).forEach(function (k) { browserMap[k] = all[k]; });
+      }
     }
-    let n = 0;
-    AppState.matches.forEach(function (m) {
-      const mid = m.code || (m.homeTeam + '_vs_' + m.awayTeam);
-      const series = map[mid];
-      if (!series || series.length < 2) return; // 至少两条快照才有"移动"
-      const first = series[0], latest = series[series.length - 1];
-      const f = first.jc || first.odds, l = latest.jc || latest.odds;
-      if (!f || !l) return;
-      m.openOdds = [+f.h, +f.d, +f.a];
-      m.closeOdds = [+l.h, +l.d, +l.a];
-      n++;
-    });
+    const feed = (typeof CLVFeed !== 'undefined' && CLVFeed.load)
+      ? await CLVFeed.load(window.APP_VERSION || '') : null;
+    const n = (typeof CLVFeed !== 'undefined' && CLVFeed.applyTo)
+      ? CLVFeed.applyTo(AppState.matches, feed, browserMap) : 0;
     if (n) window.__jcClvEnriched = n;
   } catch (e) { /* CLV 富化失败：降级，不影响推荐 */ }
 }
@@ -580,7 +574,7 @@ async function loadRecommendModel() {
    初始化
    ============================================ */
 /* ============================================
-   主题切换（亮 / 暗 / 系统）—— 联动 Ardot「JCZ Pro」暗色令牌
+   主题切换（亮 / 暗 / 系统）—— 联动 Ardot「BHZ Pro」暗色令牌
    ============================================ */
 function setupTheme() {
   const root = document.documentElement;

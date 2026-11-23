@@ -1,6 +1,6 @@
 /* ============================================
    components.css — 组件样式
-   竞彩智选 Pro · 通用组件
+   不惑智选 Pro · 通用组件
    ============================================ */
 
 /* 按钮 */
@@ -363,8 +363,8 @@
 .theme-switch button.on { background: var(--c-blue); color: #fff; box-shadow: var(--shadow-sm); }
 
 /* ============================================================
-   JCZ Pro 暗色 premium 表面（仅 [data-theme="dark"] 生效）
-   来源：Ardot「JCZ Pro」设计令牌 · 玻璃拟态
+   BHZ Pro 暗色 premium 表面（仅 [data-theme="dark"] 生效）
+   来源：Ardot「BHZ Pro」设计令牌 · 玻璃拟态
    ============================================================ */
 [data-theme="dark"] body {
   background:
@@ -402,7 +402,7 @@
 }
 [data-theme="dark"] .btn-primary:hover { color: #fff; background: linear-gradient(135deg, #4f93ff, #2563eb); }
 
-/* 徽章（JCZ Pro dim 已通过变量自动更新） */
+/* 徽章（BHZ Pro dim 已通过变量自动更新） */
 [data-theme="dark"] .badge { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 
 /* 表格 */
@@ -566,7 +566,7 @@
 @media (max-width: 980px) { .toolbox-main { grid-template-columns: 1fr; } .toolbox-main aside.card { display: none; } }
 
 /* ============================================================
-   JCZ Pro 暗色细化（仅 [data-theme="dark"] 生效）
+   BHZ Pro 暗色细化（仅 [data-theme="dark"] 生效）
    ============================================================ */
 [data-theme="dark"] .league-chip { background: rgba(255,255,255,.04); border-color: var(--glass-border); color: var(--text-muted); }
 [data-theme="dark"] .league-chip:hover { color: var(--text-primary); border-color: rgba(59,130,246,.5); }

@@ -1,6 +1,6 @@
 /**
  * oddsMonitor.js — 赔率监测组件
- * 竞彩智选 Pro · 模块化版
+ * 不惑智选 Pro · 模块化版
  * 依赖：utils.js (esc/deVigOdds)、predictor.js (eloPredict/poissonScoreMatrix)、CONFIG
  */
 

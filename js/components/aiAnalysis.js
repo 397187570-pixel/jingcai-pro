@@ -1,6 +1,6 @@
 /**
  * aiAnalysis.js — AI 研判组件
- * 竞彩智选 Pro · 模块化版
+ * 不惑智选 Pro · 模块化版
  * 依赖：utils.js (esc/deVigOdds)、predictor.js (eloPredict/findValueBets)
  */
 
