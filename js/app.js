@@ -118,24 +118,42 @@ async function loadMatches() {
     let result;
     let dataSource = 'sporttery';
 
+    /* 数据源降级链：SCF 代理 → 竞彩官网直连
+       SCF 可能因欠费/停服返回 410（InsufficientBalance），且失败响应无 CORS 头，
+       浏览器 fetch 直接抛 "Load failed"。此时必须降级，不能让整个看板空白。 */
+    let proxyFailed = false;
     if (proxyUrl) {
-      // 优先 SCF 代理
-      logStep('SCF 代理: ' + proxyUrl, true);
-      const res = await fetch(proxyUrl + '/api/matches');
-      result = { ok: res.ok, data: await res.json(), isProxy: true };
-      dataSource = 'scf-proxy';
-    } else {
-      // 唯一数据源：中国竞彩官网（经本地/云端代理）
+      try {
+        const res = await fetch(proxyUrl + '/api/matches');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const body = await res.json();
+        logStep('SCF 代理: ' + proxyUrl, true);
+        result = { ok: true, data: body, isProxy: true };
+        dataSource = 'scf-proxy';
+      } catch (e) {
+        proxyFailed = true;
+        logStep('SCF 代理不可用（' + (e.message || e) + '），降级直连竞彩官网', false);
+      }
+    }
+
+    if (!result || proxyFailed) {
+      // 降级/默认：竞彩官网直连（CORS 开放，静态部署可直接访问）
       // 规则：只展示中国竞彩选定的比赛，其他联赛一律不展示
-      logStep('竞彩官网（经代理）...', true);
-      result = await SportteryApi.getMatches('HAD');
-      logStep('竞彩 → ' + (result.ok ? (result.data ? result.data.length + ' 场' : '0 场') : ('ERR: ' + result.error)), result.ok && result.data && result.data.length > 0);
-      if (result.ok && result.data && result.data.length) {
+      logStep('竞彩官网直连（webapi.sporttery.cn）...', true);
+      const direct = await SportteryApi.getMatches('HAD');
+      logStep('竞彩 → ' + (direct.ok ? (direct.data ? direct.data.length + ' 场' : '0 场') : ('ERR: ' + direct.error)), direct.ok && direct.data && direct.data.length > 0);
+      if (direct.ok && direct.data && direct.data.length) {
+        result = direct;
         dataSource = 'sporttery';
+      } else if (proxyUrl && !proxyFailed && direct.ok && direct.data && !direct.data.length) {
+        // 代理成功但竞彩当天确实无场次：保持代理结果，如实走空态
+        result = direct;
       } else {
         // 竞彩无在售场次（如休赛期/时段无场次）→ 如实提示，不拿其他联赛充数
         logStep('今日无竞彩在售场次', false);
-        result = { ok: false, error: '今日中国竞彩暂无在售场次（竞彩未选定比赛）' };
+        result = { ok: false, error: direct.ok
+          ? '今日中国竞彩暂无在售场次（竞彩未选定比赛）'
+          : ('竞彩官网直连失败：' + direct.error) };
       }
     }
 

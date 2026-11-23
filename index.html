@@ -18,6 +18,9 @@
   <!-- 应用版本号：每次重发同步 +1，供数据请求(赛果复盘)做缓存戳，避免浏览器读旧快照 -->
   <script>window.APP_VERSION = '20261123';</script>
 
+  <!-- 静态部署无同源 /api/sporttery 代理：让 sporttery.js 直连竞彩官网（CORS 开放 *） -->
+  <script>window.JC_DIRECT = true;</script>
+
   <!-- 样式模块化引入 -->
   <link rel="stylesheet" href="css/variables.css?20261123">
   <link rel="stylesheet" href="css/layout.css?20261123">
