@@ -43,6 +43,13 @@ try:
 except Exception:
     eu_backfill_run = None
 
+# 赔率时间序列快照（方向一：开盘→临场 CLV）；隔离导入，绝不拖垮主校准
+try:
+    from odds_snapshots import bootstrap_csv as clv_bootstrap, fetch_live_snapshots as clv_snapshots
+except Exception:
+    clv_bootstrap = None
+    clv_snapshots = None
+
 SPORT_URL = ("https://webapi.sporttery.cn/gateway/uniform/football/"
              "getUniformMatchResultV1.qry")
 HISTORY_PATH = os.path.join(HERE, "data", "history_matches.json")
@@ -112,6 +119,7 @@ def main():
     ap.add_argument('--end', type=str, default=None, help='结束日期 YYYY-MM-DD（默认=昨天）')
     ap.add_argument('--no-fetch', action='store_true', help='跳过采集，仅基于现有样本重校准')
     ap.add_argument('--no-eu', action='store_true', help='跳过国际赔率回填（方案 B）')
+    ap.add_argument('--no-snap', action='store_true', help='跳过赔率时间序列快照采集（方向一）')
     args = ap.parse_args()
 
     today = datetime.date.today()
@@ -162,6 +170,21 @@ def main():
             print(f"  ⚠️ 欧盘回填异常(已隔离，不影响国内校准): {e}")
     elif not args.no_eu and new_matches and not eu_backfill_run:
         print(f"\n[1.5/3] 欧盘回填模块不可用，跳过")
+
+    # 1.6 赔率时间序列快照（方向一：开盘→临场 CLV）
+    #     CSV bootstrap（即时补齐历史 open/close）+ 当日竞彩在售赔率快照（长期累积）。
+    #     完全隔离：任何异常都不影响主校准。
+    if not args.no_snap:
+        print(f"\n[1.6/3] 赔率时间序列快照（CLV 方向一）...")
+        try:
+            if clv_bootstrap:
+                clv_bootstrap(print)
+            if clv_snapshots:
+                clv_snapshots(print)
+            else:
+                print("  ⚠️ 快照模块不可用，跳过")
+        except Exception as e:
+            print(f"  ⚠️ 赔率快照异常(已隔离，不影响校准): {e}")
 
     # 2. 校准（完整累计样本）
     print(f"\n[2/3] 在完整累计样本({len(old)} 场)上重算校准表...")

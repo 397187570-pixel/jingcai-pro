@@ -57,7 +57,8 @@
       var bestPi = p[0] >= p[1] ? (p[0] >= p[2] ? 0 : 2) : (p[1] >= p[2] ? 1 : 2);
       return {
         meta: x.meta, p: p, ev: ev, jc: jc,
-        bestPi: bestPi, bestEVi: bestEVi
+        bestPi: bestPi, bestEVi: bestEVi,
+        ruleTags: x.ruleTags || [], appliedRules: x.appliedRules || []
       };
     });
   }
@@ -70,7 +71,7 @@
     legs = legs || 3;
     var pool = legPool(scored).map(function (x) {
       var i = x.bestPi;
-      return { meta: x.meta, side: SIDES[i], sideZh: ZH[SIDES[i]], prob: x.p[i], jc: x.jc[i], ev: x.ev[i] };
+      return { meta: x.meta, side: SIDES[i], sideZh: ZH[SIDES[i]], prob: x.p[i], jc: x.jc[i], ev: x.ev[i], ruleTags: x.ruleTags || [], appliedRules: x.appliedRules || [] };
     }).sort(function (a, b) { return b.prob - a.prob; });
     var picks = pool.slice(0, legs);
     return { type: 'stable', legs: picks, stats: combine(picks) };
@@ -95,7 +96,8 @@
       return {
         meta: x.meta, double: true, sides: [SIDES[i], SIDES[j]],
         sideZh: ZH[SIDES[i]] + ' / ' + ZH[SIDES[j]],
-        prob: pComb, jc: jcD, ev: evD, type: 'stable'
+        prob: pComb, jc: jcD, ev: evD, type: 'stable',
+        ruleTags: x.ruleTags || [], appliedRules: x.appliedRules || []
       };
     }).sort(function (a, b) { return b.prob - a.prob; });
     var picks = rows.slice(0, legs);
@@ -158,7 +160,8 @@
         doubleLegs.push({
           meta: x.meta, double: true, sides: [SIDES[i.k], SIDES[j.k]],
           sideZh: ZH[SIDES[i.k]] + ' / ' + ZH[SIDES[j.k]],
-          prob: pComb, jc: jcD, ev: evD, type: 'cold'
+          prob: pComb, jc: jcD, ev: evD, type: 'cold',
+          ruleTags: x.ruleTags || [], appliedRules: x.appliedRules || []
         });
       } else if (band.length === 1) {
         var b = band[0];
@@ -201,10 +204,13 @@
         jc_h: jc[0], jc_d: jc[1], jc_a: jc[2],
         code: m.code || '', league: m.league || '', time: m.time || ''
       };
-      var res = null, usedModel = false;
+      var res = null, usedModel = false, euArr = null;
       if (m.eu_avg) {
         var eu = Array.isArray(m.eu_avg) ? m.eu_avg.map(Number) : [+m.eu_avg.h, +m.eu_avg.d, +m.eu_avg.a];
-        if (eu.length === 3 && eu[0] > 1 && eu[1] > 1 && eu[2] > 1 && OM && OM.predict) res = OM.predict(jc, eu);
+        if (eu.length === 3 && eu[0] > 1 && eu[1] > 1 && eu[2] > 1) {
+          euArr = eu;
+          if (OM && OM.predict) res = OM.predict(jc, eu);
+        }
       }
       if (!res) {
         var inv = [1 / jc[0], 1 / jc[1], 1 / jc[2]];
@@ -214,7 +220,12 @@
         // 无国际均价：gap 缺失（无国内vs国际偏差可比），advice 层对此已做空值保护
         res = { p: p, breakeven: be, ev: [p[0] - be[0], p[1] - be[1], p[2] - be[2]], gap: null };
       } else { usedModel = true; }
-      rows.push({ meta: meta, res: res, advice: (OM && OM.advice) ? OM.advice(res) : null, usedModel: usedModel, isCurrent: true });
+      rows.push({
+        meta: meta, res: res, advice: (OM && OM.advice) ? OM.advice(res) : null,
+        usedModel: usedModel, isCurrent: true,
+        jcArr: jc, euArr: euArr,
+        openOdds: m.openOdds || null, closeOdds: m.closeOdds || null
+      });
     }
     return rows;
   }
@@ -223,12 +234,21 @@
     if (!scored.length) return null;
     opts = opts || {};
     var useDouble = opts.useDouble !== undefined ? opts.useDouble : OPTS.useDouble;
+    // 规则层：把登记的所有"提升 pp"规则（分歧以欧赔为准 / CLV 资金流等）施加到打分结果上。
+    // 无规则模块时优雅降级为原样打分（保持向后兼容）。
+    var RR = (typeof window !== 'undefined' ? window : globalThis).RecommendRules;
+    var applied = (RR && RR.applyTo) ? RR.applyTo(scored) : scored;
     return {
-      stable: useDouble ? buildDoubleStable(scored, legs) : buildStable(scored, legs),
-      cold: useDouble ? buildDoubleCold(scored, legs) : buildCold(scored, legs),
+      stable: useDouble ? buildDoubleStable(applied, legs) : buildStable(applied, legs),
+      cold: useDouble ? buildDoubleCold(applied, legs) : buildCold(applied, legs),
       analyzedN: scored.length,
       usedModel: scored.some(function (x) { return x.usedModel; }),
-      useDouble: useDouble
+      useDouble: useDouble,
+      rulesApplied: applied.some(function (x) { return x.ruleApplied; }),
+      appliedRuleIds: applied.reduce(function (acc, x) {
+        (x.appliedRules || []).forEach(function (r) { if (acc.indexOf(r.id) < 0) acc.push(r.id); });
+        return acc;
+      }, [])
     };
   }
 
@@ -248,10 +268,14 @@
     return '<ol class="parlay-legs">' + legs.map(function (x) {
       var evCls = x.ev >= 0 ? 'pos' : 'neg';
       var pick = (x.double ? '<span class="pl-double">双选</span> ' : '') + x.sideZh + ' @' + x.jc.toFixed(2);
+      var tags = (x.ruleTags && x.ruleTags.length)
+        ? '<div class="pl-rule-tags" style="font-size:11px;color:var(--color-text-secondary);margin-top:3px;">' +
+          x.ruleTags.map(function (t) { return '<span title="历史回放规则修正">· ' + esc(t) + '</span>'; }).join(' ') + '</div>'
+        : '';
       return '<li><span class="pl-teams">' + esc((x.meta.zhHome || '') + ' vs ' + (x.meta.zhAway || '')) +
         '</span><span class="pl-pick">' + pick +
         '</span><span class="pl-prob">' + (x.prob * 100).toFixed(1) + '%</span>' +
-        '<span class="pl-ev ' + evCls + '">' + (x.ev >= 0 ? '+' : '') + (x.ev * 100).toFixed(1) + 'pp</span></li>';
+        '<span class="pl-ev ' + evCls + '">' + (x.ev >= 0 ? '+' : '') + (x.ev * 100).toFixed(1) + 'pp</span>' + tags + '</li>';
     }).join('') + '</ol>';
   }
 

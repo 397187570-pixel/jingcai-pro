@@ -196,6 +196,7 @@ async function loadMatches() {
     updateDiagPanel();
     renderAll();
     recordOddsTick(); // P1+P2：把当前国内外赔率写入时序存储，供偏差/背离/热度分析
+    enrichCLV().then(function () { refreshParlayPanels(); }); // R2：把浏览器已记录的开盘/最新赔率挂到比赛上，供 CLV 规则使用
     const srcLabel = dataSource.startsWith('football-data')
       ? `（${dataSource.split(':')[1]} 联赛）`
       : (dataSource === 'scf-proxy' ? '（SCF 代理）' : '（竞彩官方）');
@@ -227,6 +228,45 @@ function updateDiagPanel() {
     ${err}
     ${steps}
   </div>`;
+}
+
+/* ============================================
+   R2 CLV 数据富化：把浏览器时序快照的首条(开盘)与最新(临场)赔率挂到比赛对象上。
+   仅在用户浏览器已记录该场多次快照时生效；无记录则不影响任何推荐（R2 规则自动跳过）。
+   ============================================ */
+async function enrichCLV() {
+  if (typeof OddsHistory === 'undefined' || !OddsHistory.getAllSeries || !AppState.matches || !AppState.matches.length) return;
+  try {
+    const all = await OddsHistory.getAllSeries(); // { matchId: [snapshot,...] } 或数组
+    if (!all) return;
+    const map = {};
+    if (Array.isArray(all)) {
+      all.forEach(function (s) { if (s && s.matchId) (map[s.matchId] = map[s.matchId] || []).push(s); });
+    } else if (typeof all === 'object') {
+      Object.keys(all).forEach(function (k) { map[k] = all[k]; });
+    }
+    let n = 0;
+    AppState.matches.forEach(function (m) {
+      const mid = m.code || (m.homeTeam + '_vs_' + m.awayTeam);
+      const series = map[mid];
+      if (!series || series.length < 2) return; // 至少两条快照才有"移动"
+      const first = series[0], latest = series[series.length - 1];
+      const f = first.jc || first.odds, l = latest.jc || latest.odds;
+      if (!f || !l) return;
+      m.openOdds = [+f.h, +f.d, +f.a];
+      m.closeOdds = [+l.h, +l.d, +l.a];
+      n++;
+    });
+    if (n) window.__jcClvEnriched = n;
+  } catch (e) { /* CLV 富化失败：降级，不影响推荐 */ }
+}
+
+function refreshParlayPanels() {
+  if (!window.OddsParlay) return;
+  ['oddsParlayPanel', 'oddsParlayPanelAi'].forEach(function (id) {
+    const p = document.getElementById(id);
+    if (p) window.OddsParlay.renderParlayPanel(p, 3, AppState.matches);
+  });
 }
 
 /* ============================================
