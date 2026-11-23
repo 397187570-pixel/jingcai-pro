@@ -288,7 +288,9 @@
 
     return '<div style="margin-top:12px;padding:12px;border:1px dashed var(--border-strong);border-radius:10px;background:var(--bg-card-hover);">' +
     '<div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">📊 多维预测 ' +
-    '<span style="font-size:10px;font-weight:400;color:var(--text-muted);">（xG 主 ' + md.xg.homeXg + ' / 客 ' + md.xg.awayXg + ' · 锚定可信 1X2 概率派生）</span></div>' +
+    (m.oddsInferred
+      ? '<span style="font-size:10px;font-weight:400;color:var(--c-amber);">（本场未开胜平负·方向由让球盘反推，仅供分析参考；让球/进球/比分/半全场为竞彩真实在售）</span>'
+      : '<span style="font-size:10px;font-weight:400;color:var(--text-muted);">（xG 主 ' + md.xg.homeXg + ' / 客 ' + md.xg.awayXg + ' · 锚定可信 1X2 概率派生）</span>') + '</div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
       '<div><div style="font-size:11px;font-weight:600;color:var(--c-blue);margin-bottom:4px;">胜平负</div>' + wdlBars + '</div>' +
       '<div><div style="font-size:11px;font-weight:600;color:var(--c-cyan);margin-bottom:4px;">让胜平负 · ' + esc(ahLabel) + '</div>' + ahBars + '</div>' +

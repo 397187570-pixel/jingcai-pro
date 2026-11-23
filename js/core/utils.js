@@ -136,6 +136,9 @@ function truncate(str, maxLen = 20) {
 function getOddsForCell(cell, m) {
   if (!cell || !m) return null;
   if (cell.dim === '胜平负') {
+    // 若 HAD 赔率是从让球盘反推的（竞彩实际未开胜平负），不可当作可买赔率展示 → 返回 null 标"未开售"。
+    // 反推赔率仅用于模型计算方向概率，不代表竞彩真能买。
+    if (m.oddsInferred) return null;
     const map = { '1x2-home': 'h', '1x2-draw': 'd', '1x2-away': 'a' };
     return m.odds && m.odds[map[cell.key]];
   }

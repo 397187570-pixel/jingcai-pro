@@ -40,6 +40,63 @@
 
   function jcArr(meta) { return [+meta.jc_h, +meta.jc_d, +meta.jc_a]; }
 
+  // ===== 泛化「玩法候选行」工具（竞彩所有可售玩法均可作为推荐项）=====
+  // 每个玩法行的 res.p / res.ev / res.breakeven 与 meta.options 一一对应；
+  // meta.options = [{key, zh, odds, p, ev, be}, ...]，选项数可变（TTG 8 / CRS 31 / HAFU 9 ...）。
+  // 兼容旧 HAD 三项行：无 options 时 legPool 仍走 SIDES 三项逻辑。
+  function isMarketRow(x) { return !!(x && x.meta && Array.isArray(x.meta.options) && x.meta.options.length >= 2); }
+
+  // 把带 options 的玩法行按"单腿最优选项"展开成可挑的腿（供 stable/cold 复用三项挑腿器）
+  // sideZh 直接取该玩法选项中文名；marketLabel 供 UI 标注玩法来源。
+  function marketRowToScored(x) {
+    var opt = x.meta.options;
+    var bestP = 0, bestEV = -Infinity, iP = 0, iEV = 0;
+    for (var i = 0; i < opt.length; i++) {
+      if (opt[i].p > bestP) { bestP = opt[i].p; iP = i; }
+      if (opt[i].ev > bestEV) { bestEV = opt[i].ev; iEV = i; }
+    }
+    // 伪造与历史行一致的形状，使 pickMarketPerMatch/buildStable/buildCold 无需大改。
+    // p/ev 用选项数组（任意长度），bestPi/bestEVi 此时由 legPool 内 argmax 重算，故这里仅占位。
+    return {
+      meta: x.meta, res: x.res, advice: x.advice, usedModel: x.usedModel, isCurrent: true,
+      jcArr: x.jcArr, euArr: x.euArr, matchKey: x.matchKey,
+      openOdds: x.openOdds, closeOdds: x.closeOdds,
+      ruleTags: x.ruleTags || [], appliedRules: x.appliedRules || [], ruleApplied: !!x.ruleApplied
+    };
+  }
+
+  // argmax：兼容任意长度数组
+  function argmaxN(a) {
+    var bi = 0, bv = -Infinity;
+    for (var i = 0; i < a.length; i++) if (a[i] > bv) { bv = a[i]; bi = i; }
+    return bi;
+  }
+
+  // 泛化 legPool：对玩法行用 meta.options 的选项中文名，对历史行沿用 SIDES
+  function legPoolGeneric(scored) {
+    return scored.map(function (x) {
+      var p = x.res.p, ev = x.res.ev, jc = jcArr(x.meta);
+      var opts = (x.meta && x.meta.options) || null;
+      var bestEVi = argmaxN(ev), bestPi = argmaxN(p);
+      return {
+        meta: x.meta, p: p, ev: ev, jc: jc,
+        bestPi: bestPi, bestEVi: bestEVi,
+        options: opts,
+        ruleTags: x.ruleTags || [], appliedRules: x.appliedRules || []
+      };
+    });
+  }
+
+  // 选项中文名（玩法行取 options[i].zh，历史行取 ZH[ SIDES[i] ]）
+  function sideLabel(poolRow, i, j) {
+    var o = poolRow.options;
+    var s = o ? String(o[i].zh) : (poolRow.meta.market === 'HHAD' ? ZH_HHAD[SIDES[i]] : ZH[SIDES[i]]);
+    if (j !== undefined && j !== null) {
+      s += ' / ' + (o ? String(o[j].zh) : (poolRow.meta.market === 'HHAD' ? ZH_HHAD[SIDES[j]] : ZH[SIDES[j]]));
+    }
+    return s;
+  }
+
   // 容错读取一场比赛的胜平负赔率（兼容多种数据源形状：直形 odds.{h,d,a} / 嵌套 had / 扁平字段）
   function extractOdds(m) {
     if (!m) return null;
@@ -79,9 +136,14 @@
    */
   function buildStable(scored, legs) {
     legs = legs || 3;
-    var pool = legPool(scored).map(function (x) {
+    var pool = legPoolGeneric(scored).map(function (x) {
       var i = x.bestPi;
-      return { meta: x.meta, side: SIDES[i], sideZh: legSideZh(x.meta, i), prob: x.p[i], jc: x.jc[i], ev: x.ev[i], ruleTags: x.ruleTags || [], appliedRules: x.appliedRules || [] };
+      return {
+        meta: x.meta, side: x.options ? x.options[i].key : SIDES[i],
+        sideZh: sideLabel(x, i), prob: x.p[i], jc: x.jc[i], ev: x.ev[i],
+        marketLabel: x.meta.marketLabel || null,
+        ruleTags: x.ruleTags || [], appliedRules: x.appliedRules || []
+      };
     }).sort(function (a, b) { return b.prob - a.prob; });
     var picks = pool.slice(0, legs);
     return { type: 'stable', legs: picks, stats: combine(picks) };
@@ -98,15 +160,19 @@
     legs = legs || 3;
     var rows = scored.map(function (x) {
       var p = x.res.p, jc = jcArr(x.meta);
-      var order = [0, 1, 2].sort(function (i, j) { return p[j] - p[i]; });
+      var idxs = []; for (var k = 0; k < p.length; k++) idxs.push(k);
+      var order = idxs.sort(function (i, j) { return p[j] - p[i]; });
       var i = order[0], j = order[1];
       var pComb = p[i] + p[j];
       var jcD = doubleOdds(jc[i], jc[j]);
       var evD = pComb * (jcD - 1) - (1 - pComb);
+      var opts = x.meta && x.meta.options;
       return {
-        meta: x.meta, double: true, sides: [SIDES[i], SIDES[j]],
-        sideZh: legSideZh(x.meta, i, j),
+        meta: x.meta, double: true,
+        sides: [opts ? opts[i].key : SIDES[i], opts ? opts[j].key : SIDES[j]],
+        sideZh: sideLabel({ meta: x.meta, options: opts }, i, j),
         prob: pComb, jc: jcD, ev: evD, type: 'stable',
+        marketLabel: x.meta.marketLabel || null,
         ruleTags: x.ruleTags || [], appliedRules: x.appliedRules || []
       };
     }).sort(function (a, b) { return b.prob - a.prob; });
@@ -124,11 +190,15 @@
   var MAX_EDGE_RATIO = 1.6; // 模型概率最多为赔率隐含的 1.6 倍，超出视为不可信假价值
   function buildCold(scored, legs) {
     legs = legs || 3;
-    var pool = legPool(scored).map(function (x) {
+    var pool = legPoolGeneric(scored).map(function (x) {
       var i = x.bestEVi;
       var be = 1 / x.jc[i];                       // 该边盈亏平衡（含抽水）
       var sane = x.p[i] <= MAX_EDGE_RATIO * be;   // 模型不过度自信才纳入
-      return { meta: x.meta, side: SIDES[i], sideZh: legSideZh(x.meta, i), prob: x.p[i], jc: x.jc[i], ev: x.ev[i], sane: sane };
+      return {
+        meta: x.meta, side: x.options ? x.options[i].key : SIDES[i],
+        sideZh: sideLabel(x, i), prob: x.p[i], jc: x.jc[i], ev: x.ev[i], sane: sane,
+        marketLabel: x.meta.marketLabel || null
+      };
     });
     var band = pool.filter(function (x) { return x.jc >= 2.5 && x.jc <= 8 && x.sane; });
     var pos = band.filter(function (x) { return x.ev > 0; });
@@ -154,8 +224,10 @@
     var doubleLegs = [], singleCands = [];
     scored.forEach(function (x) {
       var p = x.res.p, ev = x.res.ev, jc = jcArr(x.meta);
+      var opts = x.meta && x.meta.options;
+      var sKey = function (k) { return opts ? opts[k].key : SIDES[k]; };
       var band = [];
-      for (var k = 0; k < 3; k++) {
+      for (var k = 0; k < p.length; k++) {
         var be = 1 / jc[k];                 // 该边盈亏平衡（含抽水）
         if (jc[k] >= 2.5 && jc[k] <= 8 && p[k] <= MAX_EDGE_RATIO * be) {
           band.push({ k: k, p: p[k], jc: jc[k], ev: ev[k] });
@@ -168,14 +240,18 @@
         var jcD = doubleOdds(i.jc, j.jc);
         var evD = pComb * (jcD - 1) - (1 - pComb);
         doubleLegs.push({
-          meta: x.meta, double: true, sides: [SIDES[i.k], SIDES[j.k]],
-          sideZh: legSideZh(x.meta, i.k, j.k),
+          meta: x.meta, double: true, sides: [sKey(i.k), sKey(j.k)],
+          sideZh: sideLabel({ meta: x.meta, options: opts }, i.k, j.k),
           prob: pComb, jc: jcD, ev: evD, type: 'cold',
+          marketLabel: x.meta.marketLabel || null,
           ruleTags: x.ruleTags || [], appliedRules: x.appliedRules || []
         });
       } else if (band.length === 1) {
         var b = band[0];
-        singleCands.push({ meta: x.meta, side: SIDES[b.k], sideZh: legSideZh(x.meta, b.k), prob: b.p, jc: b.jc, ev: b.ev });
+        singleCands.push({
+          meta: x.meta, side: sKey(b.k), sideZh: sideLabel({ meta: x.meta, options: opts }, b.k),
+          prob: b.p, jc: b.jc, ev: b.ev, marketLabel: x.meta.marketLabel || null
+        });
       }
     });
     doubleLegs.sort(function (a, b) { return b.prob - a.prob; });
@@ -259,6 +335,161 @@
     return null;
   }
 
+  // 由方向概率求 xG（供 TTG/CRS/HAFU 概率派生，与研判页同源）
+  function xgFromProbs(p) {
+    var MD = (typeof window !== 'undefined' ? window : globalThis).MultiDim;
+    if (!MD || !MD.solveXg || !p || p.length < 3) return null;
+    try {
+      var x = MD.solveXg(p[0], p[1], p[2], { maxGoals: 8 });
+      return (x && x.homeXg > 0) ? x : null;
+    } catch (e) { return null; }
+  }
+
+  // 把概率数组 + 赔率数组 + 中文标签数组，转成候选行的 options（每项含 ev/be）
+  function mkOptions(keys, zhs, odds, probs) {
+    var out = [];
+    for (var i = 0; i < odds.length; i++) {
+      var o = +odds[i], p = +probs[i];
+      if (!(o > 1) || !(p > 0) || !isFinite(p)) continue;
+      out.push({
+        key: keys[i], zh: zhs[i], odds: o, p: p,
+        be: 1 / o, ev: p * o - 1
+      });
+    }
+    return out;
+  }
+
+  // 由一场比赛生成「所有竞彩真实在售玩法」的候选行（每玩法一行，供每场择一）。
+  // 概率来自 xG 泊松派生（与研判页 MultiDim 同源）；赔率来自竞彩真实在售值。
+  // 返回行数组；无有效概率/赔率的玩法自动跳过。
+  function buildMarketRows(m, baseP, matchKey, usedModel) {
+    var MD = (typeof window !== 'undefined' ? window : globalThis).MultiDim;
+    if (!MD) return [];
+    var rows = [];
+    var base = {
+      zhHome: m.homeTeamFull || m.homeTeam || '主队',
+      zhAway: m.awayTeamFull || m.awayTeam || '客队',
+      code: m.code || '', league: m.league || '',
+      date: m.date || '', time: m.time || '', matchKey: matchKey,
+      isCurrent: true, usedModel: usedModel, oddsInferred: !!m.oddsInferred
+    };
+    var xg = xgFromProbs(baseP);
+
+    // 1) 胜平负 HAD（仅竞彩真实开出且非反推时；反推赔率不可当可买项）
+    if (!m.oddsInferred) {
+      var jc = extractOdds(m);
+      if (jc && jc.length === 3 && jc.every(function (v) { return v > 1; })) {
+        var opt = mkOptions(SIDES, ['主胜', '平', '客胜'], jc, baseP);
+        if (opt.length === 3) {
+          rows.push(makeMarketRow('HAD', '胜平负', base, opt, jc, baseP));
+        }
+      }
+    }
+
+    // 2) 让球胜平负 HHAD（竞彩真实整数盘）
+    var hh = m.hhad, hhOdds = hh && [+hh.h, +hh.d, +hh.a];
+    var hhLine = (typeof m.handicap === 'number' && !isNaN(m.handicap))
+      ? m.handicap
+      : (hh && hh.line ? Number(String(hh.line).replace('+', '')) : null);
+    if (hhOdds && hhOdds.length === 3 && hhOdds.every(function (v) { return v > 1; }) &&
+        typeof hhLine === 'number' && hhLine !== 0) {
+      var hp = handicapProbs(baseP, hhLine, hhOdds);
+      if (hp && hp.every(function (v) { return v > 0; })) {
+        var hopt = mkOptions(SIDES, ['让胜', '让平', '让负'], hhOdds, hp);
+        if (hopt.length === 3) {
+          var hrow = makeMarketRow('HHAD', '让球胜平负 ' + lineText(hhLine), base, hopt, hhOdds, hp);
+          hrow.meta.line = hhLine;
+          rows.push(hrow);
+        }
+      }
+    }
+
+    if (!xg) return rows; // 无 xG：仅 HAD/HHAD（其概率不依赖 xG）
+
+    // 3) 总进球 TTG（s0~s7，s7=7+球）
+    if (m.ttg && Object.keys(m.ttg).length) {
+      var tg = MD.totalGoals(xg.homeXg, xg.awayXg, 7); // 7+=桶
+      var tgKeys = [], tgZh = [], tgOdds = [], tgP = [];
+      for (var g = 0; g <= 7; g++) {
+        var key = 's' + g;
+        var od = +(m.ttg[key] || m.ttg[String(g)]);
+        if (!(od > 1)) continue;
+        var bucket = tg.find(function (t) {
+          return String(t.goals).replace('+', '') === String(g);
+        });
+        var pv = bucket ? bucket.p : 0;
+        tgKeys.push(key); tgZh.push(g === 7 ? '7+球' : (g + '球'));
+        tgOdds.push(od); tgP.push(pv);
+      }
+      var topt = mkOptions(tgKeys, tgZh, tgOdds, tgP);
+      if (topt.length) rows.push(makeMarketRow('TTG', '总进球', base, topt, tgOdds, tgP, tgKeys));
+    }
+
+    // 4) 比分 CRS（sXXsYY，主2位+客2位；概率取泊松比分矩阵）
+    if (m.crs && Object.keys(m.crs).length && MD.scoreMatrix) {
+      var sm = MD.scoreMatrix(xg.homeXg, xg.awayXg, 8);
+      var pmap = {};
+      sm.forEach(function (s) { pmap[s.home + ':' + s.away] = s.p; });
+      var ck = [], cz = [], co = [], cp = [];
+      Object.keys(m.crs).forEach(function (k) {
+        var mm = String(k).match(/^s(\d{2})s(\d{2})$/);
+        if (!mm) return;
+        var h = +mm[1], a = +mm[2], od = +m.crs[k];
+        if (!(od > 1)) return;
+        var pv = pmap[h + ':' + a];
+        if (!(pv > 0)) return;
+        ck.push(k); cz.push(h + ':' + a); co.push(od); cp.push(pv);
+      });
+      var copt = mkOptions(ck, cz, co, cp);
+      if (copt.length) rows.push(makeMarketRow('CRS', '比分', base, copt, co, cp, ck));
+    }
+
+    // 5) 半全场 HAFU（9 组合，概率取上下半场联合分布）
+    if (m.hafu && Object.keys(m.hafu).length && MD.halfFullWdl) {
+      var hf = MD.halfFullWdl(xg.homeXg, xg.awayXg);
+      var hfZh = {
+        hh: '胜/胜', hd: '胜/平', ha: '胜/负',
+        dh: '平/胜', dd: '平/平', da: '平/负',
+        ah: '负/胜', ad: '负/平', aa: '负/负'
+      };
+      var fk = [], fz = [], fo = [], fp = [];
+      Object.keys(hfZh).forEach(function (k) {
+        var od = +m.hafu[k];
+        if (!(od > 1)) return;
+        fk.push(k); fz.push(hfZh[k]); fo.push(od); fp.push(hf[k] || 0);
+      });
+      var fopt = mkOptions(fk, fz, fo, fp);
+      if (fopt.length) rows.push(makeMarketRow('HAFU', '半全场', base, fopt, fo, fp, fk));
+    }
+
+    return rows;
+  }
+
+  function lineText(line) {
+    return (line > 0 ? '+' : '') + line;
+  }
+
+  // 构造一条玩法候选行（形状对齐历史 scored 行，补 meta.options / meta.marketLabel）
+  function makeMarketRow(market, marketLabel, base, options, jc, probs, keysOverride) {
+    var ev = options.map(function (o) { return o.ev; });
+    var be = options.map(function (o) { return o.be; });
+    var p = options.map(function (o) { return o.p; });
+    var meta = {
+      zhHome: base.zhHome, zhAway: base.zhAway, code: base.code, league: base.league,
+      date: base.date, time: base.time, matchKey: base.matchKey,
+      market: market, marketLabel: marketLabel, options: options,
+      jc_h: +jc[0], jc_d: +jc[1], jc_a: +jc[2]
+    };
+    return {
+      meta: meta,
+      res: { p: p, breakeven: be, ev: ev, gap: null },
+      advice: null, usedModel: base.usedModel, isCurrent: true,
+      jcArr: jc, euArr: null, matchKey: base.matchKey,
+      openOdds: null, closeOdds: null,
+      oddsInferred: base.oddsInferred
+    };
+  }
+
   // 把"当日比赛"转成与历史记录相同的 scored 行（供 buildStable/buildCold 复用）
   // 有国际均价时走 P8 多源融合模型；否则用竞彩去抽水隐含概率（诚实降级，仍需如实标注）
   function scoreCurrentMatches(matches, now) {
@@ -295,40 +526,32 @@
         // 无国际均价：gap 缺失（无国内vs国际偏差可比），advice 层对此已做空值保护
         res = { p: p, breakeven: be, ev: [p[0] - be[0], p[1] - be[1], p[2] - be[2]], gap: null };
       } else { usedModel = true; }
+
+      // 有完整竞彩玩法数据的当日场次 → 生成全玩法候选行（HAD/HHAD/TTG/CRS/HAFU）。
+      // 只有 odds 的历史场次（compare.js 复盘）无 hhad/ttg/crs/hafu → 保持原 HAD 三项行，向后兼容。
+      var hasPlays = !!(m.ttg || m.crs || m.hafu || m.hhad);
+      if (hasPlays) {
+        var mrows = buildMarketRows(m, res.p, matchKey, usedModel);
+        if (mrows.length) {
+          mrows.forEach(function (r) {
+            r.openOdds = m.openOdds || null;
+            r.closeOdds = m.closeOdds || null;
+            r.euArr = euArr;
+            r.advice = (OM && OM.advice) ? OM.advice(res) : null;
+          });
+          rows = rows.concat(mrows);
+          continue;
+        }
+      }
+
+      // 降级：无玩法数据的历史行（HAD 三项），保持原逻辑。
+      // （有 hhad 的场次已在上方 hasPlays 分支由 buildMarketRows 统一生成 HHAD，此处不会重复。）
       rows.push({
         meta: meta, res: res, advice: (OM && OM.advice) ? OM.advice(res) : null,
         usedModel: usedModel, isCurrent: true,
         jcArr: jc, euArr: euArr, matchKey: matchKey,
         openOdds: m.openOdds || null, closeOdds: m.closeOdds || null
       });
-
-      // 竞彩让球胜平负(HHAD)：只在竞彩真实开了整数盘且三项赔率可读时生成候选行。
-      // 概率由同场 HAD 基底按真实盘口重算（与研判页同源），赔率/盈亏平衡用 hhad 真实赔率。
-      var hh = m.hhad;
-      var hhOdds = hh && [+hh.h, +hh.d, +hh.a];
-      var hhLine = (typeof m.handicap === 'number' && !isNaN(m.handicap))
-        ? m.handicap
-        : (hh && hh.line ? Number(String(hh.line).replace('+', '')) : null);
-      if (hhOdds && hhOdds.length === 3 && hhOdds.every(function (v) { return v > 1; }) &&
-          typeof hhLine === 'number' && hhLine !== 0) {
-        var hp = handicapProbs(res.p, hhLine, hhOdds);
-        if (hp && hp.every(function (v) { return v > 0; })) {
-          var hbe = [1 / hhOdds[0], 1 / hhOdds[1], 1 / hhOdds[2]];
-          var hres = { p: hp, breakeven: hbe, ev: [hp[0] - hbe[0], hp[1] - hbe[1], hp[2] - hbe[2]], gap: null };
-          var hmeta = {
-            zhHome: meta.zhHome, zhAway: meta.zhAway,
-            jc_h: hhOdds[0], jc_d: hhOdds[1], jc_a: hhOdds[2],
-            code: meta.code, league: meta.league, date: meta.date, time: meta.time,
-            market: 'HHAD', line: hhLine, matchKey: matchKey
-          };
-          rows.push({
-            meta: hmeta, res: hres, advice: null,
-            usedModel: usedModel, isCurrent: true,
-            jcArr: hhOdds, euArr: null, matchKey: matchKey,
-            openOdds: null, closeOdds: null
-          });
-        }
-      }
     }
     return rows;
   }
@@ -352,13 +575,22 @@
     // 规则层：把登记的所有"提升 pp"规则（分歧以欧赔为准 / CLV 资金流等）施加到打分结果上。
     // 无规则模块时优雅降级为原样打分（保持向后兼容）。
     var RR = (typeof window !== 'undefined' ? window : globalThis).RecommendRules;
-    var applied = (RR && RR.applyTo) ? RR.applyTo(scored) : scored;
-    // 同一场可能同时有 HAD 与 HHAD 候选行，只保留命中概率最高的一个市场，避免同场重复下注。
+    // 规则层 R1/R2 是 HAD 三项方向规则：只作用于历史三项行。
+    // 玩法行(N 项 options)的概率已由同一方向基底派生，若让 R2 按三项索引改 res.p 会破坏数组结构，
+    // 故玩法行跳过规则层（其基底已在 scoreCurrentMatches 用同一 P8/去水概率生成）。
+    var legacy = scored.filter(function (x) { return !isMarketRow(x); });
+    var marketRows = scored.filter(function (x) { return isMarketRow(x); });
+    var appliedLegacy = (RR && RR.applyTo && legacy.length) ? RR.applyTo(legacy) : legacy;
+    var applied = appliedLegacy.concat(marketRows);
+    // 同一场可能同时有多个玩法候选行，只保留命中概率最高的一个市场，避免同场重复下注。
     applied = pickMarketPerMatch(applied);
+    // analyzedN 按"场"统计而非玩法行：多玩法场次的候选行去重，避免把 16 场显示成 39 场。
+    var matchKeys = {};
+    scored.forEach(function (x) { matchKeys[x.matchKey || (x.meta && x.meta.matchKey) || Math.random()] = 1; });
     return {
       stable: useDouble ? buildDoubleStable(applied, legs) : buildStable(applied, legs),
       cold: useDouble ? buildDoubleCold(applied, legs) : buildCold(applied, legs),
-      analyzedN: scored.length,
+      analyzedN: Object.keys(matchKeys).length,
       usedModel: scored.some(function (x) { return x.usedModel; }),
       useDouble: useDouble,
       rulesApplied: applied.some(function (x) { return x.ruleApplied; }),
@@ -397,10 +629,17 @@
       var kickHtml = kick
         ? '<span class="pl-kick">' + esc(kick) + ' 开赛</span>'
         : '';
-      // 让球玩法标注盘口（竞彩真实整数盘），避免与胜平负混淆
-      var marketHtml = (x.meta && x.meta.market === 'HHAD')
-        ? '<span class="pl-market" title="竞彩让球胜平负，盘口 ' + esc(String(x.meta.line)) + '">让球' + esc(String(x.meta.line)) + '</span>'
-        : '';
+      // 玩法标签：竞彩所有可售玩法均标出来源，避免与胜平负混淆。
+      // - 让球盘口（竞彩真实整数盘）单独显示盘口值；
+      // - 其余玩法（总进球/比分/半全场）显示玩法名。
+      var marketHtml = '';
+      if (x.meta && x.meta.market && x.meta.market !== 'HAD') {
+        if (x.meta.market === 'HHAD') {
+          marketHtml = '<span class="pl-market" title="竞彩让球胜平负，盘口 ' + esc(String(x.meta.line)) + '">让球' + esc(String(x.meta.line)) + '</span>';
+        } else {
+          marketHtml = '<span class="pl-market" title="竞彩' + esc(x.meta.marketLabel || x.meta.market) + '">' + esc(x.meta.marketLabel || x.meta.market) + '</span>';
+        }
+      }
       var tags = (x.ruleTags && x.ruleTags.length)
         ? '<div class="pl-rule-tags" style="font-size:11px;color:var(--color-text-secondary);margin-top:3px;">' +
           x.ruleTags.map(function (t) { return '<span title="历史回放规则修正">· ' + esc(t) + '</span>'; }).join(' ') + '</div>'
@@ -481,7 +720,9 @@
       '<div class="patterns-head">AI 串关推荐 · ' + srcLabel + ' · ' + modelLabel + ' · 双策略（市场有效，组合 EV 多为负，仅作风险/回报取舍参考）</div>' +
       '<div class="parlay-row">' + renderCard(rec.stable) + renderCard(rec.cold) + '</div>' +
       '推荐口径：只纳入开赛时间落在竞彩销售日「今日 10:00 ~ 次日 10:00」内的在售场次，跨到下一销售日的场次不纳入；' +
-      '玩法以竞彩可买为准，让球腿按竞彩实际整数盘口（让球+X/让胜平负）计算，每场只取胜平负或让胜平负其一，避免同场重复下注；推荐腿已标注开赛时间，均可在今天下单。' +
+      '竞彩所有可售玩法（胜平负/让球胜平负/总进球/比分/半全场）均可作为推荐项，每场按模型命中概率择优取一个玩法，避免同场重复下注；' +
+      '各玩法概率由同一方向基底以泊松模型一致派生，让球按竞彩真实整数盘口计算；未开胜平负的场次改用其在售玩法（如让球/总进球/比分/半全场）推荐，反推赔率不作为可买项。' +
+      '高抽水玩法（总进球约25%/半全场约25%/比分约46%）EV 天然偏低，冷门型策略会自动少选，请留意；推荐腿已标注玩法与开赛时间，均可在今天下单。' +
       '组合 EV = 组合模型概率 ×(组合赔率−1) −(1−组合概率)，竞彩串关赔率为各腿相乘。' +
       '因多次抽水叠加，组合 EV 通常为负；「稳妥型」主打高命中、「冷门型」主打高回报，均为风险偏好选择，不构成必胜建议。' +
       (info.isCurrent && !rec.usedModel ? '（当前比赛未接入国际均价，概率取自竞彩去抽水隐含值；开启国际赔率采集后自动升级为 P8 模型。）' : '') +

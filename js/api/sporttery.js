@@ -104,10 +104,35 @@
  * 标准化比赛数据
  */
   function normalizeMatches(raw) {
+    // MultiDim 用于缺 HAD 时从让球盘反推方向概率（浏览器/Node 双环境）
+    let MD = null;
+    if (typeof window !== 'undefined' && window.MultiDim) MD = window.MultiDim;
+    if (!MD) { try { MD = require('../engine/multiDim.js'); } catch (e) { MD = null; } }
+
     const matches = [];
     const infoList = raw.value?.matchInfoList || [];
     infoList.forEach(day => {
       (day.subMatchList || []).forEach(m => {
+        const had = (m.had && Number(m.had.h) > 1 && Number(m.had.d) > 1 && Number(m.had.a) > 1)
+          ? { h: +m.had.h, d: +m.had.d, a: +m.had.a } : null;
+        const hhad = m.hhad && m.hhad.h ? { h: +m.hhad.h, d: +m.hhad.d, a: +m.hhad.a, line: m.hhad.goalLine } : null;
+        const lineNum = m.hhad && m.hhad.goalLine && !Number.isNaN(Number(String(m.hhad.goalLine).replace('+', '')))
+          ? Number(String(m.hhad.goalLine).replace('+', '')) : null;
+        let odds = had;
+        let oddsInferred = false;
+        let wdlInferred = null;
+        // 缺 HAD 但有让球盘：从让球赔率反推等效胜平负赔率，让研判页/多维分析可用
+        if (!odds && hhad && lineNum !== null && MD && typeof MD.inferWdlFromHandicap === 'function') {
+          wdlInferred = MD.inferWdlFromHandicap(hhad, lineNum, {});
+          if (wdlInferred && wdlInferred.homeWin > 0 && wdlInferred.draw > 0 && wdlInferred.awayWin > 0) {
+            odds = {
+              h: Math.round(100 / wdlInferred.homeWin) / 100,
+              d: Math.round(100 / wdlInferred.draw) / 100,
+              a: Math.round(100 / wdlInferred.awayWin) / 100
+            };
+            oddsInferred = true;
+          }
+        }
         matches.push({
           id: m.matchId,
           code: m.matchNumStr,
@@ -122,10 +147,12 @@
           awayTeam: m.awayTeamAbbName,
           awayTeamFull: m.awayTeamAllName,
           status: m.matchStatus,
-          odds: m.had ? { h: +m.had.h, d: +m.had.d, a: +m.had.a } : null,
-          hhad: m.hhad && m.hhad.h ? { h: +m.hhad.h, d: +m.hhad.d, a: +m.hhad.a, line: m.hhad.goalLine } : null,
+          odds: odds,
+          oddsInferred: oddsInferred,
+          wdlInferred: wdlInferred,
+          hhad: hhad,
           // 竞彩真实让球盘口（顶层，研判/串关统一读取）；'+1'=主受让1，'-1'=主让1
-          handicap: m.hhad && m.hhad.goalLine ? Number(String(m.hhad.goalLine).replace('+', '')) : '',
+          handicap: lineNum !== null ? lineNum : '',
           crs: Object.keys(m.crs || {}).length ? m.crs : null,
           ttg: Object.keys(m.ttg || {}).length ? m.ttg : null,
           hafu: Object.keys(m.hafu || {}).length ? m.hafu : null

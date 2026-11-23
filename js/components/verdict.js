@@ -181,7 +181,12 @@
     const ahSub = md.lineSuggested
       ? '让球 ' + md.lineLabel + ' · 模型建议（竞彩未开售，不可下单）'
       : '竞彩让球 ' + jcLineTxt + '（' + md.lineLabel + '）· 可买';
-    return renderDimCard('胜平负', null, wdlRows) +
+    // 缺 HAD 场次：胜平负方向由让球盘反推（仅供分析，竞彩未开此玩法不可下单），如实标注；
+    // 让球/进球数/比分/半全场为竞彩真实在售，正常展示与分析。
+    const wdSub = m.oddsInferred
+      ? '本场未开胜平负 · 方向由让球盘反推（仅供参考，不可下单）'
+      : null;
+    return renderDimCard('胜平负', wdSub, wdlRows) +
       renderDimCard('让胜平负', ahSub, ahRows) +
       renderDimCard('进球数', null, goalRows) +
       renderDimCard('比分', null, scoreRows);

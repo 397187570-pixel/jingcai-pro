@@ -195,6 +195,101 @@ function asianHandicap(homeXg, awayXg, line, maxGoals) {
 }
 
 /* ============================================
+   半全场胜平负(HAFU)：上下半场独立泊松联合分布
+   ============================================ */
+/**
+ * 半全场 9 种组合概率。假设上/下半场各自独立、xG 各占一半：
+ *   上半场比分 (h1,a1) ~ Poisson(lh/2), Poisson(la/2)
+ *   下半场比分 (h2,a2) ~ Poisson(lh/2), Poisson(la/2)
+ *   半场结果 = WDL(h1,a1)；全场结果 = WDL(h1+h2, a1+a2)
+ * 联合概率 = Σ P(h1)P(a1)P(h2)P(a2)，对所有满足该(半场,全场)组合的比分求和。
+ * 竞彩 HAFU 键 = 半场结果字母 + 全场结果字母（h=主胜/d=平/a=客胜），
+ *   如 'hh'=半主全主、'dh'=半平全主、'aa'=半客全客。
+ * @returns {Object<string,number>} 9 个键的概率（和为 1）
+ */
+function halfFullWdl(homeXg, awayXg, opts) {
+  const mg = (opts && opts.maxGoals) || 6; // 半场进球上限，6 足够（泊松尾部极小）
+  const lh = homeXg / 2, la = awayXg / 2;
+  const res = {};
+  ['h', 'd', 'a'].forEach(x => ['h', 'd', 'a'].forEach(y => { res[x + y] = 0; }));
+  const wd = (h, a) => h > a ? 'h' : (h === a ? 'd' : 'a');
+  const ph = [], pa = [];
+  for (let k = 0; k <= mg; k++) { ph[k] = mdPoisson(lh, k); pa[k] = mdPoisson(la, k); }
+  for (let h1 = 0; h1 <= mg; h1++) {
+    if (ph[h1] === 0) continue;
+    for (let a1 = 0; a1 <= mg; a1++) {
+      const p1 = ph[h1] * pa[a1];
+      if (p1 === 0) continue;
+      const half = wd(h1, a1);
+      for (let h2 = 0; h2 <= mg; h2++) {
+        if (ph[h2] === 0) continue;
+        for (let a2 = 0; a2 <= mg; a2++) {
+          const p = p1 * ph[h2] * pa[a2];
+          if (p === 0) continue;
+          const full = wd(h1 + h2, a1 + a2);
+          res[half + full] += p;
+        }
+      }
+    }
+  }
+  return res;
+}
+
+/* ============================================
+   缺胜平负(HAD)时：从让球胜平负(HHAD)反推方向概率
+   ============================================ */
+/**
+ * 部分竞彩场次只开让球胜平负(HHAD)、不开胜平负(HAD)（如主队让2球的悬殊场次）。
+ * 此时没有 HAD 赔率，方向模型无法启动。本函数用让球盘赔率反推等效 HAD 概率：
+ *   1) 让球三项赔率去水 → 让胜/让平/让负目标概率；
+ *   2) 网格搜索 (homeXg, awayXg) 使 asianHandicap(xg, line) 拟合该目标；
+ *   3) 用同一组 xG 经泊松算 WDL → 反推的胜平负方向概率。
+ * 注意：单让球盘反解 xG 数学上非唯一，但泊松模型下解通常稳定；结果仅用于
+ *      让缺 HAD 场次的研判页/多维分析可用，并应标注"由让球盘反推，仅供参考"。
+ * @param {{h:number,d:number,a:number}} hhadOdds 让球胜平负赔率（去水前原始赔率）
+ * @param {number} line 竞彩让球盘口（如 -2 表示主让2球）
+ * @param {{maxGoals?:number}} [opts]
+ * @returns {{homeWin:number,draw:number,awayWin:number,homeXg:number,awayXg:number,fitErr:number}|null}
+ */
+function inferWdlFromHandicap(hhadOdds, line, opts) {
+  if (!hhadOdds || !Number.isFinite(line)) return null;
+  const h = Number(hhadOdds.h), d = Number(hhadOdds.d), a = Number(hhadOdds.a);
+  if (!(h > 1 && d > 1 && a > 1)) return null;
+  const mg = (opts && opts.maxGoals) || 8;
+  // 让球三项去水
+  const s = 1 / h + 1 / d + 1 / a;
+  const tH = 1 / h / s, tD = 1 / d / s, tA = 1 / a / s;
+  // 网格搜索 xG 拟合让球三项（粗搜 + 局部精搜）
+  const evalErr = (lh, la) => {
+    const ah = asianHandicap(lh, la, line, mg);
+    const dH = ah.home - tH, dD = ah.draw - tD, dA = ah.away - tA;
+    return dH * dH + dD * dD + dA * dA;
+  };
+  let best = { lh: 1.4, la: 1.1, err: Infinity };
+  for (let lh = 0.1; lh <= 5; lh += 0.1) {
+    for (let la = 0.1; la <= 5; la += 0.1) {
+      const err = evalErr(lh, la);
+      if (err < best.err) best = { lh, la, err };
+    }
+  }
+  const cLh0 = Math.max(0.1, best.lh - 0.1), cLh1 = Math.min(5, best.lh + 0.1);
+  const cLa0 = Math.max(0.1, best.la - 0.1), cLa1 = Math.min(5, best.la + 0.1);
+  for (let lh = cLh0; lh <= cLh1; lh += 0.02) {
+    for (let la = cLa0; la <= cLa1; la += 0.02) {
+      const err = evalErr(lh, la);
+      if (err < best.err) best = { lh, la, err };
+    }
+  }
+  const wdl = poissonWDL(best.lh, best.la, mg);
+  const sum = wdl.homeWin + wdl.draw + wdl.awayWin;
+  if (!(sum > 0)) return null;
+  return {
+    homeWin: wdl.homeWin / sum, draw: wdl.draw / sum, awayWin: wdl.awayWin / sum,
+    homeXg: mdRound3(best.lh), awayXg: mdRound3(best.la), fitErr: mdRound4(best.err)
+  };
+}
+
+/* ============================================
    盘口格式化
    ============================================ */
 function roundTo025(x) {
@@ -321,6 +416,8 @@ const MultiDimApi = {
   scoreMatrix: scoreMatrix,
   totalGoals: totalGoals,
   asianHandicap: asianHandicap,
+  halfFullWdl: halfFullWdl,
+  inferWdlFromHandicap: inferWdlFromHandicap,
   roundTo025: roundTo025,
   lineLabel: lineLabel
 };
