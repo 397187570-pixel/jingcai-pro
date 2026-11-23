@@ -656,6 +656,9 @@
 /* ===== 移动端：AI 串关推荐排版（窄屏防竖排/裁切） ===== */
 .pl-double { white-space: nowrap; }
 .pl-kick { font-size: 11px; color: var(--text-muted); margin-left: 6px; white-space: nowrap; }
+.pl-market { display: inline-block; font-size: 10px; line-height: 1; font-weight: 600; padding: 2px 5px; margin-right: 5px;
+  border-radius: 5px; vertical-align: middle; white-space: nowrap;
+  background: rgba(6,182,212,.12); color: var(--c-cyan, #06B6D4); border: 1px solid var(--c-cyan, #06B6D4); }
 
 @media (max-width: 768px) {
   /* 两张策略卡在窄屏改单列纵向排列，避免右侧卡片被裁切 */

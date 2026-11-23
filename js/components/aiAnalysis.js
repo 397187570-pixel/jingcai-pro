@@ -240,7 +240,11 @@
       { l: '客胜', p: findCell('1x2-away').p, c: 'var(--c-red)' }
     ]);
 
-    const ahLabel = '让球 ' + md.lineLabel + (md.lineSuggested ? '（模型建议）' : '');
+    // 以竞彩可买盘口为准：md.asian 由 m.handicap（竞彩真实整数盘）重算；
+    // 仅当竞彩未开让球盘时退回模型建议，并明确标注不可下单。
+    const ahLabel = md.lineSuggested
+      ? '让球 ' + md.lineLabel + '（模型建议·竞彩未开售，不可下单）'
+      : '竞彩让球 ' + md.lineLabel + '（可买）';
     const ahBars = bars([
       { l: '让胜', p: md.asian.home, c: 'var(--c-green)' },
       { l: '让平', p: md.asian.draw, c: 'var(--c-amber)' },
@@ -264,13 +268,13 @@
       const col = dimColor[c.dim];
       const bg = dimBg[c.dim];
       const odd = cellOdds(c);
-      const oddTxt = odd ? ('@ ' + Number(odd).toFixed(2)) : '';
+      const oddTxt = odd ? ('@ ' + Number(odd).toFixed(2)) : '未开售';
       return '<div class="top5-opt" data-mid="' + idx + '" data-opt="' + esc(c.key) + '" ' +
       'style="display:flex;align-items:center;gap:8px;padding:7px 9px;margin-bottom:5px;border:1px solid var(--border-color);border-radius:8px;cursor:pointer;transition:var(--transition);background:var(--bg-card);">' +
       '<span style="width:22px;height:22px;border-radius:50%;background:' + col + ';color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;">' + (i + 1) + '</span>' +
       '<span style="font-size:10px;padding:2px 6px;border-radius:6px;color:' + col + ';background:' + bg + ';white-space:nowrap;">' + esc(c.dim) + '</span>' +
       '<span style="flex:1;font-size:13px;font-weight:600;color:var(--text-primary);">' + esc(c.label) + '</span>' +
-      '<span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);white-space:nowrap;">' + esc(oddTxt) + '</span>' +
+      '<span style="font-family:var(--font-mono);font-size:12px;color:' + (odd ? 'var(--text-muted)' : 'var(--c-amber)') + ';white-space:nowrap;">' + esc(oddTxt) + '</span>' +
       '<span style="font-family:var(--font-mono);font-size:13px;color:' + col + ';font-weight:700;min-width:48px;text-align:right;">' + pct(c.p) + '</span>' +
       '</div>';
     }).join('');
@@ -286,6 +290,7 @@
     '</div>' +
     '<div style="margin-top:12px;">' +
       '<div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">🎯 概率最高 Top 5 结果（点击选择）</div>' +
+      '<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">以竞彩可买项为准 · 标"未开售"的该项竞彩无此玩法或盘口</div>' +
       top5Html +
       '<div style="font-size:10px;color:var(--text-muted);margin-top:4px;">⚠️ 选择仅为辅助参考，竞彩长期负 EV，请理性仓位。</div>' +
     '</div>' +

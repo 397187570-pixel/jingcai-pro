@@ -139,8 +139,8 @@ async function loadMatches() {
     if (!result || proxyFailed) {
       // 降级/默认：竞彩官网直连（CORS 开放，静态部署可直接访问）
       // 规则：只展示中国竞彩选定的比赛，其他联赛一律不展示
-      logStep('竞彩官网直连（webapi.sporttery.cn）...', true);
-      const direct = await SportteryApi.getMatches('HAD');
+      logStep('竞彩官网直连（webapi.sporttery.cn，HAD+HHAD 全玩法）...', true);
+      const direct = await SportteryApi.getMatches('HAD,HHAD');
       logStep('竞彩 → ' + (direct.ok ? (direct.data ? direct.data.length + ' 场' : '0 场') : ('ERR: ' + direct.error)), direct.ok && direct.data && direct.data.length > 0);
       if (direct.ok && direct.data && direct.data.length) {
         result = direct;
@@ -178,7 +178,8 @@ async function loadMatches() {
         time: m.matchTime || m.time,
         date: m.matchDate || m.date,
         odds: m.had ? { h: parseFloat(m.had.h), d: parseFloat(m.had.d), a: parseFloat(m.had.a) } : null,
-        handicap: m.hhad ? m.hhad.goalLine : ''
+        hhad: m.hhad && m.hhad.h ? { h: +m.hhad.h, d: +m.hhad.d, a: +m.hhad.a, line: m.hhad.goalLine } : null,
+        handicap: m.hhad && m.hhad.goalLine ? Number(String(m.hhad.goalLine).replace('+', '')) : ''
       }));
     } else if (dataSource.startsWith('football-data')) {
       matches = result.data || [];

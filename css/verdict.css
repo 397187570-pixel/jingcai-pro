@@ -337,6 +337,7 @@
   margin-right: var(--space-3);
   white-space: nowrap;
 }
+.verdict-top5-odds.verdict-top5-na { color: var(--c-amber); opacity: 0.85; font-size: 11px; }
 
 /* 方法论 */
 .verdict-method-grid {

@@ -122,6 +122,8 @@
           status: m.matchStatus,
           odds: m.had ? { h: +m.had.h, d: +m.had.d, a: +m.had.a } : null,
           hhad: m.hhad && m.hhad.h ? { h: +m.hhad.h, d: +m.hhad.d, a: +m.hhad.a, line: m.hhad.goalLine } : null,
+          // 竞彩真实让球盘口（顶层，研判/串关统一读取）；'+1'=主受让1，'-1'=主让1
+          handicap: m.hhad && m.hhad.goalLine ? Number(String(m.hhad.goalLine).replace('+', '')) : '',
           crs: Object.keys(m.crs || {}).length ? m.crs : null,
           ttg: Object.keys(m.ttg || {}).length ? m.ttg : null,
           hafu: Object.keys(m.hafu || {}).length ? m.hafu : null

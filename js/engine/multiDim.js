@@ -248,6 +248,36 @@ function buildMultiDim(target, opts) {
   const tg = totalGoals(xg.homeXg, xg.awayXg, mg);
   const ah = asianHandicap(xg.homeXg, xg.awayXg, line, mg);
 
+  // 竞彩可买盘口换算：模型建议盘口可能是 0.75 这类竞彩没有的四分盘。
+  // 竞彩 HHAD 只开整数盘，把建议盘口按"主队让/受让方向"吸附到最近整数盘，
+  // 并给出"建议盘一侧概率 = 可买整数盘哪几项之和"的对照，避免展示买不到的概率。
+  let jcConvert = null;
+  if (typeof o.line === 'number' && !Number.isNaN(o.line)) {
+    // 已有竞彩真实盘口：可直接买，无需换算
+    jcConvert = { needed: false, buyLine: line, buyAsian: ah, mapping: null };
+  } else {
+    // 模型建议盘口：吸附到最近整数盘（0 视为平手，也不可买让球盘则保留说明）
+    const dir = line < 0 ? -1 : 1;                       // 主让 / 主受让
+    const mag = Math.abs(line);
+    let buyMag = Math.round(mag);                         // 最近整数
+    if (buyMag === 0) buyMag = 1;                         // 平手盘无让球玩法，给最接近的 ±1
+    const buyLine = dir * buyMag;
+    const buyAsian = asianHandicap(xg.homeXg, xg.awayXg, buyLine, mg);
+    // 例：建议主受让0.75(dir=+1, mag=0.75→buy1)。建议让负=客净胜≥1球
+    //     = 可买+1盘的(让平=客恰净胜1 + 让负=客净胜≥2)。让胜同盘一致。
+    // 例：建议主让0.75(dir=-1)→buy-1。建议让胜=主净胜≥1球 = -1盘(让胜+让平)。
+    let mapping;
+    if (mag - Math.floor(mag) > 0 && Math.floor(mag) < buyMag) {
+      // 四分/半球盘，吸附到"更大让球"的整数盘，一侧概率被拆成两项
+      mapping = dir > 0
+        ? { side: 'away', parts: ['ah-draw', 'ah-away'] } // 主受让：建议让负 = 可买盘 让平+让负
+        : { side: 'home', parts: ['ah-home', 'ah-draw'] }; // 主让：建议让胜 = 可买盘 让胜+让平
+    } else {
+      mapping = null;
+    }
+    jcConvert = { needed: true, suggestLine: line, buyLine: buyLine, buyAsian: buyAsian, mapping: mapping };
+  }
+
   // 汇总所有维度的候选结果（每个维度各自归一，概率口径一致可直接比较）
   const cells = [];
   cells.push({ dim: '胜平负', key: '1x2-home', label: '主胜', p: homeWin });
@@ -275,6 +305,7 @@ function buildMultiDim(target, opts) {
     scoreMatrix: sm,
     totalGoals: tg,
     asian: ah,
+    jcConvert: jcConvert,
     cells: cells,
     top5: top5
   };

@@ -171,8 +171,13 @@
       return { label: s.score.replace(':', '-') + ' ' + pct(s.p), p: s.p, color: 'var(--c-blue)' };
     });
 
+    // 以竞彩可买盘口为准：AppState.matches 已带真实 handicap，buildMulti 用它重算 md.asian。
+    // 仅当竞彩该场没开让球盘时，才退回模型建议并明确标注"竞彩未开售，不可下单"。
+    const ahSub = md.lineSuggested
+      ? '让球 ' + md.lineLabel + ' · 模型建议（竞彩未开售，不可下单）'
+      : '竞彩让球 ' + md.lineLabel + ' · 可买';
     return renderDimCard('胜平负', null, wdlRows) +
-      renderDimCard('让胜平负', '让球 ' + md.lineLabel + (md.lineSuggested ? ' · 模型建议' : ' · 竞彩盘口'), ahRows) +
+      renderDimCard('让胜平负', ahSub, ahRows) +
       renderDimCard('进球数', null, goalRows) +
       renderDimCard('比分', null, scoreRows);
   }
@@ -196,18 +201,20 @@
     const rows = top5.map(function (c, i) {
       const rank = i + 1;
       const odd = getOddsForCell(c, m);
-      const oddTxt = odd ? ('@ ' + Number(odd).toFixed(2)) : '';
+      // 以竞彩可买为准：有竞彩赔率=可下单；无赔率（含让球玩法未开售/进球数比分未开）=未开售
+      const oddTxt = odd ? ('@ ' + Number(odd).toFixed(2)) : '未开售';
+      const oddCls = odd ? 'verdict-top5-odds' : 'verdict-top5-odds verdict-top5-na';
       return `<div class="verdict-top5-row">
         <span class="verdict-top5-rank">${rank}</span>
         <span class="verdict-top5-name">${esc(c.label)} · ${esc(c.dim)}</span>
-        <span class="verdict-top5-odds">${esc(oddTxt)}</span>
+        <span class="${oddCls}">${esc(oddTxt)}</span>
         <span class="${rankColorClass(rank)}">${pct(c.p)}</span>
       </div>`;
     }).join('');
 
     return `
       <div class="verdict-top5-header">🎯 概率最高 Top5 结果（点击选择）</div>
-      <div class="verdict-top5-sub">跨维度归一 · 概率口径一致 · 供你优先参考</div>
+      <div class="verdict-top5-sub">跨维度归一 · 概率口径一致 · 以竞彩可买项为准 · 标"未开售"的该项竞彩无此玩法</div>
       <div class="verdict-top5-body">${rows || '<div class="verdict-top5-row">暂无数据</div>'}</div>
     `;
   }
