@@ -213,7 +213,8 @@
         zhHome: m.homeTeamFull || m.homeTeam || '主队',
         zhAway: m.awayTeamFull || m.awayTeam || '客队',
         jc_h: jc[0], jc_d: jc[1], jc_a: jc[2],
-        code: m.code || '', league: m.league || '', time: m.time || ''
+        code: m.code || '', league: m.league || '',
+        date: m.date || '', time: m.time || ''
       };
       var res = null, usedModel = false, euArr = null;
       if (m.eu_avg) {
@@ -275,15 +276,27 @@
     return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; });
   }
 
+  // 竞彩销售日跨零点：今天在售的场次常在次日凌晨/白天开赛，必须把开赛时间摆在明面上
+  function kickoffText(meta) {
+    var d = (meta.date || '').slice(5);   // 2026-11-24 -> 11-24
+    var t = (meta.time || '').slice(0, 5); // 02:00:00 -> 02:00
+    if (d && t) return d + ' ' + t;
+    return d || t || '';
+  }
+
   function renderLegs(legs) {
     return '<ol class="parlay-legs">' + legs.map(function (x) {
       var evCls = x.ev >= 0 ? 'pos' : 'neg';
       var pick = (x.double ? '<span class="pl-double">双选</span> ' : '') + x.sideZh + ' @' + x.jc.toFixed(2);
+      var kick = kickoffText(x.meta || {});
+      var kickHtml = kick
+        ? '<span class="pl-kick" style="font-size:11px;color:var(--color-text-secondary);margin-left:6px;">' + esc(kick) + ' 开赛</span>'
+        : '';
       var tags = (x.ruleTags && x.ruleTags.length)
         ? '<div class="pl-rule-tags" style="font-size:11px;color:var(--color-text-secondary);margin-top:3px;">' +
           x.ruleTags.map(function (t) { return '<span title="历史回放规则修正">· ' + esc(t) + '</span>'; }).join(' ') + '</div>'
         : '';
-      return '<li><span class="pl-teams">' + esc((x.meta.zhHome || '') + ' vs ' + (x.meta.zhAway || '')) +
+      return '<li><span class="pl-teams">' + esc((x.meta.zhHome || '') + ' vs ' + (x.meta.zhAway || '')) + kickHtml +
         '</span><span class="pl-pick">' + pick +
         '</span><span class="pl-prob">' + (x.prob * 100).toFixed(1) + '%</span>' +
         '<span class="pl-ev ' + evCls + '">' + (x.ev >= 0 ? '+' : '') + (x.ev * 100).toFixed(1) + 'pp</span>' + tags + '</li>';
@@ -348,7 +361,7 @@
   function paintRec(container, rec, info) {
     if (!rec) { container.innerHTML = '<div class="empty-hint">无可分析场次。</div>'; return; }
     var srcLabel = info.isCurrent
-      ? '基于当日 ' + rec.analyzedN + ' 场可购买竞彩场次'
+      ? '今日在售 ' + rec.analyzedN + ' 场（含次日开赛，已标时间）'
       : '基于 ' + rec.analyzedN + ' 场历史回测（不可购买）';
     var modelLabel = rec.usedModel ? 'P8 模型（2159 场历史校准）' : '竞彩去抽水隐含概率';
     var demoBanner = info.fallback
@@ -358,7 +371,8 @@
       demoBanner +
       '<div class="patterns-head">AI 串关推荐 · ' + srcLabel + ' · ' + modelLabel + ' · 双策略（市场有效，组合 EV 多为负，仅作风险/回报取舍参考）</div>' +
       '<div class="parlay-row">' + renderCard(rec.stable) + renderCard(rec.cold) + '</div>' +
-      '<div class="patterns-foot">组合 EV = 组合模型概率 ×(组合赔率−1) −(1−组合概率)，竞彩串关赔率为各腿相乘。' +
+      '<div class="patterns-foot">竞彩销售日跨零点：今日在售场次多为次日凌晨/白天开赛，推荐腿已标注具体开赛时间；均可在今天下单。' +
+      '组合 EV = 组合模型概率 ×(组合赔率−1) −(1−组合概率)，竞彩串关赔率为各腿相乘。' +
       '因多次抽水叠加，组合 EV 通常为负；「稳妥型」主打高命中、「冷门型」主打高回报，均为风险偏好选择，不构成必胜建议。' +
       (info.isCurrent && !rec.usedModel ? '（当前比赛未接入国际均价，概率取自竞彩去抽水隐含值；开启国际赔率采集后自动升级为 P8 模型。）' : '') +
       '</div>';
