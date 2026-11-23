@@ -199,14 +199,43 @@
     return true;
   }
 
+  // 竞彩销售日：当日 10:00 ≤ 开赛时间 < 次日 10:00。
+  // 以 10:00 为界；若当前时刻在 10:00 之前，则归属"昨日 10:00 ~ 今日 10:00"这个销售日。
+  function salesWindow(now) {
+    var d = (now instanceof Date) ? new Date(now.getTime()) : (now ? new Date(now) : new Date());
+    var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 10, 0, 0, 0);
+    if (d.getTime() < start.getTime()) start.setDate(start.getDate() - 1);
+    var end = new Date(start.getTime());
+    end.setDate(end.getDate() + 1);
+    return { start: start, end: end };
+  }
+
+  // 开赛时间是否落在当前销售日窗口内。
+  // 无开赛日期/时间时无法判断 → 降级保留（仍受 isPurchasable 在售约束），避免误杀。
+  function inSalesWindow(m, now) {
+    if (!m) return false;
+    var date = m.date || m.matchDate || '';
+    var time = m.time || m.matchTime || '';
+    var dm = String(date).match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (!dm) return true;
+    var tm = String(time).match(/^(\d{1,2}):(\d{1,2})/);
+    var hh = tm ? +tm[1] : 0;
+    var mm = tm ? +tm[2] : 0;
+    var kick = new Date(+dm[1], +dm[2] - 1, +dm[3], hh, mm, 0, 0);
+    if (isNaN(kick.getTime())) return true;
+    var w = salesWindow(now);
+    return kick.getTime() >= w.start.getTime() && kick.getTime() < w.end.getTime();
+  }
+
   // 把"当日比赛"转成与历史记录相同的 scored 行（供 buildStable/buildCold 复用）
   // 有国际均价时走 P8 多源融合模型；否则用竞彩去抽水隐含概率（诚实降级，仍需如实标注）
-  function scoreCurrentMatches(matches) {
+  function scoreCurrentMatches(matches, now) {
     var OM = (typeof window !== 'undefined' ? window : globalThis).OddsModel;
     var rows = [];
     for (var i = 0; i < (matches || []).length; i++) {
       var m = matches[i];
       if (!isPurchasable(m)) continue; // 只保留当日竞彩在售场次
+      if (!inSalesWindow(m, now)) continue; // 只保留当前竞彩销售日窗口内开赛的场次
       var jc = extractOdds(m);
       if (!jc || jc.some(function (v) { return !(v > 1); })) continue;
       var meta = {
@@ -361,7 +390,7 @@
   function paintRec(container, rec, info) {
     if (!rec) { container.innerHTML = '<div class="empty-hint">无可分析场次。</div>'; return; }
     var srcLabel = info.isCurrent
-      ? '今日在售 ' + rec.analyzedN + ' 场（含次日开赛，已标时间）'
+      ? '今日在售 ' + rec.analyzedN + ' 场（销售日 10:00~次日10:00 开赛，已标时间）'
       : '基于 ' + rec.analyzedN + ' 场历史回测（不可购买）';
     var modelLabel = rec.usedModel ? 'P8 模型（2159 场历史校准）' : '竞彩去抽水隐含概率';
     var demoBanner = info.fallback
@@ -371,7 +400,7 @@
       demoBanner +
       '<div class="patterns-head">AI 串关推荐 · ' + srcLabel + ' · ' + modelLabel + ' · 双策略（市场有效，组合 EV 多为负，仅作风险/回报取舍参考）</div>' +
       '<div class="parlay-row">' + renderCard(rec.stable) + renderCard(rec.cold) + '</div>' +
-      '<div class="patterns-foot">竞彩销售日跨零点：今日在售场次多为次日凌晨/白天开赛，推荐腿已标注具体开赛时间；均可在今天下单。' +
+      '推荐口径：只纳入开赛时间落在竞彩销售日「今日 10:00 ~ 次日 10:00」内的在售场次，跨到下一销售日的场次不纳入；推荐腿已标注具体开赛时间，均可在今天下单。' +
       '组合 EV = 组合模型概率 ×(组合赔率−1) −(1−组合概率)，竞彩串关赔率为各腿相乘。' +
       '因多次抽水叠加，组合 EV 通常为负；「稳妥型」主打高命中、「冷门型」主打高回报，均为风险偏好选择，不构成必胜建议。' +
       (info.isCurrent && !rec.usedModel ? '（当前比赛未接入国际均价，概率取自竞彩去抽水隐含值；开启国际赔率采集后自动升级为 P8 模型。）' : '') +
@@ -403,7 +432,7 @@
   function renderNoLiveState(container, legs, opts) {
     container.innerHTML = '<div class="empty-hint">' +
       '<b>暂无当日可购买的竞彩串关</b><br>' +
-      '本面板只使用今日竞彩在售（Selling）且赔率可读的场次，不用历史比赛凑数。<br>' +
+      '本面板只使用今日竞彩在售（Selling）、开赛时间落在销售日 10:00~次日10:00 内且赔率可读的场次，不用历史比赛凑数。<br>' +
       '<button type="button" class="parlay-hist-demo" style="margin-top:8px;padding:6px 12px;cursor:pointer;' +
       'background:var(--color-bg-elevated,rgba(255,255,255,.06));color:var(--color-text-primary);' +
       'border:1px solid var(--color-border);border-radius:8px;">查看历史回测演示（非当日推荐，不可下单）</button>' +
@@ -427,7 +456,7 @@
 
   var api = {
     combine: combine, buildStable: buildStable, buildCold: buildCold, buildDoubleStable: buildDoubleStable, buildDoubleCold: buildDoubleCold,
-    isPurchasable: isPurchasable,
+    isPurchasable: isPurchasable, salesWindow: salesWindow, inSalesWindow: inSalesWindow,
     scoreCurrentMatches: scoreCurrentMatches, recommendFromScored: recommendFromScored,
     recommend: recommend, renderParlayPanel: renderParlayPanel, renderCard: renderCard,
     setOption: setOption, getOption: function (k) { return OPTS[k]; }
