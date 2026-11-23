@@ -652,3 +652,33 @@
 /* 暗色下的复盘强调 */
 [data-theme="dark"] .cmp-combo.cmp-hit { background: rgba(46,201,138,.12); }
 [data-theme="dark"] .cmp-combo.cmp-miss { background: rgba(246,88,107,.12); }
+
+/* ===== 移动端：AI 串关推荐排版（窄屏防竖排/裁切） ===== */
+.pl-double { white-space: nowrap; }
+.pl-kick { font-size: 11px; color: var(--text-muted); margin-left: 6px; white-space: nowrap; }
+
+@media (max-width: 768px) {
+  /* 两张策略卡在窄屏改单列纵向排列，避免右侧卡片被裁切 */
+  .parlay-row { grid-template-columns: 1fr; gap: 12px; }
+  .parlay-card { min-width: 0; padding: 12px; }
+  .parlay-card-head { flex-wrap: wrap; }
+  .patterns-head { line-height: 1.6; overflow-wrap: anywhere; }
+
+  /* 每条腿改两行网格：第一行 队名 + 概率/EV，第二行 投注选项整行 */
+  .parlay-legs li {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "teams prob ev"
+      "pick  pick pick";
+    gap: 5px 8px;
+    padding: 9px 0;
+  }
+  .parlay-legs li .pl-teams { grid-area: teams; min-width: 0; font-size: 13px; }
+  .parlay-legs li .pl-kick { display: block; margin: 2px 0 0; }
+  .parlay-legs li .pl-pick  { grid-area: pick; white-space: nowrap; }
+  .parlay-legs li .pl-prob  { grid-area: prob; text-align: right; white-space: nowrap; }
+  .parlay-legs li .pl-ev    { grid-area: ev; text-align: right; white-space: nowrap; }
+  .parlay-legs li .pl-rule-tags { grid-column: 1 / -1; margin-top: 0; }
+  .parlay-stats { gap: 12px; }
+  .parlay-note, .parlay-strategy, .patterns-advice { line-height: 1.6; overflow-wrap: anywhere; }
+}

@@ -319,7 +319,7 @@
       var pick = (x.double ? '<span class="pl-double">双选</span> ' : '') + x.sideZh + ' @' + x.jc.toFixed(2);
       var kick = kickoffText(x.meta || {});
       var kickHtml = kick
-        ? '<span class="pl-kick" style="font-size:11px;color:var(--color-text-secondary);margin-left:6px;">' + esc(kick) + ' 开赛</span>'
+        ? '<span class="pl-kick">' + esc(kick) + ' 开赛</span>'
         : '';
       var tags = (x.ruleTags && x.ruleTags.length)
         ? '<div class="pl-rule-tags" style="font-size:11px;color:var(--color-text-secondary);margin-top:3px;">' +
