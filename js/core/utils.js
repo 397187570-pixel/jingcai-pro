@@ -144,9 +144,14 @@ function getOddsForCell(cell, m) {
     return m.hhad && m.hhad[map[cell.key]];
   }
   if (cell.dim === '进球数') {
-    const g = String(cell.key).replace('goals-', '');
+    let g = String(cell.key).replace('goals-', '');
+    // 竞彩 TTG 只有 s0~s7，其中 s7 = "7+球"。模型 maxGoals 默认 8，会产出 7+/8+ 桶，
+    // 必须把这些 plus 桶归一到 s7，否则 Top5 命中 7+/8+ 时误显示"未开售"。
+    const plusMatch = g.match(/^(\d+)\+$/);
+    if (plusMatch) g = '7'; // 任意 plus 桶（7+/8+...）→ 竞彩最高档 s7（7+球）
+    if (!m.ttg) return null;
     // 竞彩官方字段 s0/s1/.../s7；兼容已规范化的纯数字键
-    return m.ttg && (m.ttg['s' + g] != null ? m.ttg['s' + g] : m.ttg[g]);
+    return m.ttg['s' + g] != null ? m.ttg['s' + g] : m.ttg[g];
   }
   if (cell.dim === '比分') {
     let s = String(cell.key).replace('score-', '');

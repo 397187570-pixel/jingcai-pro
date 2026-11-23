@@ -122,14 +122,28 @@ async function loadMatches() {
        SCF 可能因欠费/停服返回 410（InsufficientBalance），且失败响应无 CORS 头，
        浏览器 fetch 直接抛 "Load failed"。此时必须降级，不能让整个看板空白。 */
     let proxyFailed = false;
+    let proxyFallback = null; // 代理数据兜底：SCF 常只返回 HAD 单玩法
     if (proxyUrl) {
       try {
         const res = await fetch(proxyUrl + '/api/matches');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const body = await res.json();
-        logStep('SCF 代理: ' + proxyUrl, true);
-        result = { ok: true, data: body, isProxy: true };
-        dataSource = 'scf-proxy';
+        // 玩法完整性检测：SCF 代理当前仅返回 playType=HAD，hhad/ttg/crs/hafu 全为 null。
+        // 若直接用，研判页让球/进球数/比分会全部显示"未开售"——必须降级直连补全。
+        const hasFullPlays = (body.matches || []).some(m =>
+          (m.ttg && Object.keys(m.ttg).length) ||
+          (m.crs && Object.keys(m.crs).length) ||
+          (m.hhad && m.hhad.h)
+        );
+        if (hasFullPlays) {
+          logStep('SCF 代理: ' + proxyUrl + '（全玩法）', true);
+          result = { ok: true, data: body, isProxy: true };
+          dataSource = 'scf-proxy';
+        } else {
+          proxyFallback = { ok: true, data: body, isProxy: true };
+          proxyFailed = true;
+          logStep('SCF 代理仅含 HAD 单玩法（缺让球/进球数/比分），降级竞彩官网直连补全', false);
+        }
       } catch (e) {
         proxyFailed = true;
         logStep('SCF 代理不可用（' + (e.message || e) + '），降级直连竞彩官网', false);
@@ -140,11 +154,17 @@ async function loadMatches() {
       // 降级/默认：竞彩官网直连（CORS 开放，静态部署可直接访问）
       // 规则：只展示中国竞彩选定的比赛，其他联赛一律不展示
       logStep('竞彩官网直连（webapi.sporttery.cn，HAD+HHAD+TTG+CRS+HAFU 全玩法）...', true);
-      const direct = await SportteryApi.getMatches('HAD,HHAD,TTG,CRS,HAFU');
+      // forceDirect=true：绕过可能残留的 SCF 代理配置，强制直连竞彩官网拿全玩法
+      const direct = await SportteryApi.getMatches('HAD,HHAD,TTG,CRS,HAFU', true);
       logStep('竞彩 → ' + (direct.ok ? (direct.data ? direct.data.length + ' 场' : '0 场') : ('ERR: ' + direct.error)), direct.ok && direct.data && direct.data.length > 0);
       if (direct.ok && direct.data && direct.data.length) {
         result = direct;
         dataSource = 'sporttery';
+      } else if (proxyFallback) {
+        // 直连失败但代理仍有场次：回退代理（仅胜平负）并在诊断里如实说明，不让看板空白
+        logStep('直连失败，回退 SCF 代理（仅胜平负，让球/进球数/比分显示未开售）', false);
+        result = proxyFallback;
+        dataSource = 'scf-proxy';
       } else if (proxyUrl && !proxyFailed && direct.ok && direct.data && !direct.data.length) {
         // 代理成功但竞彩当天确实无场次：保持代理结果，如实走空态
         result = direct;

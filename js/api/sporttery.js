@@ -31,12 +31,14 @@
     //   1) JC_API_BASE 为代理域名（如 SCF 云函数）→ 走代理: {BASE}/api/sporttery/*
     //   2) JC_API_BASE 为空字符串且设置了 JC_DIRECT（云端静态部署）→ 直连竞彩官网（CORS 开放, Access-Control-Allow-Origin:*）
     //   3) 其他（Node 环境）→ 直接 https://webapi.sporttery.cn/*
+    // forceDirect=true：忽略 JC_API_BASE/JC_DIRECT，强制直连竞彩官网（用于代理仅含 HAD 时补全全玩法）
+    const forceDirect = options.forceDirect === true;
     let url;
     if (typeof window !== 'undefined') {
-      const base = window.JC_API_BASE || '';
+      const base = forceDirect ? '' : (window.JC_API_BASE || '');
       if (base) {
         url = base + '/api/sporttery' + path;
-      } else if (window.JC_DIRECT) {
+      } else if (forceDirect || window.JC_DIRECT) {
         url = 'https://' + cfg.base + path;
       } else {
       // 本地预览：同源走 local_server.py 代理
@@ -71,10 +73,10 @@
  * 获取在售比赛（支持 5 种玩法）
  * @param {string} [playType='HAD'] HAD/HHAD/CRS/TTG/HAFU
  */
-  async function getMatches(playType = 'HAD') {
+  async function getMatches(playType = 'HAD', forceDirect = false) {
     const cfg = CONFIG.dataSources.sporttery;
     const path = `${cfg.paths.calculator}?poolCode=${playType}&channel=${cfg.channel}`;
-    const result = await request(path);
+    const result = await request(path, { forceDirect });
 
     if (!result.ok) return { ok: false, error: result.error };
     return { ok: true, data: normalizeMatches(result.data) };
