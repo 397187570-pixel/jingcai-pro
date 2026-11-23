@@ -189,6 +189,16 @@
     };
   }
 
+  // 当日可购买判定：竞彩官方 matchStatus='Selling' 才算在售；
+  // 代理/历史结构可能没有 status，只要赔率有效就按可购买处理（不误杀）。
+  // 已完场/停售/取消的场次绝不进入串关，避免推荐无法下单的历史比赛。
+  function isPurchasable(m) {
+    if (!m) return false;
+    var s = String(m.status || m.matchStatus || '').toLowerCase();
+    if (s && s !== 'selling' && s !== 'sale' && s !== 'onsale' && s !== 'open') return false;
+    return true;
+  }
+
   // 把"当日比赛"转成与历史记录相同的 scored 行（供 buildStable/buildCold 复用）
   // 有国际均价时走 P8 多源融合模型；否则用竞彩去抽水隐含概率（诚实降级，仍需如实标注）
   function scoreCurrentMatches(matches) {
@@ -196,6 +206,7 @@
     var rows = [];
     for (var i = 0; i < (matches || []).length; i++) {
       var m = matches[i];
+      if (!isPurchasable(m)) continue; // 只保留当日竞彩在售场次
       var jc = extractOdds(m);
       if (!jc || jc.some(function (v) { return !(v > 1); })) continue;
       var meta = {
@@ -337,11 +348,11 @@
   function paintRec(container, rec, info) {
     if (!rec) { container.innerHTML = '<div class="empty-hint">无可分析场次。</div>'; return; }
     var srcLabel = info.isCurrent
-      ? '基于当日 ' + rec.analyzedN + ' 场在售比赛'
-      : '基于 ' + rec.analyzedN + ' 场历史回测';
+      ? '基于当日 ' + rec.analyzedN + ' 场可购买竞彩场次'
+      : '基于 ' + rec.analyzedN + ' 场历史回测（不可购买）';
     var modelLabel = rec.usedModel ? 'P8 模型（2159 场历史校准）' : '竞彩去抽水隐含概率';
     var demoBanner = info.fallback
-      ? '<div class="parlay-demo-banner">⚠️ 演示数据：当前无在售场次或赔率暂不可读，以下为 <b>' + rec.analyzedN + ' 场历史回测样本</b>，<b>非当日真实推荐</b>，仅供模型与界面演示。接入竞彩 / SCF 代理实时数据后自动切换为当日串关。</div>'
+      ? '<div class="parlay-demo-banner">⚠️ 演示数据：当前无当日可购买场次或赔率暂不可读，以下为 <b>' + rec.analyzedN + ' 场历史回测样本</b>，<b>非当日真实推荐、不可下单</b>，仅供模型与界面演示。接入竞彩实时数据后自动切换为当日串关。</div>'
       : '';
     container.innerHTML =
       demoBanner +
@@ -357,7 +368,7 @@
     if (!container) return;
     legs = legs || 3;
 
-    // 1) 当日比赛优先：有数据且可打分 → 直接展示当日串关（修复"显示历史比赛"问题）
+    // 1) 当日可购买场次优先（status=Selling 且赔率可读）→ 只展示能下单的串关
     if (Array.isArray(matches) && matches.length) {
       var scored = scoreCurrentMatches(matches);
       if (scored.length) {
@@ -370,8 +381,21 @@
       }
     }
 
-    // 2) 无当日数据 / 当日赔率不可读 → 历史回测演示（明确标注，非当日推荐）
-    renderParlayFallback(container, legs, opts);
+    // 2) 无当日可购买场次 → 如实空态，不自动拿历史比赛凑数。
+    //    历史回测演示改为用户显式点击才加载，且明确标注不可下单。
+    renderNoLiveState(container, legs, opts);
+  }
+
+  function renderNoLiveState(container, legs, opts) {
+    container.innerHTML = '<div class="empty-hint">' +
+      '<b>暂无当日可购买的竞彩串关</b><br>' +
+      '本面板只使用今日竞彩在售（Selling）且赔率可读的场次，不用历史比赛凑数。<br>' +
+      '<button type="button" class="parlay-hist-demo" style="margin-top:8px;padding:6px 12px;cursor:pointer;' +
+      'background:var(--color-bg-elevated,rgba(255,255,255,.06));color:var(--color-text-primary);' +
+      'border:1px solid var(--color-border);border-radius:8px;">查看历史回测演示（非当日推荐，不可下单）</button>' +
+      '</div>';
+    var btn = container.querySelector('.parlay-hist-demo');
+    if (btn) btn.addEventListener('click', function () { renderParlayFallback(container, legs, opts); });
   }
 
   // 历史回测演示：仅在无当日可分析场次时作为兜底，明确标注为演示数据（不冒充当日推荐）
@@ -389,6 +413,7 @@
 
   var api = {
     combine: combine, buildStable: buildStable, buildCold: buildCold, buildDoubleStable: buildDoubleStable, buildDoubleCold: buildDoubleCold,
+    isPurchasable: isPurchasable,
     scoreCurrentMatches: scoreCurrentMatches, recommendFromScored: recommendFromScored,
     recommend: recommend, renderParlayPanel: renderParlayPanel, renderCard: renderCard,
     setOption: setOption, getOption: function (k) { return OPTS[k]; }
