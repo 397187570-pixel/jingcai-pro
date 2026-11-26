@@ -1,41 +1,41 @@
 {
   "type": "confidence_calibration",
   "version": "2.0.0-daily",
-  "n_matches": 9526,
-  "cumulative_total": 9526,
+  "n_matches": 9553,
+  "cumulative_total": 9553,
   "brier_score": 0.0003,
-  "mean_abs_bias": 0.0131,
-  "generated_at": "2026-11-25 13:51",
+  "mean_abs_bias": 0.0133,
+  "generated_at": "2026-11-26 10:18",
   "table": [
     {
       "range": "0.3-0.4",
       "predicted": 0.3767,
-      "actual": 0.3913,
-      "count": 1467
+      "actual": 0.3918,
+      "count": 1470
     },
     {
       "range": "0.4-0.5",
-      "predicted": 0.4471,
-      "actual": 0.4461,
-      "count": 3060
+      "predicted": 0.4472,
+      "actual": 0.4459,
+      "count": 3066
     },
     {
       "range": "0.5-0.6",
       "predicted": 0.5488,
-      "actual": 0.5245,
-      "count": 2370
+      "actual": 0.5242,
+      "count": 2373
     },
     {
       "range": "0.6-0.7",
-      "predicted": 0.6468,
-      "actual": 0.6562,
-      "count": 1629
+      "predicted": 0.6469,
+      "actual": 0.6565,
+      "count": 1636
     },
     {
       "range": "0.7-0.8",
-      "predicted": 0.7447,
-      "actual": 0.7726,
-      "count": 963
+      "predicted": 0.7448,
+      "actual": 0.7724,
+      "count": 971
     },
     {
       "range": "0.8-0.9",
